@@ -1,0 +1,82 @@
+# R
+.Rhistory
+.Rapp.history
+.RData
+.Ruserdata
+*.Rproj.user
+*.Rproj
+*.rda
+*.rds
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv
+*.pkl
+*.pth
+*.pt
+*.onnx
+*.h5
+*.hdf5
+
+# Data files
+*.csv
+*.xlsx
+*.xls
+*.npy
+*.npz
+
+# Model files (too large for GitHub)
+*.pkl
+*.pth
+*.pt
+*.onnx
+*.h5
+*.hdf5
+*.json
+catboost_info/
+
+# Images
+*.png
+*.jpg
+*.jpeg
+*.gif
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+*.out
+
+# Temporary files
+*.tmp
+*.temp
+~$*
+
+# Keep best_model structure but ignore large files
+R_scripts/best_model/*.pkl
+R_scripts/best_model/*.pth
+R_scripts/best_model/*.onnx
+R_scripts/best_model/*.json
+R_scripts/best_model/*.csv
+
+# But keep the scripts
+!R_scripts/best_model/*.R
+!R_scripts/best_model/README*.txt
+
