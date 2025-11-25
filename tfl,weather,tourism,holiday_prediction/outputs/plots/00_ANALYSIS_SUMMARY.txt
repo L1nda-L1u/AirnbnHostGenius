@@ -1,0 +1,32 @@
+==========================================================
+COMPONENT DESCRIPTIVE ANALYSIS SUMMARY
+==========================================================
+
+Analysis Date: 2025-11-25 
+Data Period: 17897 to 20432 
+Total Days: 2536 
+
+COMPONENTS ANALYZED:
+
+1. TfL TRANSPORT
+   - Mean daily journeys:  8.63  million
+   - Median:  9.58  million
+   - Date range:  17897  to  20432 
+
+2. TOURISM
+   - Mean quarterly visits:  6016  thousand
+   - Median:  6126  thousand
+   - Date range:  17897  to  20432 
+
+3. WEATHER
+   - Mean temperature:  11.4 °C
+   - Mean weather quality:  0.755 
+
+KEY CORRELATIONS:
+   - TfL vs Tourism:  -0.468 
+   - TfL vs Temperature:  0.04 
+   - Tourism vs Temperature:  0.556 
+
+==========================================================
+All visualizations saved to: outputs/plots/
+==========================================================
