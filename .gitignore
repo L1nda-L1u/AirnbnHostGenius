@@ -80,20 +80,3 @@ R_scripts/best_model/*.csv
 !R_scripts/best_model/*.R
 !R_scripts/best_model/README*.txt
 
-# R_pure_models - keep scripts, README, and dataset; ignore large model files
-R_pure_models/*.xgb
-R_pure_models/*.pt
-R_pure_models/*.rds
-R_pure_models/*.png
-!R_pure_models/*.R
-!R_pure_models/README.md
-!R_pure_models/verify_paths.R
-!R_pure_models/*.Rproj
-!R_pure_models/*.csv
-
-# Archive folder
-archive/
-
-# Temporary files
-.RDataTmp
-.Rproj.user
