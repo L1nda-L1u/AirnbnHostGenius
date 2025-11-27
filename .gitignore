@@ -80,3 +80,4 @@ R_scripts/best_model/*.csv
 !R_scripts/best_model/*.R
 !R_scripts/best_model/README*.txt
 
+.Rproj.user
