@@ -33,9 +33,10 @@ if (!require(reticulate, quietly = TRUE)) {
   if (!py_available()) {
     # 尝试使用已知的Python路径
     python_paths <- c(
-      "C:/Users/linda/AppData/Local/Programs/Python/Python310/python.exe",
-      "C:/Python310/python.exe",
-      "C:/Python39/python.exe"
+      Sys.which("python3"),
+      Sys.which("python"),
+      "/usr/bin/python3",
+      "/usr/local/bin/python3"
     )
     
     python_configured <- FALSE

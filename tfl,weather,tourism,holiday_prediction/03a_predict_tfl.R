@@ -10,7 +10,8 @@ library(lubridate)
 library(forecast)
 library(zoo)
 
-setwd("/Users/xiongyi/Desktop/Airbnb/AirbnbHostGenius/foot_traffic_prediction")
+# Note: Working directory should be set by the master script (00_run_all.R)
+# or manually before running this script
 
 # Create output directories (force create)
 if (!dir.exists("outputs")) dir.create("outputs", recursive = TRUE)

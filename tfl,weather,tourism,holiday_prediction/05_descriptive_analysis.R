@@ -12,7 +12,8 @@ library(corrplot)
 library(gridExtra)
 library(scales)
 
-setwd("/Users/xiongyi/Desktop/Airbnb/AirbnbHostGenius/foot_traffic_prediction")
+# Note: Working directory should be set by the master script (00_run_all.R)
+# or manually before running this script
 
 # Create output directory for plots
 dir.create("outputs/plots", recursive = TRUE, showWarnings = FALSE)

@@ -79,61 +79,60 @@ fetch_weather_forecast <- function(forecast_days = 16) {
     "&forecast_days=", forecast_days
   )
   
-  tryCatch({
-    message("Fetching ", forecast_days, "-day forecast from Open-Meteo API...")
-    
-    response <- GET(url)
-    
-    if (status_code(response) != 200) {
-      warning("Open-Meteo API returned status ", status_code(response), ". Using fallback.")
-      return(get_weather_fallback())
+  message("Fetching ", forecast_days, "-day forecast from Open-Meteo API...")
+  
+  response <- GET(url)
+  
+  if (status_code(response) != 200) {
+    stop("Open-Meteo API returned status ", status_code(response))
+  }
+  
+  data <- content(response, "parsed")
+  
+  # Parse daily forecast data safely - handle variable length arrays
+  dates <- as.Date(sapply(data$daily$time, function(x) if(is.null(x)) NA else x))
+  n_days <- length(dates)
+  
+  # Extract each field with proper length handling
+  extract_field <- function(field_data, n) {
+    vals <- sapply(field_data, function(x) if(is.null(x)) NA else as.numeric(x))
+    if (length(vals) < n) {
+      vals <- c(vals, rep(NA, n - length(vals)))
     }
-    
-    data <- content(response, "parsed")
-    
-    # Parse daily forecast data
-    # Convert dates properly - API returns character strings
-    forecast_df <- tibble(
-      date = as.Date(unlist(data$daily$time)),
-      temp_max_c = as.numeric(unlist(data$daily$temperature_2m_max)),
-      temp_min_c = as.numeric(unlist(data$daily$temperature_2m_min)),
-      precip_mm = as.numeric(unlist(data$daily$precipitation_sum)),
-      wind_kmh = as.numeric(unlist(data$daily$windspeed_10m_max))
+    vals[1:n]
+  }
+  
+  forecast_df <- tibble(
+    date = dates,
+    temp_max_c = extract_field(data$daily$temperature_2m_max, n_days),
+    temp_min_c = extract_field(data$daily$temperature_2m_min, n_days),
+    precip_mm = extract_field(data$daily$precipitation_sum, n_days),
+    wind_kmh = extract_field(data$daily$windspeed_10m_max, n_days)
+  ) %>%
+    filter(!is.na(date)) %>%
+    mutate(
+      # Calculate average temperature
+      temp_c = (temp_max_c + temp_min_c) / 2,
+      
+      # Calculate weather quality index (0-1)
+      weather_quality = case_when(
+        temp_c >= 15 & temp_c <= 25 & precip_mm < 1 & wind_kmh < 20 ~ 1.0,
+        temp_c >= 10 & temp_c < 15 & precip_mm < 2 ~ 0.8,
+        temp_c >= 25 | precip_mm >= 2 ~ 0.6,
+        temp_c < 10 | wind_kmh >= 20 ~ 0.4,
+        TRUE ~ 0.5
+      ),
+      is_good_weather = weather_quality >= 0.8
     ) %>%
-      mutate(
-        # Handle NA values
-        temp_max_c = replace_na(temp_max_c, 15),
-        temp_min_c = replace_na(temp_min_c, 10),
-        precip_mm = replace_na(precip_mm, 0),
-        wind_kmh = replace_na(wind_kmh, 15),
-        
-        # Calculate average temperature
-        temp_c = (temp_max_c + temp_min_c) / 2,
-        
-        # Calculate weather quality index (0-1)
-        weather_quality = case_when(
-          temp_c >= 15 & temp_c <= 25 & precip_mm < 1 & wind_kmh < 20 ~ 1.0,
-          temp_c >= 10 & temp_c < 15 & precip_mm < 2 ~ 0.8,
-          temp_c >= 25 | precip_mm >= 2 ~ 0.6,
-          temp_c < 10 | wind_kmh >= 20 ~ 0.4,
-          TRUE ~ 0.5
-        ),
-        is_good_weather = weather_quality >= 0.8
-      ) %>%
-      select(date, temp_c, wind_kmh, precip_mm, weather_quality, is_good_weather)
-    
-    # Save to cache
-    save_to_cache(forecast_df, "weather_forecast")
-    
-    message("✅ Fetched ", nrow(forecast_df), " days of weather forecast from Open-Meteo")
-    message("   Date range: ", min(forecast_df$date), " to ", max(forecast_df$date))
-    
-    return(forecast_df)
-    
-  }, error = function(e) {
-    warning("Error fetching weather data from Open-Meteo: ", e$message, ". Using fallback.")
-    return(get_weather_fallback())
-  })
+    select(date, temp_c, wind_kmh, precip_mm, weather_quality, is_good_weather)
+  
+  # Save to cache
+  save_to_cache(forecast_df, "weather_forecast")
+  
+  message("✅ Fetched ", nrow(forecast_df), " days of weather forecast from Open-Meteo")
+  message("   Date range: ", min(forecast_df$date), " to ", max(forecast_df$date))
+  
+  return(forecast_df)
 }
 
 #' Fallback: Use historical weather averages for forecast

@@ -10,7 +10,8 @@ library(data.table)
 library(lubridate)
 library(gridExtra)
 
-setwd("/Users/xiongyi/Desktop/Airbnb/AirbnbHostGenius/foot_traffic_prediction")
+# Note: Working directory should be set by the master script (00_run_all.R)
+# or manually before running this script
 
 message("\n==========================================================")
 message("COMPONENT-LEVEL VALIDATION REPORT")

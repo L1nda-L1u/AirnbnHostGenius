@@ -11,32 +11,27 @@ init_python <- function() {
     return(TRUE)
   }
   
-  # 尝试配置Python
-  python_path <- "C:/Users/linda/AppData/Local/Programs/Python/Python310/python.exe"
+  # Try to find Python from PATH and common locations
+  python_paths <- c(
+    Sys.which("python3"),
+    Sys.which("python"),
+    "/usr/bin/python3",
+    "/usr/local/bin/python3"
+  )
   
-  if (file.exists(python_path)) {
-    tryCatch({
-      use_python(python_path, required = FALSE)
-      py_discover_config()  # 关键：重新发现配置
-      
-      if (py_available()) {
-        return(TRUE)
-      }
-    }, error = function(e) {
-      cat("Python initialization error:", e$message, "\n")
-    })
-  }
-  
-  # 如果还是不行，尝试从PATH查找
-  python_cmd <- Sys.which("python")
-  if (python_cmd != "" && python_cmd != python_path) {
-    tryCatch({
-      use_python(python_cmd, required = FALSE)
-      py_discover_config()
-      if (py_available()) {
-        return(TRUE)
-      }
-    }, error = function(e) {})
+  for (python_path in python_paths) {
+    if (python_path != "" && file.exists(python_path)) {
+      tryCatch({
+        use_python(python_path, required = FALSE)
+        py_discover_config()
+        
+        if (py_available()) {
+          return(TRUE)
+        }
+      }, error = function(e) {
+        cat("Python initialization error:", e$message, "\n")
+      })
+    }
   }
   
   return(FALSE)
