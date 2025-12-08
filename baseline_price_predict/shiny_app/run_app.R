@@ -6,7 +6,8 @@
 required_packages <- c(
   "shiny", "shinydashboard", "DT", "leaflet", "plotly",
   "dplyr", "geosphere", "xgboost", "reticulate", "glmnet",
-  "httr", "jsonlite", "caret"
+  "httr", "jsonlite", "caret", "zoo", "data.table", "sf",
+  "lubridate", "scales", "ggplot2"
 )
 
 missing_packages <- required_packages[!sapply(required_packages, requireNamespace, quietly = TRUE)]
