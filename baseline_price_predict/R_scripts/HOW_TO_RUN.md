@@ -21,8 +21,8 @@ source("R_scripts/sensitivity_analysis.R")
 ### 方法2: 使用绝对路径
 
 ```r
-# 直接使用完整路径
-source("C:/Users/linda/Desktop/Data to Product/AirbnbHostGeniusR/baseline_price_predict/R_scripts/sensitivity_analysis.R")
+# Navigate to the project folder first, then:
+source("R_scripts/sensitivity_analysis.R")
 ```
 
 ### 方法3: 从baseprice_model目录运行（已修复）
@@ -59,13 +59,13 @@ baseline_price_predict/
 
 1. **在项目根目录运行**（推荐）：
    ```r
-   setwd("C:/Users/linda/Desktop/Data to Product/AirbnbHostGeniusR/baseline_price_predict")
+   # Navigate to baseline_price_predict folder first
    source("R_scripts/sensitivity_analysis.R")
    ```
 
 2. **或者在R_scripts目录运行**：
    ```r
-   setwd("C:/Users/linda/Desktop/Data to Product/AirbnbHostGeniusR/baseline_price_predict/R_scripts")
+   # Navigate to R_scripts folder first
    source("sensitivity_analysis.R")
    ```
 

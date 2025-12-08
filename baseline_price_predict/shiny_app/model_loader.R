@@ -82,9 +82,10 @@ load_models <- function() {
   if (!py_available()) {
     tryCatch({
       python_paths <- c(
-        "C:/Users/linda/AppData/Local/Programs/Python/Python310/python.exe",
         Sys.which("python"),
-        Sys.which("python3")
+        Sys.which("python3"),
+        "/usr/bin/python3",
+        "/usr/local/bin/python3"
       )
       
       for (py_path in python_paths) {

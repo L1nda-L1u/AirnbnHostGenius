@@ -9,7 +9,8 @@ library(tidyverse)
 library(data.table)
 library(lubridate)
 
-setwd("/Users/xiongyi/Desktop/Airbnb/AirbnbHostGenius/foot_traffic_prediction")
+# Note: Working directory should be set by the master script (00_run_all.R)
+# or manually before running this script
 
 # Create output directories
 dir.create("outputs/plots", recursive = TRUE, showWarnings = FALSE)
@@ -124,20 +125,15 @@ source("apis/weather_api.R")
 # Fetch 16-day forecast
 api_forecast <- fetch_weather_forecast(forecast_days = 16)
 
-if (!is.null(api_forecast) && nrow(api_forecast) > 0) {
-  message("✅ API forecast: ", nrow(api_forecast), " days")
-  message("   Date range: ", min(api_forecast$date), " to ", max(api_forecast$date))
-  
-  # Check if these are truly future dates
-  max_historical <- max(weather_historical$date)
-  future_api_dates <- api_forecast %>% filter(date > max_historical)
-  
-  if (nrow(future_api_dates) > 0) {
-    message("   Future dates: ", nrow(future_api_dates), " days beyond historical data")
-  }
-} else {
-  message("⚠️  No API forecast available, will use seasonal averages only")
-  api_forecast <- tibble()
+message("✅ API forecast: ", nrow(api_forecast), " days")
+message("   Date range: ", min(api_forecast$date), " to ", max(api_forecast$date))
+
+# Check if these are truly future dates
+max_historical <- max(weather_historical$date)
+future_api_dates <- api_forecast %>% filter(date > max_historical)
+
+if (nrow(future_api_dates) > 0) {
+  message("   Future dates: ", nrow(future_api_dates), " days beyond historical data")
 }
 
 # ==================================================================================

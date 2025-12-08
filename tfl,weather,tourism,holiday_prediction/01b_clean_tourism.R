@@ -7,7 +7,8 @@ library(tidyverse)
 library(data.table)
 library(lubridate)
 
-setwd("/Users/xiongyi/Desktop/Airbnb/AirbnbHostGenius/foot_traffic_prediction")
+# Note: Working directory should be set by the master script (00_run_all.R)
+# or manually before running this script
 
 # Load data
 tourism_raw <- fread("foot_traffic_data/raw/tourism/international-visitors-london-raw.csv")

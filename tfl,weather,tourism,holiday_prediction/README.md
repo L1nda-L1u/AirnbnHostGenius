@@ -16,8 +16,8 @@ Clean and predict REAL components for Airbnb pricing:
 
 ### ⭐ Recommended: Run Complete Pipeline
 ```r
-setwd("/Users/xiongyi/Desktop/Airbnb/AirbnbHostGenius/foot_traffic_prediction")
-source("00_run_cleaning.R")
+# Navigate to the project folder first, then run:
+source("00_run_all.R")
 ```
 
 **This will**:

@@ -3,7 +3,12 @@
 # ==================================================================================
 
 rm(list = ls())
-setwd("/Users/xiongyi/Desktop/Airbnb/AirbnbHostGenius/foot_traffic_prediction")
+# Auto-detect working directory if not already set correctly
+if (!file.exists("01a_clean_tfl.R")) {
+  if (file.exists("tfl,weather,tourism,holiday_prediction/01a_clean_tfl.R")) {
+    setwd("tfl,weather,tourism,holiday_prediction")
+  }
+}
 
 # ==================================================================================
 # Configuration

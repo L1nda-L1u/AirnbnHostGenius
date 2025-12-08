@@ -8,7 +8,27 @@
 # ==================================================================================
 
 rm(list = ls())
-setwd("/Users/xiongyi/Desktop/Airbnb/AirbnbHostGenius/foot_traffic_prediction")
+
+# Auto-detect script directory (works when sourced or run directly)
+if (interactive()) {
+  # If running interactively, use current working directory
+  script_dir <- getwd()
+} else {
+  # If running via source() or Rscript
+  script_dir <- dirname(sys.frame(1)$ofile)
+}
+
+# Ensure we're in the correct directory
+if (!file.exists(file.path(script_dir, "00_run_all.R"))) {
+  # Try to find the script directory
+  if (file.exists("00_run_all.R")) {
+    script_dir <- getwd()
+  } else if (file.exists("tfl,weather,tourism,holiday_prediction/00_run_all.R")) {
+    script_dir <- file.path(getwd(), "tfl,weather,tourism,holiday_prediction")
+  }
+}
+
+setwd(script_dir)
 
 message("==========================================================")
 message("COMPONENT PREDICTION PIPELINE")
