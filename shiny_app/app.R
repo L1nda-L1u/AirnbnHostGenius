@@ -61,9 +61,9 @@ ui <- dashboardPage(
       menuItem("About", tabName = "about", icon = icon("info-circle"))
     ),
     tags$div(
-      style = "padding: 20px; margin-top: 20px;",
+      style = "padding: 10px; margin-top: 10px;",
       tags$p(
-        style = "color: #7F8C8D; font-size: 12px; text-align: center;",
+        style = "color: #7F8C8D; font-size: 11px; text-align: center; line-height: 1.3;",
         "Enter property details to get smart pricing suggestions"
       )
     )
@@ -157,6 +157,16 @@ ui <- dashboardPage(
         }
         .content {
           padding: 10px 15px !important;
+        }
+        .box-body {
+          padding: 15px !important;
+        }
+        .form-group {
+          margin-bottom: 10px !important;
+        }
+        .form-group label {
+          margin-bottom: 3px !important;
+          font-size: 13px !important;
         }
         .row {
           margin-left: -7.5px !important;
@@ -294,10 +304,11 @@ ui <- dashboardPage(
           column(
             width = 4,
             box(
-              title = tags$h3("Property Details", style = "color: #2C3E50; margin: 0; font-weight: 600;"),
+              title = tags$h3("Property Details", style = "color: #2C3E50; margin: 0; font-weight: 600; font-size: 18px;"),
               width = NULL,
               solidHeader = TRUE,
               status = "primary",
+              style = "margin-bottom: 0;",
               
               textInput(
                 "address",
