@@ -216,6 +216,11 @@ ui <- dashboardPage(
           color: #4A4A4A !important;
         }
         /* Custom scrollbar for amenities */
+        .amenities-scrollable {
+          max-height: 100% !important;
+          overflow-y: auto !important;
+          overflow-x: hidden !important;
+        }
         .amenities-scrollable::-webkit-scrollbar {
           width: 8px;
         }
@@ -229,6 +234,10 @@ ui <- dashboardPage(
         }
         .amenities-scrollable::-webkit-scrollbar-thumb:hover {
           background: #909090;
+        }
+        /* Ensure checkbox group is scrollable */
+        .amenities-scrollable .shiny-input-checkboxgroup {
+          max-height: none !important;
         }
       "))
     ),
@@ -447,7 +456,7 @@ ui <- dashboardPage(
                   
                   tags$div(
                     class = "amenities-scrollable",
-                    style = "flex: 1; overflow-y: auto; overflow-x: hidden; border: 1px solid #E0E0E0; padding: 10px; border-radius: 5px; background-color: #F5F5F5; max-height: 100%; min-height: 0;",
+                    style = "flex: 1; overflow-y: auto; overflow-x: hidden; border: 1px solid #E0E0E0; padding: 10px; border-radius: 5px; background-color: #F5F5F5; height: 100%; max-height: 100%; min-height: 0;",
                     checkboxGroupInput(
                       "amenities",
                       NULL,
@@ -462,11 +471,7 @@ ui <- dashboardPage(
                         "Breakfast" = "Breakfast",
                         "Dedicated Workspace" = "Dedicated workspace",
                         "Pets Allowed" = "Pets allowed",
-                        "Smoking Allowed" = "Smoking allowed",
-                        "Elevator" = "Elevator",
-                        "Gym" = "Gym",
-                        "Pool" = "Pool",
-                        "Hot Tub" = "Hot tub"
+                        "Smoking Allowed" = "Smoking allowed"
                       ),
                       selected = c("Wifi", "Kitchen", "Heating")
                     )
