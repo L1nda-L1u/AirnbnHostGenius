@@ -178,13 +178,6 @@ ui <- dashboardPage(
         }
         .content {
           padding: 15px 10px !important;
-          height: 100% !important;
-        }
-        .tab-content {
-          height: 100% !important;
-        }
-        .tab-pane {
-          height: 100% !important;
         }
         .box-body {
           padding: 15px !important;
@@ -570,16 +563,16 @@ ui <- dashboardPage(
             
             # Bottom row - Map (full width)
             fluidRow(
-              style = "display: flex; flex: 1; min-height: 0;",
+              style = "display: flex; flex: 1; min-height: 0; margin-top: 15px;",
               column(
                 width = 12,
-                style = "display: flex; flex-direction: column;",
+                style = "display: flex; flex-direction: column; height: 100%;",
                 box(
                   title = tags$h3("Location Context", style = "color: #2C3E50; margin: 0; font-weight: 600; font-size: 18px;"),
                   width = NULL,
                   solidHeader = TRUE,
                   status = "info",
-                  style = "margin-bottom: 0; display: flex; flex-direction: column; flex: 1; min-height: 0;",
+                  style = "margin-bottom: 0; display: flex; flex-direction: column; height: 100%;",
                   
                   tags$div(
                     class = "map-container",
