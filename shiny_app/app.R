@@ -542,7 +542,7 @@ ui <- dashboardPage(
                   
                   tags$div(
                     class = "map-container",
-                    style = "flex: 1; min-height: 300px;",
+                    style = "flex: 1; min-height: 300px; height: 100%; position: relative;",
                     leafletOutput("map", height = "100%")
                   )
                 )
