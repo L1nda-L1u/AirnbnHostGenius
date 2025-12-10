@@ -310,9 +310,11 @@ ui <- dashboardPage(
       tabItem(
         tabName = "predict",
         fluidRow(
+          style = "display: flex; align-items: stretch;",
           # Left column - Property Information
           column(
             width = 4,
+            style = "display: flex; flex-direction: column;",
             box(
               title = tags$h3("Property Details", style = "color: #2C3E50; margin: 0; font-weight: 600; font-size: 18px;"),
               width = NULL,
@@ -449,6 +451,7 @@ ui <- dashboardPage(
           # Right column - Predictions, Recommendations, and Map
           column(
             width = 8,
+            style = "display: flex; flex-direction: column;",
             # Top row - Price and Recommendations side by side (equal height)
             fluidRow(
               column(
@@ -519,10 +522,11 @@ ui <- dashboardPage(
               column(
                 width = 12,
                 box(
-                  title = tags$h3("Location Context", style = "color: #2C3E50; margin: 0; font-weight: 600;"),
+                  title = tags$h3("Location Context", style = "color: #2C3E50; margin: 0; font-weight: 600; font-size: 18px;"),
                   width = NULL,
                   solidHeader = TRUE,
                   status = "info",
+                  style = "flex: 1; display: flex; flex-direction: column;",
                   
                   leafletOutput("map", height = "500px")
                 )
