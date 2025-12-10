@@ -217,9 +217,9 @@ ui <- dashboardPage(
         }
         /* Custom scrollbar for amenities */
         .amenities-scrollable {
-          max-height: 100% !important;
           overflow-y: auto !important;
           overflow-x: hidden !important;
+          max-height: 100% !important;
         }
         .amenities-scrollable::-webkit-scrollbar {
           width: 8px;
@@ -235,9 +235,13 @@ ui <- dashboardPage(
         .amenities-scrollable::-webkit-scrollbar-thumb:hover {
           background: #909090;
         }
-        /* Ensure checkbox group is scrollable */
+        /* Ensure checkbox group content is scrollable */
         .amenities-scrollable .shiny-input-checkboxgroup {
-          max-height: none !important;
+          display: block !important;
+        }
+        .amenities-scrollable .shiny-input-checkboxgroup .checkbox {
+          margin-top: 8px;
+          margin-bottom: 8px;
         }
       "))
     ),
@@ -462,16 +466,35 @@ ui <- dashboardPage(
                       NULL,
                       choices = list(
                         "WiFi" = "Wifi",
+                        "Smoke Alarm" = "Smoke.alarm",
                         "Kitchen" = "Kitchen",
                         "Washer" = "Washer",
-                        "TV" = "TV",
+                        "Essentials" = "Essentials",
+                        "Iron" = "Iron",
+                        "Hot Water" = "Hot.water",
+                        "Hangers" = "Hangers",
+                        "Carbon Monoxide Alarm" = "Carbon.monoxide.alarm",
+                        "Hair Dryer" = "Hair.dryer",
                         "Heating" = "Heating",
-                        "Air Conditioning" = "Air conditioning",
-                        "Free Parking" = "Free parking",
-                        "Breakfast" = "Breakfast",
-                        "Dedicated Workspace" = "Dedicated workspace",
-                        "Pets Allowed" = "Pets allowed",
-                        "Smoking Allowed" = "Smoking allowed"
+                        "Bed Linens" = "Bed.linens",
+                        "TV" = "TV",
+                        "Dishes and Silverware" = "Dishes.and.silverware",
+                        "Refrigerator" = "Refrigerator",
+                        "Cooking Basics" = "Cooking.basics",
+                        "Shampoo" = "Shampoo",
+                        "Microwave" = "Microwave",
+                        "Hot Water Kettle" = "Hot.water.kettle",
+                        "Oven" = "Oven",
+                        "Dedicated Workspace" = "Dedicated.workspace",
+                        "Toaster" = "Toaster",
+                        "Freezer" = "Freezer",
+                        "Shower Gel" = "Shower.gel",
+                        "First Aid Kit" = "First.aid.kit",
+                        "Dining Table" = "Dining.table",
+                        "Cleaning Products" = "Cleaning.products",
+                        "Self Check-in" = "Self.check.in",
+                        "Fire Extinguisher" = "Fire.extinguisher",
+                        "Long Term Stays Allowed" = "Long.term.stays.allowed"
                       ),
                       selected = c("Wifi", "Kitchen", "Heating")
                     )
