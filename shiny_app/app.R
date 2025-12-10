@@ -43,7 +43,7 @@ source(file.path(app_dir, "market_indicators.R"), local = TRUE)
 ui <- dashboardPage(
   dashboardHeader(
     title = tags$div(
-      tags$span("Airbnb", style = "font-size: 20px; font-weight: bold; color: #FF5A5F; margin-right: 8px;"),
+      tags$span("Airbnb", style = "font-size: 20px; font-weight: bold; color: #2C7A7B; margin-right: 8px;"),
       tags$span("HostGenius", 
                 style = "font-size: 20px; font-weight: bold; color: #2C3E50;")
     ),
@@ -87,8 +87,8 @@ ui <- dashboardPage(
           background-color: #F8F8F8 !important;
         }
         .skin-blue .main-sidebar .sidebar-menu > li.active > a {
-          background-color: #0D9488 !important;
-          border-left-color: #0F766E !important;
+          background-color: #2C7A7B !important;
+          border-left-color: #234E52 !important;
           color: #FFFFFF !important;
         }
         .skin-blue .main-sidebar .sidebar-menu > li > a {
@@ -132,12 +132,12 @@ ui <- dashboardPage(
           background-color: #FFFFFF;
         }
         .form-control:focus {
-          border-color: #0D9488;
+          border-color: #2C7A7B;
           box-shadow: 0 0 5px rgba(20, 184, 166, 0.2);
         }
         .btn-primary {
-          background-color: #0D9488 !important;
-          border-color: #0F766E !important;
+          background-color: #2C7A7B !important;
+          border-color: #234E52 !important;
           border-radius: 6px;
           font-weight: 500;
           padding: 10px 20px;
@@ -145,13 +145,13 @@ ui <- dashboardPage(
           color: #FFFFFF !important;
         }
         .btn-primary:hover {
-          background-color: #0F766E !important;
+          background-color: #234E52 !important;
           box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         .price-display {
-          font-size: 56px;
+          font-size: 72px;
           font-weight: bold;
-          color: #0D9488;
+          color: #2C7A7B;
           text-align: center;
           padding: 20px 15px;
           background-color: #FFFFFF;
@@ -1328,17 +1328,17 @@ server <- function(input, output, session) {
       }
       tags$div(
         tags$span(location_text, style = "font-size: 11px;"),
-        style = "color: #0F766E; font-weight: 500; padding: 4px 8px; background-color: #E0F2F1; border-radius: 5px; font-size: 11px; width: 100%; line-height: 1.3; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"
+        style = "color: #234E52; font-weight: 500; padding: 4px 8px; background-color: #E0F2F1; border-radius: 5px; font-size: 11px; width: 100%; line-height: 1.3; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"
       )
     } else if (grepl("Cannot find|Error", status)) {
       tags$div(
         status,
-        style = "color: #0F766E; font-weight: 500; padding: 6px 10px; background-color: #E0F2F1; border-radius: 5px; font-size: 12px; width: 100%; line-height: 1.4;"
+        style = "color: #234E52; font-weight: 500; padding: 6px 10px; background-color: #E0F2F1; border-radius: 5px; font-size: 12px; width: 100%; line-height: 1.4;"
       )
     } else {
       tags$div(
         status,
-        style = "color: #0F766E; font-weight: 500; padding: 6px 10px; background-color: #E0F2F1; border-radius: 5px; font-size: 12px; width: 100%; line-height: 1.4;"
+        style = "color: #234E52; font-weight: 500; padding: 6px 10px; background-color: #E0F2F1; border-radius: 5px; font-size: 12px; width: 100%; line-height: 1.4;"
       )
     }
   })
