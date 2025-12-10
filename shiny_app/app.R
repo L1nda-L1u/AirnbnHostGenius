@@ -1668,15 +1668,15 @@ server <- function(input, output, session) {
       recs <- recommendations$recommendations
       
       tagList(
-        tags$div(
-          style = "padding-top: 0; margin-top: 0;",
-          lapply(1:nrow(recs), function(i) {
-            rec <- recs[i, ]
-            tags$div(
-              style = paste0(
-                "padding: 6px 0; margin-bottom: 6px;",
-                if(i < nrow(recs)) " border-bottom: 1px solid #E0E0E0;" else ""
-              ),
+          tags$div(
+            style = "padding-top: 0; margin-top: -5px;",
+            lapply(1:nrow(recs), function(i) {
+              rec <- recs[i, ]
+              tags$div(
+                style = paste0(
+                  "padding: 4px 0; margin-bottom: 4px;",
+                  if(i < nrow(recs)) " border-bottom: 1px solid #E0E0E0;" else ""
+                ),
               tags$div(
                 style = "font-weight: 600; color: #2C3E50; margin-bottom: 2px; font-size: 14px;",
                 rec$amenity_name
