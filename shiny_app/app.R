@@ -111,12 +111,17 @@ ui <- dashboardPage(
           box-shadow: 0 2px 8px rgba(0,0,0,0.08) !important;
           border: 1px solid #E0E0E0 !important;
           background-color: #FFFFFF !important;
-          margin-bottom: 15px !important;
+          margin-bottom: 10px !important;
         }
         .box-header {
           background-color: #FFFFFF !important;
           border-bottom: 1px solid #E0E0E0;
           border-radius: 8px 8px 0 0;
+          padding: 8px 15px !important;
+        }
+        .box-title {
+          margin-top: 0 !important;
+          margin-bottom: 0 !important;
         }
         .form-control {
           border-radius: 5px;
@@ -313,7 +318,7 @@ ui <- dashboardPage(
               width = NULL,
               solidHeader = TRUE,
               status = "primary",
-              style = "margin-bottom: 0;",
+              style = "margin-bottom: 0; height: 100%; display: flex; flex-direction: column;",
               
               textInput(
                 "address",
@@ -325,8 +330,14 @@ ui <- dashboardPage(
               conditionalPanel(
                 condition = "output.geocode_status",
                 tags$div(
-                  style = "margin-bottom: 10px;",
+                  style = "margin-bottom: 10px; min-height: 40px; display: flex; align-items: center;",
                   uiOutput("geocode_status_text")
+                )
+              ),
+              conditionalPanel(
+                condition = "!output.geocode_status",
+                tags$div(
+                  style = "margin-bottom: 10px; min-height: 40px;"
                 )
               ),
               
@@ -447,7 +458,7 @@ ui <- dashboardPage(
                   width = NULL,
                   solidHeader = TRUE,
                   status = "primary",
-                  style = "min-height: 200px; display: flex; flex-direction: column;",
+                  style = "height: 200px; display: flex; flex-direction: column;",
                   
                   conditionalPanel(
                     condition = "output.price_predicted",
@@ -482,7 +493,7 @@ ui <- dashboardPage(
                   width = NULL,
                   solidHeader = TRUE,
                   status = "warning",
-                  style = "min-height: 200px; display: flex; flex-direction: column;",
+                  style = "height: 200px; display: flex; flex-direction: column;",
                   
                   conditionalPanel(
                     condition = "output.price_predicted",
@@ -1233,17 +1244,17 @@ server <- function(input, output, session) {
     if (grepl("Location found", status)) {
       tags$div(
         status,
-        style = "color: #27AE60; font-weight: bold; padding: 10px; background-color: #D5F4E6; border-radius: 5px;"
+        style = "color: #0D9488; font-weight: 500; padding: 8px 12px; background-color: #E0F2F1; border-radius: 5px; font-size: 13px; width: 100%;"
       )
     } else if (grepl("Cannot find|Error", status)) {
       tags$div(
         status,
-        style = "color: #E74C3C; font-weight: bold; padding: 10px; background-color: #FADBD8; border-radius: 5px;"
+        style = "color: #0D9488; font-weight: 500; padding: 8px 12px; background-color: #E0F2F1; border-radius: 5px; font-size: 13px; width: 100%;"
       )
     } else {
       tags$div(
         status,
-        style = "color: #3498DB; font-weight: bold; padding: 10px; background-color: #EBF5FB; border-radius: 5px;"
+        style = "color: #0D9488; font-weight: 500; padding: 8px 12px; background-color: #E0F2F1; border-radius: 5px; font-size: 13px; width: 100%;"
       )
     }
   })
