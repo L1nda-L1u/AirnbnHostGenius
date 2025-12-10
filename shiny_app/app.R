@@ -149,9 +149,9 @@ ui <- dashboardPage(
           box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         .price-display {
-          font-size: 42px;
+          font-size: 56px;
           font-weight: bold;
-          color: #2C3E50;
+          color: #14B8A6;
           text-align: center;
           padding: 20px 15px;
           background-color: #FFFFFF;
