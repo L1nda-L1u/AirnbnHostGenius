@@ -1614,6 +1614,7 @@ server <- function(input, output, session) {
       
       tagList(
         tags$div(
+          style = "padding-top: 0; margin-top: 0;",
           lapply(1:nrow(recs), function(i) {
             rec <- recs[i, ]
             tags$div(
