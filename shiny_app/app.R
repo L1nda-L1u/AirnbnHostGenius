@@ -157,12 +157,12 @@ ui <- dashboardPage(
           margin: 10px 0;
         }
         #map {
-          height: 500px;
+          height: 300px;
           border-radius: 8px;
           overflow: hidden;
         }
         .leaflet-container {
-          height: 500px !important;
+          height: 300px !important;
           overflow: hidden !important;
         }
         .content {
