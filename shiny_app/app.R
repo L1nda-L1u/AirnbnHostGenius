@@ -545,12 +545,12 @@ ui <- dashboardPage(
                   width = NULL,
                   solidHeader = TRUE,
                   status = "info",
-                  style = "flex: 1; display: flex; flex-direction: column; min-height: 0;",
+                  style = "display: flex; flex-direction: column;",
                   
                   tags$div(
                     class = "map-container",
-                    style = "flex: 1; min-height: 300px; height: 100%; position: relative; overflow: hidden;",
-                    leafletOutput("map", height = "100%")
+                    style = "height: 350px; position: relative;",
+                    leafletOutput("map", height = "350px")
                   )
                 )
               )
