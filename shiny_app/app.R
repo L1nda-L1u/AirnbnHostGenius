@@ -157,13 +157,18 @@ ui <- dashboardPage(
           margin: 10px 0;
         }
         #map {
-          height: 100%;
+          height: 100% !important;
+          min-height: 300px !important;
           border-radius: 8px;
           overflow: hidden;
+          position: relative;
         }
         .leaflet-container {
           height: 100% !important;
+          min-height: 300px !important;
+          width: 100% !important;
           overflow: hidden !important;
+          position: relative;
         }
         .map-container {
           flex: 1;
