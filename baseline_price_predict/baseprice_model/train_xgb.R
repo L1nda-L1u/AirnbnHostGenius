@@ -1,6 +1,6 @@
 # =============================================
-# XGBoost 模型训练 - 纯 R 版本
-# 与 Python 版本完全一致
+# XGBoost Model Training - Pure R Version
+# Fully consistent with Python version
 # =============================================
 
 library(xgboost)
@@ -13,7 +13,7 @@ cat("XGBoost Model Training (Pure R)\n")
 cat("========================================\n\n")
 
 # =============================================
-# 1. 加载数据
+# 1. Load Data
 # =============================================
 cat("Loading data...\n")
 # Data file in current directory
@@ -30,7 +30,7 @@ if (!file.exists(data_file)) {
 }
 cat(sprintf("Using data file: %s\n", data_file))
 df_original <- read.csv(data_file, stringsAsFactors = FALSE)
-cat(sprintf("原始数据量: %s 行\n", format(nrow(df_original), big.mark = ",")))
+cat(sprintf("Original data: %s rows\n", format(nrow(df_original), big.mark = ",")))
 
 target_col <- "price_num"
 feature_cols <- setdiff(colnames(df_original), target_col)
@@ -42,44 +42,44 @@ for (i in seq_along(feature_cols)) {
 cat(sprintf("\nTotal features = %d\n\n", length(feature_cols)))
 
 # =============================================
-# 2. 数据清理（与 Python 版本完全一致）
+# 2. Data Cleaning (Fully consistent with Python version)
 # =============================================
-cat("Cleaning outliers (完善版)...\n")
+cat("Cleaning outliers...\n")
 df <- df_original
 
-# 清理规则1: 2人及以下但价格>400
+# Cleaning rule 1: 2 or fewer people but price > 400
 df <- df[!((df$accommodates <= 2) & (df$price_num > 400)), ]
 
-# 清理规则2: 4人及以下但价格>600
+# Cleaning rule 2: 4 or fewer people but price > 600
 df <- df[!((df$accommodates <= 4) & (df$price_num > 600)), ]
 
-# 清理规则3: 6人及以下但价格>800
+# Cleaning rule 3: 6 or fewer people but price > 800
 df <- df[!((df$accommodates <= 6) & (df$price_num > 800)), ]
 
-# 清理规则4: 移除99.5%分位数以上的极端值
+# Cleaning rule 4: Remove extreme values above 99.5% quantile
 upper <- quantile(df$price_num, 0.995)
 df <- df[df$price_num < upper, ]
 
 rownames(df) <- NULL
-cat(sprintf("清理后数据量: %s 行 (删除了 %s 行异常值)\n", 
+cat(sprintf("After cleaning: %s rows (removed %s outliers)\n", 
             format(nrow(df), big.mark = ","),
             format(nrow(df_original) - nrow(df), big.mark = ",")))
 
 # =============================================
 # 3. LOG-transform price → improves model stability
 # =============================================
-# 确保列名保留
+# Ensure column names are preserved
 X <- as.matrix(df[, feature_cols, drop = FALSE])
-colnames(X) <- feature_cols  # 确保有列名
+colnames(X) <- feature_cols  # Ensure column names
 X <- matrix(as.numeric(X), nrow = nrow(X), ncol = ncol(X))
-colnames(X) <- feature_cols  # 再次设置列名（因为 matrix() 会丢失）
+colnames(X) <- feature_cols  # Set column names again (matrix() may lose them)
 y_raw <- as.numeric(df[[target_col]])
 y_log <- log1p(y_raw)  # log(price + 1)
 
 # =============================================
-# 4. Train/Test split（随机划分，真实预测场景）
+# 4. Train/Test Split (Random split, real prediction scenario)
 # =============================================
-cat("\n使用随机划分（真实预测场景，不使用价格分层）...\n")
+cat("\nUsing random split (real prediction scenario, no price stratification)...\n")
 set.seed(42)
 train_idx <- createDataPartition(y_log, p = 0.90, list = FALSE)
 
@@ -90,15 +90,15 @@ y_test_log <- y_log[-train_idx]
 y_train_raw <- y_raw[train_idx]
 y_test_raw <- y_raw[-train_idx]
 
-cat(sprintf("\n数据划分统计:\n"))
-cat(sprintf("  训练集: %s 行\n", format(nrow(X_train), big.mark = ",")))
-cat(sprintf("  测试集: %s 行\n", format(nrow(X_test), big.mark = ",")))
-cat(sprintf("  注意: 使用随机划分（真实预测场景，不使用价格分层）\n"))
+cat(sprintf("\nData split statistics:\n"))
+cat(sprintf("  Training set: %s rows\n", format(nrow(X_train), big.mark = ",")))
+cat(sprintf("  Test set: %s rows\n", format(nrow(X_test), big.mark = ",")))
+cat(sprintf("  Note: Using random split (real prediction scenario, no price stratification)\n"))
 
 # =============================================
 # 5. Standardize features
 # =============================================
-# 转换为数据框（preProcess 需要）
+# Convert to data frame (required by preProcess)
 X_train_df <- as.data.frame(X_train)
 X_test_df <- as.data.frame(X_test)
 colnames(X_train_df) <- feature_cols
@@ -108,10 +108,10 @@ preProc <- preProcess(X_train_df, method = c("center", "scale"))
 X_train_scaled <- predict(preProc, X_train_df)
 X_test_scaled <- predict(preProc, X_test_df)
 
-# 确保转换为数值矩阵（XGBoost 需要）
+# Ensure conversion to numeric matrix (required by XGBoost)
 X_train_scaled <- as.matrix(X_train_scaled)
 X_test_scaled <- as.matrix(X_test_scaled)
-# 确保是数值类型
+# Ensure numeric type
 storage.mode(X_train_scaled) <- "numeric"
 storage.mode(X_test_scaled) <- "numeric"
 
@@ -120,12 +120,12 @@ storage.mode(X_test_scaled) <- "numeric"
 # =============================================
 cat("\nTraining XGBoost...\n")
 
-# 转换为 DMatrix（XGBoost 格式）
-# 确保数据是矩阵格式
+# Convert to DMatrix (XGBoost format)
+# Ensure data is in matrix format
 dtrain <- xgb.DMatrix(data = X_train_scaled, label = y_train_log)
 dtest <- xgb.DMatrix(data = X_test_scaled, label = y_test_log)
 
-# XGBoost 参数（与 Python 版本一致）
+# XGBoost parameters (consistent with Python version)
 params <- list(
   objective = "reg:squarederror",
   eval_metric = "rmse",
@@ -137,7 +137,7 @@ params <- list(
   nthread = parallel::detectCores() - 1
 )
 
-# 训练模型
+# Train model
 xgb_model <- xgb.train(
   params = params,
   data = dtrain,
@@ -152,7 +152,7 @@ xgb_model <- xgb.train(
 # 7. Evaluation
 # =============================================
 log_pred <- predict(xgb_model, dtest)
-pred_real <- expm1(log_pred)  # 转回真实价格 (£)
+pred_real <- expm1(log_pred)  # Convert back to real price (£)
 true_real <- y_test_raw
 
 mae <- mean(abs(true_real - pred_real))
@@ -193,7 +193,7 @@ for (idx in indices) {
   cat(sprintf("True price: £%.2f\n", true_real[idx]))
   cat(sprintf("Predicted:  £%.2f\n", pred_real[idx]))
   cat("------ Feature Values ------\n")
-  # 显示前20个特征
+  # Display top 20 features
   test_row <- df[-train_idx, ][idx, feature_cols[1:min(20, length(feature_cols))]]
   print(test_row)
 }

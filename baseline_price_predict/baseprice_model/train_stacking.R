@@ -1,5 +1,5 @@
 # =============================================
-# Stacking 模型训练 - 融合 XGBoost 和 Neural Network
+# Stacking Model Training - Combine XGBoost and Neural Network
 # =============================================
 
 library(xgboost)
@@ -12,7 +12,7 @@ cat("========================================\n")
 cat("Stacking Model Training\n")
 cat("========================================\n\n")
 
-# 检查 reticulate
+# Check reticulate
 if (!require(reticulate, quietly = TRUE)) {
   install.packages("reticulate")
 }
@@ -72,7 +72,7 @@ y_test_raw <- y_raw[-train_idx]
 
 cat(sprintf("Train set: %d, Test set: %d\n", nrow(X_train), nrow(X_test)))
 
-# 5. 加载 XGBoost 模型
+# 5. Load XGBoost Model
 cat("\nLoading XGBoost model...\n")
 xgb_model <- xgb.load("best_xgb_log_model.xgb")
 scaler_xgb <- readRDS("scaler_xgb.rds")
@@ -100,7 +100,7 @@ import torch
 import torch.nn as nn
 import numpy as np
 
-# 改进版模型（带残差连接）
+# Improved model (with residual connections)
 class ImprovedPricePredictor(nn.Module):
     def __init__(self, input_size):
         super(ImprovedPricePredictor, self).__init__()
@@ -210,7 +210,7 @@ nn_pred <- expm1(nn_pred_log)
 
 cat(sprintf("NN predictions: %d samples\n", length(nn_pred)))
 
-# 7. 准备 Stacking 数据
+# 7. Prepare Stacking Data
 y_test_real <- y_test_raw
 min_len <- min(length(y_test_real), length(xgb_pred), length(nn_pred))
 y_test_real <- y_test_real[1:min_len]
