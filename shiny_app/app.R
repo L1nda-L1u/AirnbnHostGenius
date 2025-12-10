@@ -472,7 +472,7 @@ ui <- dashboardPage(
                   width = NULL,
                   solidHeader = TRUE,
                   status = "primary",
-                  style = "height: 180px; display: flex; flex-direction: column;",
+                  style = "height: 180px; display: flex; flex-direction: column; overflow: hidden;",
                   
                   conditionalPanel(
                     condition = "output.price_predicted",
@@ -507,7 +507,7 @@ ui <- dashboardPage(
                   width = NULL,
                   solidHeader = TRUE,
                   status = "warning",
-                  style = "height: 180px; display: flex; flex-direction: column;",
+                  style = "height: 180px; display: flex; flex-direction: column; overflow: hidden;",
                   
                   conditionalPanel(
                     condition = "output.price_predicted",
