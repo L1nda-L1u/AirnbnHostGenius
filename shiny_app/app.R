@@ -178,6 +178,13 @@ ui <- dashboardPage(
         }
         .content {
           padding: 15px 10px !important;
+          height: 100% !important;
+        }
+        .tab-content {
+          height: 100% !important;
+        }
+        .tab-pane {
+          height: 100% !important;
         }
         .box-body {
           padding: 15px !important;
@@ -344,18 +351,19 @@ ui <- dashboardPage(
       
       tabItem(
         tabName = "predict",
+        style = "height: 100%; display: flex; flex-direction: column;",
         fluidRow(
-          style = "display: flex; align-items: stretch;",
+          style = "display: flex; align-items: stretch; flex: 1; min-height: 0;",
           # Left column - Property Information
           column(
             width = 4,
-            style = "display: flex; flex-direction: column;",
+            style = "display: flex; flex-direction: column; height: 100%;",
             box(
               title = tags$h3("Property Details", style = "color: #2C3E50; margin: 0; font-weight: 600; font-size: 18px;"),
               width = NULL,
               solidHeader = TRUE,
               status = "primary",
-              style = "margin-bottom: 0; flex: 1; display: flex; flex-direction: column; min-height: 0;",
+              style = "margin-bottom: 0; flex: 1; display: flex; flex-direction: column; min-height: 0; height: 100%;",
               
               # Postcode input with status on the right
               fluidRow(
@@ -495,7 +503,7 @@ ui <- dashboardPage(
           # Right column - Predictions, Recommendations, and Map
           column(
             width = 8,
-            style = "display: flex; flex-direction: column;",
+            style = "display: flex; flex-direction: column; height: 100%;",
             # Top row - Price and Recommendations side by side (equal height)
             fluidRow(
               column(
@@ -563,15 +571,16 @@ ui <- dashboardPage(
             
             # Bottom row - Map (full width)
             fluidRow(
+              style = "display: flex; flex: 1; min-height: 0; margin-top: 15px;",
               column(
                 width = 12,
-                style = "display: flex; flex-direction: column; flex: 1; min-height: 0;",
+                style = "display: flex; flex-direction: column; height: 100%;",
                 box(
                   title = tags$h3("Location Context", style = "color: #2C3E50; margin: 0; font-weight: 600; font-size: 18px;"),
                   width = NULL,
                   solidHeader = TRUE,
                   status = "info",
-                  style = "flex: 1; display: flex; flex-direction: column; min-height: 0; margin-bottom: 0;",
+                  style = "flex: 1; display: flex; flex-direction: column; min-height: 0; margin-bottom: 0; height: 100%;",
                   
                   tags$div(
                     class = "map-container",
