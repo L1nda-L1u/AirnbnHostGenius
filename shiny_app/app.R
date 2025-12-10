@@ -111,7 +111,9 @@ ui <- dashboardPage(
           box-shadow: 0 2px 8px rgba(0,0,0,0.08) !important;
           border: 1px solid #E0E0E0 !important;
           background-color: #FFFFFF !important;
-          margin-bottom: 10px !important;
+          margin-bottom: 15px !important;
+          margin-left: 5px !important;
+          margin-right: 5px !important;
         }
         .box-header {
           background-color: #FFFFFF !important;
@@ -157,26 +159,22 @@ ui <- dashboardPage(
           margin: 10px 0;
         }
         #map {
-          height: 100% !important;
-          min-height: 300px !important;
+          height: 350px !important;
           border-radius: 8px;
           overflow: hidden;
           position: relative;
         }
         .leaflet-container {
-          height: 100% !important;
-          min-height: 300px !important;
+          height: 350px !important;
           width: 100% !important;
           overflow: hidden !important;
           position: relative;
         }
         .map-container {
-          flex: 1;
-          min-height: 300px;
-          height: 100%;
+          height: 350px;
         }
         .content {
-          padding: 10px 15px !important;
+          padding: 15px 10px !important;
         }
         .box-body {
           padding: 15px !important;
@@ -189,12 +187,12 @@ ui <- dashboardPage(
           font-size: 13px !important;
         }
         .row {
-          margin-left: -7.5px !important;
-          margin-right: -7.5px !important;
+          margin-left: -5px !important;
+          margin-right: -5px !important;
         }
-        .col-sm-4, .col-md-4 {
-          padding-left: 7.5px !important;
-          padding-right: 7.5px !important;
+        .col-sm-4, .col-md-4, .col-sm-6, .col-md-6, .col-sm-8, .col-md-8, .col-sm-12, .col-md-12 {
+          padding-left: 5px !important;
+          padding-right: 5px !important;
         }
         .checkbox {
           margin-top: 10px;
@@ -319,9 +317,8 @@ ui <- dashboardPage(
       
       tabItem(
         tabName = "predict",
-        style = "height: calc(100vh - 100px); overflow: hidden;",
         fluidRow(
-          style = "display: flex; align-items: stretch; height: 100%;",
+          style = "display: flex; align-items: stretch;",
           # Left column - Property Information
           column(
             width = 4,
@@ -364,68 +361,73 @@ ui <- dashboardPage(
                 # Left column - Basic Properties
                 column(
                   width = 6,
+                  style = "display: flex; flex-direction: column;",
                   tags$h4("Basic Properties", style = "color: #4A4A4A; margin-top: 0; margin-bottom: 12px; font-weight: 600; font-size: 14px;"),
                   
-                  numericInput(
-                    "bedrooms",
-                    "Bedrooms",
-                    value = 1,
-                    min = 0,
-                    max = 20,
-                    step = 1,
-                    width = "100%"
-                  ),
-                  
-                  numericInput(
-                    "bathrooms",
-                    "Bathrooms",
-                    value = 1,
-                    min = 0,
-                    max = 10,
-                    step = 0.5,
-                    width = "100%"
-                  ),
-                  
-                  numericInput(
-                    "accommodates",
-                    "Accommodates",
-                    value = 2,
-                    min = 1,
-                    max = 20,
-                    step = 1,
-                    width = "100%"
-                  ),
-                  
-                  numericInput(
-                    "beds",
-                    "Beds",
-                    value = 1,
-                    min = 0,
-                    max = 20,
-                    step = 1,
-                    width = "100%"
-                  ),
-                  
-                  selectInput(
-                    "room_type",
-                    "Room Type",
-                    choices = list(
-                      "Entire home/apt" = "Entire home/apt",
-                      "Private room" = "Private room",
-                      "Shared room" = "Shared room"
+                  tags$div(
+                    style = "flex: 1; display: flex; flex-direction: column;",
+                    numericInput(
+                      "bedrooms",
+                      "Bedrooms",
+                      value = 1,
+                      min = 0,
+                      max = 20,
+                      step = 1,
+                      width = "100%"
                     ),
-                    selected = "Entire home/apt",
-                    width = "100%"
+                    
+                    numericInput(
+                      "bathrooms",
+                      "Bathrooms",
+                      value = 1,
+                      min = 0,
+                      max = 10,
+                      step = 0.5,
+                      width = "100%"
+                    ),
+                    
+                    numericInput(
+                      "accommodates",
+                      "Accommodates",
+                      value = 2,
+                      min = 1,
+                      max = 20,
+                      step = 1,
+                      width = "100%"
+                    ),
+                    
+                    numericInput(
+                      "beds",
+                      "Beds",
+                      value = 1,
+                      min = 0,
+                      max = 20,
+                      step = 1,
+                      width = "100%"
+                    ),
+                    
+                    selectInput(
+                      "room_type",
+                      "Room Type",
+                      choices = list(
+                        "Entire home/apt" = "Entire home/apt",
+                        "Private room" = "Private room",
+                        "Shared room" = "Shared room"
+                      ),
+                      selected = "Entire home/apt",
+                      width = "100%"
+                    )
                   )
                 ),
                 
                 # Right column - Amenities
                 column(
                   width = 6,
+                  style = "display: flex; flex-direction: column;",
                   tags$h4("Amenities", style = "color: #4A4A4A; margin-top: 0; margin-bottom: 12px; font-weight: 600; font-size: 14px;"),
                   
                   tags$div(
-                    style = "margin-top: 40px; max-height: 350px; overflow-y: auto; border: 1px solid #E0E0E0; padding: 10px; border-radius: 5px; background-color: #F5F5F5;",
+                    style = "flex: 1; margin-top: 40px; overflow-y: auto; border: 1px solid #E0E0E0; padding: 10px; border-radius: 5px; background-color: #F5F5F5;",
                     checkboxGroupInput(
                       "amenities",
                       NULL,
@@ -478,7 +480,7 @@ ui <- dashboardPage(
                   width = NULL,
                   solidHeader = TRUE,
                   status = "primary",
-                  style = "height: 180px; display: flex; flex-direction: column; overflow: hidden;",
+                  style = "height: 180px; display: flex; flex-direction: column;",
                   
                   conditionalPanel(
                     condition = "output.price_predicted",
@@ -513,12 +515,12 @@ ui <- dashboardPage(
                   width = NULL,
                   solidHeader = TRUE,
                   status = "warning",
-                  style = "height: 180px; display: flex; flex-direction: column; overflow: hidden;",
+                  style = "height: 180px; display: flex; flex-direction: column;",
                   
                   conditionalPanel(
                     condition = "output.price_predicted",
                     tags$div(
-                      style = "padding: 8px 15px; flex: 1; overflow-y: auto; overflow-x: hidden;",
+                      style = "padding: 5px 15px; flex: 1; overflow-y: auto; overflow-x: hidden;",
                       uiOutput("amenity_recommendations")
                     )
                   ),
@@ -1618,9 +1620,9 @@ server <- function(input, output, session) {
           lapply(1:nrow(recs), function(i) {
             rec <- recs[i, ]
             tags$div(
-              style = "padding: 8px 0; border-bottom: 1px solid #E0E0E0; margin-bottom: 8px;",
+              style = "padding: 6px 0; border-bottom: 1px solid #E0E0E0; margin-bottom: 6px;",
               tags$div(
-                style = "font-weight: 600; color: #2C3E50; margin-bottom: 4px; font-size: 14px;",
+                style = "font-weight: 600; color: #2C3E50; margin-bottom: 3px; font-size: 14px;",
                 rec$amenity_name
               ),
               tags$div(
