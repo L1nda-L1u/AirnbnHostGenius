@@ -460,7 +460,7 @@ ui <- dashboardPage(
                   
                   tags$div(
                     class = "amenities-scrollable",
-                    style = "overflow-y: auto !important; overflow-x: hidden; border: 1px solid #E0E0E0; padding: 10px; border-radius: 5px; background-color: #F5F5F5; max-height: 280px; height: 280px;",
+                    style = "overflow-y: auto !important; overflow-x: hidden; border: 1px solid #E0E0E0; padding: 10px; border-radius: 5px; background-color: #F5F5F5; max-height: 350px; height: 350px;",
                     checkboxGroupInput(
                       "amenities",
                       NULL,
@@ -521,14 +521,16 @@ ui <- dashboardPage(
             style = "display: flex; flex-direction: column;",
             # Top row - Price and Recommendations side by side (equal height)
             fluidRow(
+              style = "display: flex; align-items: stretch;",
               column(
                 width = 6,
+                style = "display: flex; flex-direction: column;",
                 box(
                   title = tags$h3("Predicted Baseline Price", style = "color: #2C3E50; margin: 0; font-weight: 600; font-size: 18px;"),
                   width = NULL,
                   solidHeader = TRUE,
                   status = "primary",
-                  style = "height: 180px; display: flex; flex-direction: column;",
+                  style = "height: 200px; display: flex; flex-direction: column; margin-bottom: 15px;",
                   
                   conditionalPanel(
                     condition = "output.price_predicted",
@@ -558,12 +560,13 @@ ui <- dashboardPage(
               
               column(
                 width = 6,
+                style = "display: flex; flex-direction: column;",
                 box(
                   title = tags$h3("Top 3 Amenity Recommendations", style = "color: #2C3E50; margin: 0; font-weight: 600; font-size: 18px;"),
                   width = NULL,
                   solidHeader = TRUE,
                   status = "warning",
-                  style = "height: 180px; display: flex; flex-direction: column; margin-bottom: 15px;",
+                  style = "height: 200px; display: flex; flex-direction: column; margin-bottom: 15px;",
                   
                   conditionalPanel(
                     condition = "output.price_predicted",
