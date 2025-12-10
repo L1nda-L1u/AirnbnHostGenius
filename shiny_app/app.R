@@ -117,7 +117,7 @@ ui <- dashboardPage(
           background-color: #FFFFFF !important;
           border-bottom: 1px solid #E0E0E0;
           border-radius: 8px 8px 0 0;
-          padding: 8px 15px !important;
+          padding: 5px 15px !important;
         }
         .box-title {
           margin-top: 0 !important;
@@ -329,6 +329,13 @@ ui <- dashboardPage(
                 width = "100%"
               ),
               
+              actionButton(
+                "predict_btn",
+                "Update Prediction",
+                class = "btn-primary",
+                style = "width: 100%; font-size: 16px; padding: 12px; margin-top: 10px; margin-bottom: 10px;"
+              ),
+              
               conditionalPanel(
                 condition = "output.geocode_status",
                 tags$div(
@@ -437,13 +444,6 @@ ui <- dashboardPage(
                   ),
                   selected = c("Wifi", "Kitchen", "Heating")
                 )
-              ),
-              
-              actionButton(
-                "predict_btn",
-                "Update Prediction",
-                class = "btn-primary",
-                style = "width: 100%; font-size: 16px; padding: 12px; margin-top: 15px;"
               )
             )
           ),
@@ -461,7 +461,7 @@ ui <- dashboardPage(
                   width = NULL,
                   solidHeader = TRUE,
                   status = "primary",
-                  style = "height: 200px; display: flex; flex-direction: column;",
+                  style = "height: 150px; display: flex; flex-direction: column;",
                   
                   conditionalPanel(
                     condition = "output.price_predicted",
@@ -492,11 +492,11 @@ ui <- dashboardPage(
               column(
                 width = 6,
                 box(
-                  title = tags$h3("Amenity Recommendations", style = "color: #2C3E50; margin: 0; font-weight: 600; font-size: 18px;"),
+                  title = tags$h3("Top 3 Amenity Recommendations", style = "color: #2C3E50; margin: 0; font-weight: 600; font-size: 18px;"),
                   width = NULL,
                   solidHeader = TRUE,
                   status = "warning",
-                  style = "height: 200px; display: flex; flex-direction: column;",
+                  style = "height: 150px; display: flex; flex-direction: column;",
                   
                   conditionalPanel(
                     condition = "output.price_predicted",
@@ -528,7 +528,7 @@ ui <- dashboardPage(
                   status = "info",
                   style = "flex: 1; display: flex; flex-direction: column;",
                   
-                  leafletOutput("map", height = "500px")
+                  leafletOutput("map", height = "300px")
                 )
               )
             )
@@ -1589,18 +1589,18 @@ server <- function(input, output, session) {
       
       tagList(
         tags$div(
-          style = "margin-bottom: 10px;",
-          tags$h4("Top Recommended Amenities", style = "color: #2C3E50; margin-top: 0; margin-bottom: 8px; font-weight: 600; font-size: 16px;")
-        ),
-        
-        tags$div(
           lapply(1:nrow(recs), function(i) {
             rec <- recs[i, ]
-            tags$button(
-              paste0("+ ", rec$amenity_name, " (£", round(rec$price_impact, 0), "/night)"),
-              style = "background-color: #14B8A6; color: #FFFFFF; padding: 10px 16px; border-radius: 6px; font-size: 13px; font-weight: 500; border: none; cursor: pointer; width: 100%; text-align: left; margin-bottom: 8px; transition: background-color 0.2s;",
-              onmouseover = "this.style.backgroundColor='#0D9488'",
-              onmouseout = "this.style.backgroundColor='#14B8A6'"
+            tags$div(
+              style = "background-color: #14B8A6; color: #FFFFFF; padding: 10px 16px; border-radius: 6px; font-size: 13px; font-weight: 500; margin-bottom: 8px;",
+              tags$div(
+                style = "font-weight: 600; margin-bottom: 4px;",
+                rec$amenity_name
+              ),
+              tags$div(
+                style = "font-size: 12px; opacity: 0.9;",
+                paste0("+£", round(rec$price_impact, 2), " | New Price: £", round(rec$new_price, 2))
+              )
             )
           })
         )
