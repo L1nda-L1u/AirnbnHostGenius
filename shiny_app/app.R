@@ -101,7 +101,10 @@ ui <- dashboardPage(
           background-color: #FAFAFA !important;
         }
         .content-wrapper {
-          background: transparent !important;
+          background-color: #FAFAFA !important;
+        }
+        .content {
+          background-color: #FAFAFA !important;
         }
         .box {
           border-radius: 8px;
@@ -149,7 +152,7 @@ ui <- dashboardPage(
           margin: 15px 0;
         }
         #map {
-          height: 400px;
+          height: 600px;
           border-radius: 8px;
         }
         .content {
@@ -418,116 +421,81 @@ ui <- dashboardPage(
             )
           ),
           
-          # Middle column - Predictions
+          # Right column - Predictions, Recommendations, and Map
           column(
-            width = 4,
-            box(
-              title = tags$h3("Predicted Baseline Price", style = "color: #2C3E50; margin: 0; font-weight: 600;"),
-              width = NULL,
-              solidHeader = TRUE,
-              status = "primary",
-              
-              conditionalPanel(
-                condition = "output.price_predicted",
-                tags$div(
-                  class = "price-display",
-                  textOutput("predicted_price")
-                ),
-                tags$div(
-                  style = "text-align: center; color: #888888; margin-top: 10px; font-size: 14px;",
-                  textOutput("price_note")
+            width = 8,
+            # Top row - Price and Recommendations side by side
+            fluidRow(
+              column(
+                width = 6,
+                box(
+                  title = tags$h3("Predicted Baseline Price", style = "color: #2C3E50; margin: 0; font-weight: 600;"),
+                  width = NULL,
+                  solidHeader = TRUE,
+                  status = "primary",
+                  
+                  conditionalPanel(
+                    condition = "output.price_predicted",
+                    tags$div(
+                      class = "price-display",
+                      textOutput("predicted_price")
+                    ),
+                    tags$div(
+                      style = "text-align: center; color: #888888; margin-top: 10px; font-size: 14px;",
+                      textOutput("price_note")
+                    )
+                  ),
+                  
+                  conditionalPanel(
+                    condition = "!output.price_predicted",
+                    tags$div(
+                      style = "text-align: center; padding: 50px; color: #AAAAAA;",
+                      tags$p("Fill in property information and click Update Prediction", style = "font-size: 14px;")
+                    )
+                  )
                 )
               ),
               
-              conditionalPanel(
-                condition = "!output.price_predicted",
-                tags$div(
-                  style = "text-align: center; padding: 50px; color: #AAAAAA;",
-                  tags$p("Fill in property information and click Update Prediction", style = "font-size: 14px;")
+              column(
+                width = 6,
+                box(
+                  title = tags$h3("Amenity Recommendations", style = "color: #2C3E50; margin: 0; font-weight: 600; font-size: 18px;"),
+                  width = NULL,
+                  solidHeader = TRUE,
+                  status = "warning",
+                  
+                  conditionalPanel(
+                    condition = "output.price_predicted",
+                    tags$div(
+                      style = "padding: 15px;",
+                      uiOutput("amenity_recommendations")
+                    )
+                  ),
+                  
+                  conditionalPanel(
+                    condition = "!output.price_predicted",
+                    tags$div(
+                      style = "text-align: center; padding: 30px; color: #AAAAAA;",
+                      tags$p("Get price prediction to see recommendations", style = "font-size: 14px;")
+                    )
+                  )
                 )
               )
             ),
             
-            box(
-              title = tags$h3("Occupancy Prediction", style = "color: #2C3E50; margin: 0; font-weight: 600;"),
-              width = NULL,
-              solidHeader = TRUE,
-              status = "info",
-              
-              conditionalPanel(
-                condition = "output.price_predicted",
-                tags$div(
-                  style = "text-align: center; padding: 30px;",
-                  tags$p("Model integration pending", style = "color: #888888; font-size: 14px; font-style: italic;")
-                )
-              ),
-              
-              conditionalPanel(
-                condition = "!output.price_predicted",
-                tags$div(
-                  style = "text-align: center; padding: 30px; color: #AAAAAA;",
-                  tags$p("Will show after price prediction", style = "font-size: 14px;")
+            # Bottom row - Map (full width)
+            fluidRow(
+              column(
+                width = 12,
+                box(
+                  title = tags$h3("Location Context", style = "color: #2C3E50; margin: 0; font-weight: 600;"),
+                  width = NULL,
+                  solidHeader = TRUE,
+                  status = "info",
+                  
+                  leafletOutput("map", height = "600px")
                 )
               )
-            ),
-            
-            box(
-              title = tags$h3("Annual Revenue", style = "color: #2C3E50; margin: 0; font-weight: 600;"),
-              width = NULL,
-              solidHeader = TRUE,
-              status = "success",
-              
-              conditionalPanel(
-                condition = "output.price_predicted",
-                tags$div(
-                  style = "text-align: center; padding: 30px;",
-                  tags$p("Model integration pending", style = "color: #888888; font-size: 14px; font-style: italic;")
-                )
-              ),
-              
-              conditionalPanel(
-                condition = "!output.price_predicted",
-                tags$div(
-                  style = "text-align: center; padding: 30px; color: #AAAAAA;",
-                  tags$p("Will show after price prediction", style = "font-size: 14px;")
-                )
-              )
-            )
-          ),
-          
-          # Right column - Recommendations and Map
-          column(
-            width = 4,
-            box(
-              title = tags$h3("Amenity Recommendations", style = "color: #2C3E50; margin: 0; font-weight: 600; font-size: 18px;"),
-              width = NULL,
-              solidHeader = TRUE,
-              status = "warning",
-              
-              conditionalPanel(
-                condition = "output.price_predicted",
-                tags$div(
-                  style = "padding: 15px;",
-                  uiOutput("amenity_recommendations")
-                )
-              ),
-              
-              conditionalPanel(
-                condition = "!output.price_predicted",
-                tags$div(
-                  style = "text-align: center; padding: 30px; color: #AAAAAA;",
-                  tags$p("Get price prediction to see recommendations", style = "font-size: 14px;")
-                )
-              )
-            ),
-            
-            box(
-              title = tags$h3("Location Context", style = "color: #2C3E50; margin: 0; font-weight: 600;"),
-              width = NULL,
-              solidHeader = TRUE,
-              status = "info",
-              
-              leafletOutput("map", height = "400px")
             )
           )
         )
