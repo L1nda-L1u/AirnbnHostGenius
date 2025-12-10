@@ -530,7 +530,7 @@ ui <- dashboardPage(
                   width = NULL,
                   solidHeader = TRUE,
                   status = "primary",
-                  style = "height: 170px; display: flex; flex-direction: column; margin-bottom: 15px;",
+                  style = "height: 160px; display: flex; flex-direction: column; margin-bottom: 15px;",
                   
                   conditionalPanel(
                     condition = "output.price_predicted",
@@ -566,7 +566,7 @@ ui <- dashboardPage(
                   width = NULL,
                   solidHeader = TRUE,
                   status = "warning",
-                  style = "height: 170px; display: flex; flex-direction: column; margin-bottom: 15px;",
+                  style = "height: 160px; display: flex; flex-direction: column; margin-bottom: 15px;",
                   
                   conditionalPanel(
                     condition = "output.price_predicted",
@@ -589,7 +589,7 @@ ui <- dashboardPage(
             
             # Bottom row - Map (full width)
             fluidRow(
-              style = "display: flex; flex: 1; min-height: 0; margin-top: 15px;",
+              style = "display: flex; flex: 1; min-height: 0; margin-top: 0;",
               column(
                 width = 12,
                 style = "display: flex; flex-direction: column; height: 100%;",
@@ -598,7 +598,7 @@ ui <- dashboardPage(
                   width = NULL,
                   solidHeader = TRUE,
                   status = "info",
-                  style = "margin-bottom: 0; display: flex; flex-direction: column; height: 100%;",
+                  style = "margin-bottom: 0; display: flex; flex-direction: column; height: 100%; flex: 1;",
                   
                   tags$div(
                     class = "map-container",
