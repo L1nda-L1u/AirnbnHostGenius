@@ -157,17 +157,17 @@ ui <- dashboardPage(
           margin: 10px 0;
         }
         #map {
-          height: calc(100vh - 550px);
-          min-height: 250px;
-          max-height: 400px;
+          height: 100%;
           border-radius: 8px;
           overflow: hidden;
         }
         .leaflet-container {
-          height: calc(100vh - 550px) !important;
-          min-height: 250px !important;
-          max-height: 400px !important;
+          height: 100% !important;
           overflow: hidden !important;
+        }
+        .map-container {
+          flex: 1;
+          min-height: 0;
         }
         .content {
           padding: 10px 15px !important;
@@ -358,7 +358,7 @@ ui <- dashboardPage(
                 # Left column - Basic Properties
                 column(
                   width = 6,
-                  tags$h4("Basic Properties", style = "color: #4A4A4A; margin-top: 0; margin-bottom: 12px; font-weight: 500; font-size: 14px;"),
+                  tags$h4("Basic Properties", style = "color: #4A4A4A; margin-top: 0; margin-bottom: 12px; font-weight: 600; font-size: 14px;"),
                   
                   numericInput(
                     "bedrooms",
@@ -416,10 +416,10 @@ ui <- dashboardPage(
                 # Right column - Amenities
                 column(
                   width = 6,
-                  tags$h4("Amenities", style = "color: #4A4A4A; margin-top: 0; margin-bottom: 12px; font-weight: 500; font-size: 14px;"),
+                  tags$h4("Amenities", style = "color: #4A4A4A; margin-top: 0; margin-bottom: 12px; font-weight: 600; font-size: 14px;"),
                   
                   tags$div(
-                    style = "max-height: 280px; overflow-y: auto; border: 1px solid #E0E0E0; padding: 10px; border-radius: 5px; background-color: #F5F5F5;",
+                    style = "margin-top: 40px; max-height: 280px; overflow-y: auto; border: 1px solid #E0E0E0; padding: 10px; border-radius: 5px; background-color: #F5F5F5;",
                     checkboxGroupInput(
                       "amenities",
                       NULL,
@@ -512,7 +512,7 @@ ui <- dashboardPage(
                   conditionalPanel(
                     condition = "output.price_predicted",
                     tags$div(
-                      style = "padding: 15px; flex: 1; overflow-y: auto;",
+                      style = "padding: 15px; flex: 1; overflow-y: auto; overflow-x: hidden;",
                       uiOutput("amenity_recommendations")
                     )
                   ),
@@ -540,7 +540,7 @@ ui <- dashboardPage(
                   style = "flex: 1; display: flex; flex-direction: column;",
                   
                   tags$div(
-                    style = "flex: 1; min-height: 250px;",
+                    class = "map-container",
                     leafletOutput("map", height = "100%")
                   )
                 )
@@ -1606,13 +1606,13 @@ server <- function(input, output, session) {
           lapply(1:nrow(recs), function(i) {
             rec <- recs[i, ]
             tags$div(
-              style = "background-color: #14B8A6; color: #FFFFFF; padding: 10px 16px; border-radius: 6px; font-size: 13px; font-weight: 500; margin-bottom: 8px;",
+              style = "padding: 8px 0; border-bottom: 1px solid #E0E0E0; margin-bottom: 8px;",
               tags$div(
-                style = "font-weight: 600; margin-bottom: 4px;",
+                style = "font-weight: 600; color: #2C3E50; margin-bottom: 4px; font-size: 14px;",
                 rec$amenity_name
               ),
               tags$div(
-                style = "font-size: 12px; opacity: 0.9;",
+                style = "font-size: 12px; color: #666666;",
                 paste0("+£", round(rec$price_impact, 2), " | New Price: £", round(rec$new_price, 2))
               )
             )
