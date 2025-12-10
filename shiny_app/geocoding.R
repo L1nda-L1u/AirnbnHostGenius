@@ -1,23 +1,23 @@
 # =============================================
-# Geocoding - 地址转经纬度
+# Geocoding - Address to Latitude/Longitude
 # =============================================
 
 library(httr)
 library(jsonlite)
 
-# 使用Nominatim (OpenStreetMap) 免费地理编码服务
+# Use Nominatim (OpenStreetMap) free geocoding service
 geocode_address <- function(address) {
   if (is.null(address) || nchar(trimws(address)) == 0) {
     return(NULL)
   }
   
-  # 清理地址
+  # Clean address
   address_clean <- trimws(address)
   
   # Nominatim API endpoint
   base_url <- "https://nominatim.openstreetmap.org/search"
   
-  # 构建请求
+  # Build request
   params <- list(
     q = address_clean,
     format = "json",
@@ -25,13 +25,13 @@ geocode_address <- function(address) {
     addressdetails = 1
   )
   
-  # 添加User-Agent（Nominatim要求）
+  # Add User-Agent (required by Nominatim)
   headers <- add_headers(
     "User-Agent" = "AirbnbPricePredictor/1.0"
   )
   
   tryCatch({
-    # 设置超时时间（5秒）
+    # Set timeout (5 seconds)
     response <- GET(base_url, query = params, headers, timeout(5))
     
     if (status_code(response) == 200) {
@@ -53,15 +53,15 @@ geocode_address <- function(address) {
       return(NULL)
     }
   }, error = function(e) {
-    # 静默处理错误，不打印到控制台
+    # Silently handle errors, don't print to console
     return(NULL)
   })
 }
 
-# 备用方法：使用Google Geocoding API（需要API key）
+# Alternative method: Use Google Geocoding API (requires API key)
 geocode_address_google <- function(address, api_key = NULL) {
   if (is.null(api_key)) {
-    # 如果没有API key，使用Nominatim
+    # If no API key, use Nominatim
     return(geocode_address(address))
   }
   

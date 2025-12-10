@@ -1,14 +1,14 @@
 # =============================================
-# 启动 Shiny 应用 - Airbnb 基准价格预测器
+# Launch Shiny App - Airbnb Baseline Price Predictor
 # =============================================
 # 
-# 使用方法：
-#   在项目根目录运行: source("shiny_app/run_app.R")
-#   应用将在浏览器中自动打开: http://localhost:3838
+# Usage:
+#   Run from project root: source("shiny_app/run_app.R")
+#   App will automatically open in browser: http://localhost:3838
 #
 # =============================================
 
-# 检查并安装必需的 R 包
+# Check and install required R packages
 required_packages <- c(
   "shiny", "shinydashboard", "DT", "leaflet", "plotly",
   "dplyr", "geosphere", "xgboost", "reticulate", "glmnet",
@@ -19,51 +19,51 @@ required_packages <- c(
 missing_packages <- required_packages[!sapply(required_packages, requireNamespace, quietly = TRUE)]
 
 if (length(missing_packages) > 0) {
-  cat("正在安装缺失的 R 包...\n")
+  cat("Installing missing R packages...\n")
   install.packages(missing_packages)
-  cat("安装完成！\n\n")
+  cat("Installation complete!\n\n")
 }
 
-# 检查 Python 和 PyTorch（可选，用于神经网络模型）
-# 注意：应用使用 XGBoost-only 模式，不需要 Python 也能运行
+# Check Python and PyTorch (optional, for Neural Network model)
+# Note: App uses XGBoost-only mode, Python is not required
 if (requireNamespace("reticulate", quietly = TRUE)) {
   library(reticulate)
   
   if (!py_available()) {
-    cat("提示: Python 未配置。应用将使用 XGBoost-only 模式（这是正常的）。\n")
-    cat("如需启用神经网络模型，运行: source('baseline_price_predict/sensitivity_analysis/configure_python.R')\n\n")
+    cat("Info: Python not configured. App will use XGBoost-only mode (this is normal).\n")
+    cat("To enable Neural Network model, run: source('baseline_price_predict/sensitivity_analysis/configure_python.R')\n\n")
   } else {
     if (!py_module_available("torch")) {
-      cat("PyTorch 未安装。正在安装...\n")
+      cat("PyTorch not installed. Installing...\n")
       py_install("torch", pip = TRUE)
-      cat("PyTorch 安装完成！\n\n")
+      cat("PyTorch installation complete!\n\n")
     }
   }
 }
 
-# 启动应用
+# Launch app
 cat("========================================\n")
-cat("正在启动 Airbnb 基准价格预测器\n")
+cat("Launching Airbnb Baseline Price Predictor\n")
 cat("========================================\n\n")
 
-# 确保在正确的目录
-# 如果不在 shiny_app 目录，且 shiny_app 目录存在，则切换到该目录
+# Ensure we're in the correct directory
+# If not in shiny_app directory and shiny_app exists, switch to it
 if (basename(getwd()) != "shiny_app") {
   if (dir.exists("shiny_app")) {
     setwd("shiny_app")
-    cat("已切换到 shiny_app 目录\n\n")
+    cat("Switched to shiny_app directory\n\n")
   } else {
-    cat("警告: 未找到 shiny_app 目录。请确保在项目根目录运行此脚本。\n")
-    cat("当前目录:", getwd(), "\n\n")
+    cat("Warning: shiny_app directory not found. Please run this script from project root.\n")
+    cat("Current directory:", getwd(), "\n\n")
   }
 }
 
-# 启动 Shiny 应用
-# host = "0.0.0.0" 允许从任何网络接口访问
-# port = 3838 是 Shiny 的默认端口
-cat("应用正在启动...\n")
-cat("浏览器将自动打开，或手动访问: http://localhost:3838\n")
-cat("按 Ctrl+C 或 Esc 停止应用\n\n")
+# Launch Shiny app
+# host = "0.0.0.0" allows access from any network interface
+# port = 3838 is Shiny's default port
+cat("App is starting...\n")
+cat("Browser will open automatically, or visit: http://localhost:3838\n")
+cat("Press Ctrl+C or Esc to stop the app\n\n")
 
 shiny::runApp("app.R", host = "0.0.0.0", port = 3838)
 

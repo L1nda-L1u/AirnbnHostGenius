@@ -1,19 +1,19 @@
 # =============================================
-# Feature Builder - 构建模型输入特征向量
+# Feature Builder - Build Model Input Feature Vector
 # =============================================
 
 library(dplyr)
 library(geosphere)
 
-# 全局变量存储训练数据统计（避免重复加载）
+# Global variables to store training data statistics (avoid reloading)
 training_data_cache <- NULL
 training_stats_cache <- NULL
-cluster_centers_cache <- NULL  # 缓存cluster中心点
-neighbourhood_map_cache <- NULL  # 缓存neighbourhood映射
+cluster_centers_cache <- NULL  # Cache cluster centers
+neighbourhood_map_cache <- NULL  # Cache neighbourhood mapping
 
-# 加载训练数据以获取特征列和默认值
+# Load training data to get feature columns and default values
 load_training_sample <- function() {
-  # 如果已经加载过，直接返回
+  # If already loaded, return directly
   if (!is.null(training_data_cache)) {
     return(training_data_cache)
   }
@@ -29,9 +29,9 @@ load_training_sample <- function() {
   for (training_file in possible_paths) {
     if (file.exists(training_file)) {
       tryCatch({
-        # 读取更多数据以获得更准确的统计值（至少1000行）
+        # Read more data for more accurate statistics (at least 1000 rows)
         data <- read.csv(training_file, nrows = 1000)
-        training_data_cache <<- data  # 缓存数据
+        training_data_cache <<- data  # Cache data
         cat("Loaded", nrow(data), "rows of training data for statistics\n")
         return(data)
       }, error = function(e) {
@@ -44,23 +44,23 @@ load_training_sample <- function() {
   return(NULL)
 }
 
-# 获取最近的房源用于填充缺失特征
+# Get nearest listing features for filling missing features
 get_nearest_listing_features <- function(lat, lon, training_data) {
   if (is.null(training_data) || nrow(training_data) == 0) {
     return(NULL)
   }
   
-  # 计算距离
+  # Calculate distance
   distances <- distHaversine(
     cbind(training_data$longitude, training_data$latitude),
     c(lon, lat)
-  ) / 1000  # 转换为公里
+  ) / 1000  # Convert to kilometers
   
   nearest_idx <- which.min(distances)
   return(training_data[nearest_idx, ])
 }
 
-# 计算cluster中心点（用于根据经纬度找到对应的cluster）
+# Calculate cluster centers (for finding corresponding cluster by lat/lon)
 calculate_cluster_centers <- function(training_data) {
   if (is.null(cluster_centers_cache) && !is.null(training_data) && nrow(training_data) > 0) {
     if ("location_cluster_id" %in% colnames(training_data) &&
@@ -80,12 +80,12 @@ calculate_cluster_centers <- function(training_data) {
   return(cluster_centers_cache)
 }
 
-# 根据经纬度找到对应的cluster_id（通过最近的cluster中心）
+# Find corresponding cluster_id by lat/lon (via nearest cluster center)
 find_cluster_by_location <- function(lat, lon, training_data) {
   cluster_centers <- calculate_cluster_centers(training_data)
   
   if (is.null(cluster_centers) || nrow(cluster_centers) == 0) {
-    # 如果没有cluster中心，使用最近的房源
+    # If no cluster centers, use nearest listing
     nearest <- get_nearest_listing_features(lat, lon, training_data)
     if (!is.null(nearest) && "location_cluster_id" %in% colnames(nearest)) {
       return(as.integer(nearest$location_cluster_id))
@@ -93,13 +93,13 @@ find_cluster_by_location <- function(lat, lon, training_data) {
     return(0)
   }
   
-  # 计算到每个cluster中心的距离
+  # Calculate distance to each cluster center
   distances <- distHaversine(
     cbind(cluster_centers$center_lon, cluster_centers$center_lat),
     c(lon, lat)
-  ) / 1000  # 转换为公里
+  ) / 1000  # Convert to kilometers
   
-  # 找到最近的cluster
+  # Find nearest cluster
   nearest_cluster_idx <- which.min(distances)
   cluster_id <- cluster_centers$location_cluster_id[nearest_cluster_idx]
   
@@ -109,10 +109,10 @@ find_cluster_by_location <- function(lat, lon, training_data) {
   return(as.integer(cluster_id))
 }
 
-# 计算位置聚类特征
+# Calculate location cluster features
 calculate_cluster_features <- function(lat, lon, training_data) {
   if (is.null(training_data) || nrow(training_data) == 0) {
-    # 返回默认值
+    # Return default values
     return(list(
       location_cluster_id = 0,
       cluster_median_price = 150,
@@ -123,10 +123,10 @@ calculate_cluster_features <- function(lat, lon, training_data) {
     ))
   }
   
-  # 根据经纬度找到对应的cluster_id
+  # Find corresponding cluster_id by lat/lon
   cluster_id <- find_cluster_by_location(lat, lon, training_data)
   
-  # 计算该聚类的价格统计
+  # Calculate price statistics for this cluster
   if ("location_cluster_id" %in% colnames(training_data) && 
       "price_num" %in% colnames(training_data)) {
     cluster_data <- training_data %>%
@@ -144,7 +144,7 @@ calculate_cluster_features <- function(lat, lon, training_data) {
     }
   }
   
-  # 使用全局统计
+  # Use global statistics
   return(list(
     location_cluster_id = cluster_id,
     cluster_median_price = median(training_data$price_num, na.rm = TRUE),
@@ -155,18 +155,18 @@ calculate_cluster_features <- function(lat, lon, training_data) {
   ))
 }
 
-# 构建特征向量
+# Build feature vector
 build_features <- function(lat, lon, bedrooms, bathrooms, accommodates, beds,
                           room_type, amenities = c()) {
   
-  # 加载训练数据样本
+  # Load training data sample
   training_data <- load_training_sample()
   
-  # 获取特征列顺序
+  # Get feature column order
   if (!is.null(training_data)) {
     feature_cols <- setdiff(colnames(training_data), "price_num")
   } else {
-    # 使用默认特征列（从之前的分析）
+    # Use default feature columns (from previous analysis)
     feature_cols <- c(
       "latitude", "longitude", "accommodates", "bathrooms", "bedrooms", "beds",
       "review_scores_cleanliness", "review_scores_location", "bath_num", 
@@ -185,12 +185,12 @@ build_features <- function(lat, lon, bedrooms, bathrooms, accommodates, beds,
     )
   }
   
-  # 计算卫生间相关特征
+  # Calculate bathroom-related features
   bath_num <- ifelse(bathrooms > 0, round(bathrooms), 1)
-  bath_shared <- 0  # 默认不共享
+  bath_shared <- 0  # Default: not shared
   bath_type_unknown <- ifelse(bathrooms == 0, 1, 0)
   
-  # 房型ID映射
+  # Room type ID mapping
   room_type_map <- c(
     "Entire home/apt" = 0,
     "Private room" = 1,
@@ -199,10 +199,10 @@ build_features <- function(lat, lon, bedrooms, bathrooms, accommodates, beds,
   room_type_id <- ifelse(room_type %in% names(room_type_map), 
                         room_type_map[room_type], 0)
   
-  # 计算位置聚类特征
+  # Calculate location cluster features
   cluster_features <- calculate_cluster_features(lat, lon, training_data)
   
-  # 获取neighbourhood_id（使用最近的房源）
+  # Get neighbourhood_id (using nearest listing)
   nearest <- get_nearest_listing_features(lat, lon, training_data)
   neighbourhood_id <- if (!is.null(nearest) && "neighbourhood_id" %in% colnames(nearest)) {
     nid <- as.integer(nearest$neighbourhood_id)
@@ -210,9 +210,9 @@ build_features <- function(lat, lon, bedrooms, bathrooms, accommodates, beds,
                 lat, lon, nid))
     nid
   } else {
-    # 如果没有训练数据，使用最常见的neighbourhood_id（通常是0）
+    # If no training data, use most common neighbourhood_id (usually 0)
     if (!is.null(training_data) && "neighbourhood_id" %in% colnames(training_data)) {
-      # 使用训练数据中最常见的neighbourhood_id
+      # Use most common neighbourhood_id from training data
       most_common_id <- as.integer(names(sort(table(training_data$neighbourhood_id), decreasing = TRUE)[1]))
       if (is.na(most_common_id)) {
         cat("Warning: Could not determine neighbourhood_id, using default: 0\n")
@@ -227,7 +227,7 @@ build_features <- function(lat, lon, bedrooms, bathrooms, accommodates, beds,
     }
   }
   
-  # 构建amenity特征（one-hot编码）
+  # Build amenity features (one-hot encoding)
   amenity_features <- list()
   amenity_list <- c(
     "Wifi", "Smoke.alarm", "Kitchen", "Washer", "Essentials", "Iron", 
@@ -241,7 +241,7 @@ build_features <- function(lat, lon, bedrooms, bathrooms, accommodates, beds,
   
   for (amenity in amenity_list) {
     amenity_key <- paste0("amenity_", amenity)
-    # 检查用户选择的设施
+    # Check user-selected amenities
     if (amenity %in% amenities || 
         (amenity == "Wifi" && "Wifi" %in% amenities) ||
         (amenity == "Kitchen" && "Kitchen" %in% amenities) ||
@@ -252,7 +252,7 @@ build_features <- function(lat, lon, bedrooms, bathrooms, accommodates, beds,
     }
   }
   
-  # 构建完整特征向量
+  # Build complete feature vector
   # Use default values for review scores (median from training data)
   review_cleanliness_default <- 4.5
   review_location_default <- 4.5
@@ -271,10 +271,10 @@ build_features <- function(lat, lon, bedrooms, bathrooms, accommodates, beds,
     bath_type_unknown = bath_type_unknown
   )
   
-  # 添加amenity特征
+  # Add amenity features
   features <- c(features, amenity_features)
   
-  # 添加ID和聚类特征
+  # Add ID and cluster features
   features <- c(features, list(
     neighbourhood_id = neighbourhood_id,
     room_type_id = room_type_id,
@@ -286,17 +286,17 @@ build_features <- function(lat, lon, bedrooms, bathrooms, accommodates, beds,
     location_cluster_id = cluster_features$location_cluster_id
   ))
   
-  # 转换为向量，确保顺序正确
+  # Convert to vector, ensure correct order
   feature_vector <- numeric(length(feature_cols))
   names(feature_vector) <- feature_cols
   
-  # 计算训练数据的统计值（用于填充缺失特征）
-  # 使用缓存避免重复计算
+  # Calculate training data statistics (for filling missing features)
+  # Use cache to avoid repeated calculations
   if (is.null(training_stats_cache) && !is.null(training_data) && nrow(training_data) > 0) {
     training_stats_cache <<- list()
     for (col in feature_cols) {
       if (col %in% colnames(training_data)) {
-        # 使用中位数（更稳健）
+        # Use median (more robust)
         val <- median(training_data[[col]], na.rm = TRUE)
         if (is.na(val)) {
           val <- mean(training_data[[col]], na.rm = TRUE)
@@ -311,28 +311,28 @@ build_features <- function(lat, lon, bedrooms, bathrooms, accommodates, beds,
     }
   }
   
-  # 使用缓存的统计值或计算新的
+  # Use cached statistics or calculate new
   if (!is.null(training_stats_cache)) {
     training_stats <- training_stats_cache
   } else {
-    # 如果没有训练数据，使用默认值
+    # If no training data, use default values
     training_stats <- list()
     for (col in feature_cols) {
       training_stats[[col]] <- 0
     }
   }
   
-  # 填充特征向量
+  # Fill feature vector
   for (col in feature_cols) {
     if (col %in% names(features)) {
       feature_vector[col] <- as.numeric(features[[col]])
     } else {
-      # 使用训练数据的平均值/中位数
+      # Use mean/median from training data
       feature_vector[col] <- training_stats[[col]]
     }
   }
   
-  # 返回特征向量和元数据（用于显示）
+  # Return feature vector and metadata (for display)
   return(list(
     features = as.numeric(feature_vector),
     metadata = list(
