@@ -260,11 +260,11 @@ ui <- dashboardPage(
             width = 8,
             box(
               title = tags$h3("London Airbnb Listings", style = "color: #2C3E50; margin: 0; font-weight: 600;"),
-              width = NULL,
-              solidHeader = TRUE,
-              status = "primary",
-              leafletOutput("overview_map", height = "100%")
-            )
+                width = NULL,
+                solidHeader = TRUE,
+                status = "primary",
+                leafletOutput("overview_map", height = "700px")
+              )
           ),
           
           # Right side - Controls and Legend
@@ -540,7 +540,7 @@ ui <- dashboardPage(
                       style = "flex: 1; display: flex; flex-direction: column; justify-content: center;",
                       tags$div(
                         class = "price-display",
-                        style = "font-size: 72px; padding: 0 15px; margin: 5px 0; font-weight: bold; color: #2C7A7B; line-height: 1;",
+                        style = "font-size: 72px; padding: 0 15px; margin: 15px 0 5px 0; font-weight: bold; color: #2C7A7B; line-height: 1;",
                         textOutput("predicted_price")
                       ),
                       tags$div(
