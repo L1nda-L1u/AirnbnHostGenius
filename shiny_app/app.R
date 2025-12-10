@@ -460,7 +460,7 @@ ui <- dashboardPage(
                   
                   tags$div(
                     class = "amenities-scrollable",
-                    style = "flex: 1; overflow-y: auto; overflow-x: hidden; border: 1px solid #E0E0E0; padding: 10px; border-radius: 5px; background-color: #F5F5F5; height: 100%; max-height: 100%; min-height: 0;",
+                    style = "flex: 1; overflow-y: auto !important; overflow-x: hidden; border: 1px solid #E0E0E0; padding: 10px; border-radius: 5px; background-color: #F5F5F5; max-height: 100%; min-height: 200px; height: 100%;",
                     checkboxGroupInput(
                       "amenities",
                       NULL,
