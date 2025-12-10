@@ -598,7 +598,7 @@ ui <- dashboardPage(
                   width = NULL,
                   solidHeader = TRUE,
                   status = "info",
-                  style = "margin-bottom: 0; display: flex; flex-direction: column; flex: 1; height: auto;",
+                  style = "margin-bottom: 10px; display: flex; flex-direction: column; flex: 1; height: auto;",
                   
                   tags$div(
                     class = "map-container",
