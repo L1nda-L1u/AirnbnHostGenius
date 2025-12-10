@@ -36,6 +36,19 @@ source(file.path(app_dir, "feature_builder.R"), local = TRUE)
 source(file.path(app_dir, "sensitivity_helper.R"), local = TRUE)
 source(file.path(app_dir, "market_indicators.R"), local = TRUE)
 
+# Load competitor data (historical listings)
+competitor_data <- NULL
+tryCatch({
+  if (exists("load_competitor_data")) {
+    competitor_data <- load_competitor_data()
+    if (!is.null(competitor_data)) {
+      cat("Competitor data loaded:", nrow(competitor_data), "listings\n")
+    }
+  }
+}, error = function(e) {
+  cat("Failed to load competitor data:", e$message, "\n")
+})
+
 # =============================================
 # UI - Cyan/Gray Theme (Low Saturation, Fresh)
 # =============================================
@@ -375,7 +388,7 @@ ui <- dashboardPage(
                   )
                 ),
                 column(
-                  width = 5,
+                  width = 6,
                   style = "display: flex; align-items: center; padding-left: 8px; padding-top: 25px;",
                   conditionalPanel(
                     condition = "output.geocode_status",
@@ -1323,24 +1336,31 @@ server <- function(input, output, session) {
     status <- geocode_status()
     if (nchar(status) == 0) return(NULL)
     
+    # Common style for consistent height/alignment
+    # min-height: 55px ensures it matches the height of a 3-line message roughly
+    # display: flex + align-items: center ensures single lines are vertically centered
+    common_style <- "font-weight: 500; padding: 4px 10px; border-radius: 5px; font-size: 12px; width: 100%; min-height: 55px; display: flex; align-items: center; line-height: 1.3;"
+    
     if (grepl("Location found", status)) {
       location_text <- sub("Location found: ", "", status)
-      if (nchar(location_text) > 25) {
-        location_text <- paste0(substr(location_text, 1, 22), "...")
+      if (nchar(location_text) > 40) {
+        location_text <- paste0(substr(location_text, 1, 37), "...")
       }
+      
       tags$div(
-        tags$span(location_text, style = "font-size: 11px;"),
-        style = "color: #234E52; font-weight: 500; padding: 4px 8px; background-color: #E0F2F1; border-radius: 5px; font-size: 11px; width: 100%; line-height: 1.3; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"
+        tags$span(paste("Location found:", location_text), style = "font-size: 11px;"),
+        style = paste0("color: #234E52; background-color: #E0F2F1; ", common_style)
       )
     } else if (grepl("Cannot find|Error", status)) {
+      # Use Red/Pink for errors
       tags$div(
         status,
-        style = "color: #234E52; font-weight: 500; padding: 6px 10px; background-color: #E0F2F1; border-radius: 5px; font-size: 12px; width: 100%; line-height: 1.4;"
+        style = paste0("color: #C0392B; background-color: #FADBD8; ", common_style)
       )
     } else {
       tags$div(
         status,
-        style = "color: #234E52; font-weight: 500; padding: 6px 10px; background-color: #E0F2F1; border-radius: 5px; font-size: 12px; width: 100%; line-height: 1.4;"
+        style = paste0("color: #234E52; background-color: #E0F2F1; ", common_style)
       )
     }
   })
@@ -1349,10 +1369,58 @@ server <- function(input, output, session) {
     result <- geocode_result()
     
     if (!is.null(result) && !is.na(result$lat) && !is.na(result$lon)) {
-      leaflet() %>%
+      m <- leaflet() %>%
         addTiles() %>%
-        addMarkers(lng = result$lon, lat = result$lat, popup = result$display_name) %>%
+        addMarkers(lng = result$lon, lat = result$lat, popup = paste("<b>Target Location</b><br>", result$display_name)) %>%
         setView(lng = result$lon, lat = result$lat, zoom = 15)
+      
+      # Add competitor markers if data is available
+      if (!is.null(competitor_data) && nrow(competitor_data) > 0) {
+        # Calculate distance to finding nearest competitors
+        # Use simple Euclidean distance for speed as first pass, or Haversine for accuracy
+        # Since we want nearest ~20, calculating all distances is fine for 50k rows (vectorized)
+        
+        # Calculate distances (in meters)
+        dists <- distHaversine(
+          cbind(competitor_data$longitude, competitor_data$latitude),
+          c(result$lon, result$lat)
+        )
+        
+        # Add distance to data
+        comp_df <- competitor_data
+        comp_df$dist <- dists
+        
+        # Select nearest 20 listings
+        nearest_comps <- comp_df[order(comp_df$dist), ][seq_len(min(20, nrow(comp_df))), ]
+        
+        # Map room_type_id back to name for display
+        room_types <- c("Entire home/apt", "Private room", "Shared room")
+        nearest_comps$room_type_name <- room_types[nearest_comps$room_type_id + 1] # 0-indexed to 1-indexed
+        
+        # Create popup content
+        nearest_comps$popup <- paste0(
+          "<b>Comparables</b><br>",
+          "Price: £", nearest_comps$price_num, "<br>",
+          "Type: ", nearest_comps$room_type_name, "<br>",
+          "Bedrooms: ", nearest_comps$bedrooms, "<br>",
+          "Accommodates: ", nearest_comps$accommodates, "<br>",
+          "Distance: ", round(nearest_comps$dist), "m"
+        )
+        
+        # Add to map
+        m <- m %>% addCircleMarkers(
+          data = nearest_comps,
+          lng = ~longitude,
+          lat = ~latitude,
+          radius = 6,
+          color = "#38B2AC",  # Lighter teal (based on title color #2C7A7B)
+          stroke = TRUE,
+          fillOpacity = 0.8,
+          popup = ~popup
+        )
+      }
+      
+      m
     } else {
       leaflet() %>%
         addTiles() %>%

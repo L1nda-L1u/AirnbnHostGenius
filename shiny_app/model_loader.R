@@ -234,3 +234,50 @@ predict_baseline_price <- function(feature_vector) {
   cat("Using XGBoost-only mode\n")
   return(xgb_pred)
 }
+
+# Load competitor data for map
+load_competitor_data <- function() {
+  # Set working directory to baseprice_model
+  original_wd <- getwd()
+  
+  # Try multiple possible paths (from root directory)
+  possible_dirs <- c(
+    file.path(getwd(), "baseline_price_predict", "baseprice_model"),
+    file.path(dirname(getwd()), "baseline_price_predict", "baseprice_model"),
+    file.path(getwd(), "..", "baseline_price_predict", "baseprice_model"),
+    file.path(getwd(), "baseprice_model")
+  )
+  
+  model_dir <- NULL
+  for (dir in possible_dirs) {
+    if (dir.exists(dir)) {
+      model_dir <- dir
+      break
+    }
+  }
+  
+  if (is.null(model_dir)) {
+    warning("Cannot find baseprice_model directory for competitor data.")
+    return(NULL)
+  }
+  
+  setwd(model_dir)
+  on.exit(setwd(original_wd))
+  
+  training_file <- "nn_price_training_v4.csv"
+  if (!file.exists(training_file)) {
+    warning("Cannot find training data file: ", training_file)
+    return(NULL)
+  }
+  
+  # Load only necessary columns to save memory
+  # latitude, longitude, price_num, bedrooms, bathrooms, accommodates
+  tryCatch({
+    df <- fread(training_file, select = c("latitude", "longitude", "price_num", "bedrooms", "accommodates", "room_type_id"))
+    return(df)
+  }, error = function(e) {
+    # Fallback if fread fails or is not available (though data.table is loaded in app.R)
+    df <- read.csv(training_file)
+    return(df[, c("latitude", "longitude", "price_num", "bedrooms", "accommodates", "room_type_id")])
+  })
+}
