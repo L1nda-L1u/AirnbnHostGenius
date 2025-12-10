@@ -43,8 +43,8 @@ source(file.path(app_dir, "market_indicators.R"), local = TRUE)
 ui <- dashboardPage(
   dashboardHeader(
     title = tags$div(
-      tags$span("🏠", style = "font-size: 24px; margin-right: 10px;"),
-      tags$span("Airbnb Baseline Price Predictor", 
+      tags$span("Airbnb", style = "font-size: 20px; font-weight: bold; color: #FF5A5F; margin-right: 8px;"),
+      tags$span("Baseline Pricing Tool", 
                 style = "font-size: 20px; font-weight: bold; color: #2C3E50;")
     ),
     titleWidth = 350
@@ -73,44 +73,47 @@ ui <- dashboardPage(
     tags$head(
       tags$style(HTML("
         .skin-blue .main-header .logo {
-          background-color: #6BC4C4 !important;
-          color: #fff !important;
+          background-color: #FFFFFF !important;
+          color: #2C3E50 !important;
           font-weight: bold;
         }
         .skin-blue .main-header .logo:hover {
-          background-color: #5AB3B3 !important;
+          background-color: #F5F5F5 !important;
         }
         .skin-blue .main-header .navbar {
-          background-color: #7BC4C4 !important;
+          background-color: #FFFFFF !important;
         }
         .skin-blue .main-sidebar {
-          background-color: #E8E8E8 !important;
+          background-color: #F8F8F8 !important;
         }
         .skin-blue .main-sidebar .sidebar-menu > li.active > a {
-          background-color: #6BC4C4 !important;
-          border-left-color: #5AB3B3 !important;
+          background-color: #14B8A6 !important;
+          border-left-color: #0D9488 !important;
+          color: #FFFFFF !important;
+        }
+        .skin-blue .main-sidebar .sidebar-menu > li > a {
+          color: #2C3E50 !important;
         }
         .skin-blue .main-sidebar .sidebar-menu > li > a:hover {
-          background-color: #D8D8D8 !important;
+          background-color: #E5E5E5 !important;
         }
         body {
-          background: linear-gradient(135deg, #E8F5F3 0%, #F0F8F7 25%, #F5F9F8 50%, #E8F0ED 75%, #E8F5F3 100%) !important;
-          background-attachment: fixed;
+          background-color: #FAFAFA !important;
         }
         .content-wrapper {
           background: transparent !important;
         }
         .box {
-          border-radius: 10px;
-          box-shadow: 0 3px 12px rgba(0,0,0,0.12) !important;
-          border-top: 3px solid #88D8C0 !important;
+          border-radius: 8px;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.08) !important;
+          border: 1px solid #E0E0E0 !important;
           background-color: #FFFFFF !important;
           margin-bottom: 15px !important;
         }
         .box-header {
-          background-color: #F8F8F8 !important;
-          border-bottom: 1px solid #E8E8E8;
-          border-radius: 10px 10px 0 0;
+          background-color: #FFFFFF !important;
+          border-bottom: 1px solid #E0E0E0;
+          border-radius: 8px 8px 0 0;
         }
         .form-control {
           border-radius: 5px;
@@ -119,29 +122,29 @@ ui <- dashboardPage(
           background-color: #FFFFFF;
         }
         .form-control:focus {
-          border-color: #88D8C0;
-          box-shadow: 0 0 5px rgba(136, 216, 192, 0.2);
+          border-color: #14B8A6;
+          box-shadow: 0 0 5px rgba(20, 184, 166, 0.2);
         }
         .btn-primary {
-          background-color: #6BC4C4 !important;
-          border-color: #5AB3B3 !important;
-          border-radius: 5px;
-          font-weight: bold;
+          background-color: #14B8A6 !important;
+          border-color: #0D9488 !important;
+          border-radius: 6px;
+          font-weight: 500;
           padding: 10px 20px;
-          transition: all 0.3s;
+          transition: all 0.2s;
+          color: #FFFFFF !important;
         }
         .btn-primary:hover {
-          background-color: #5AB3B3 !important;
-          transform: translateY(-2px);
-          box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+          background-color: #0D9488 !important;
+          box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         .price-display {
-          font-size: 42px;
+          font-size: 48px;
           font-weight: bold;
-          color: #4ECDC4;
+          color: #2C3E50;
           text-align: center;
-          padding: 25px 15px;
-          background: linear-gradient(135deg, #F0F8F7 0%, #E8F5F3 100%);
+          padding: 30px 15px;
+          background-color: #FFFFFF;
           border-radius: 8px;
           margin: 15px 0;
         }
@@ -173,6 +176,9 @@ ui <- dashboardPage(
           margin-bottom: 5px;
         }
         h3, h4, h5 {
+          color: #2C3E50 !important;
+        }
+        .control-label {
           color: #4A4A4A !important;
         }
       "))
@@ -189,7 +195,7 @@ ui <- dashboardPage(
           column(
             width = 8,
             box(
-              title = tags$h3("🗺️ London Airbnb Listings", style = "color: #4A4A4A; margin: 0; font-weight: 600;"),
+              title = tags$h3("London Airbnb Listings", style = "color: #2C3E50; margin: 0; font-weight: 600;"),
               width = NULL,
               solidHeader = TRUE,
               status = "primary",
@@ -201,7 +207,7 @@ ui <- dashboardPage(
           column(
             width = 4,
             box(
-              title = tags$h4("🎨 Color Coding Options", style = "color: #4A4A4A; margin: 0; font-weight: 600;"),
+              title = tags$h4("Color Coding Options", style = "color: #2C3E50; margin: 0; font-weight: 600;"),
               width = NULL,
               solidHeader = TRUE,
               status = "info",
@@ -219,17 +225,17 @@ ui <- dashboardPage(
               
               hr(),
               
-              tags$h5("📊 Distribution (Click to Filter)", style = "color: #5A5A5A; font-weight: 600;"),
+              tags$h5("Distribution (Click to Filter)", style = "color: #4A4A4A; font-weight: 600;"),
               uiOutput("category_bars"),
               
               hr(),
               
-              tags$h5("📈 Summary Statistics", style = "color: #5A5A5A; font-weight: 600;"),
+              tags$h5("Summary Statistics", style = "color: #4A4A4A; font-weight: 600;"),
               uiOutput("overview_stats")
             ),
             
             box(
-              title = tags$h4("🔍 Filter Options", style = "color: #4A4A4A; margin: 0; font-weight: 600;"),
+              title = tags$h4("Filter Options", style = "color: #2C3E50; margin: 0; font-weight: 600;"),
               width = NULL,
               solidHeader = TRUE,
               status = "warning",
@@ -285,7 +291,7 @@ ui <- dashboardPage(
           column(
             width = 4,
             box(
-              title = tags$h3("📍 Property Information", style = "color: #4A4A4A; margin: 0; font-weight: 600;"),
+              title = tags$h3("Property Details", style = "color: #2C3E50; margin: 0; font-weight: 600;"),
               width = NULL,
               solidHeader = TRUE,
               status = "primary",
@@ -307,7 +313,7 @@ ui <- dashboardPage(
               
               hr(),
               
-              tags$h4("🏠 Basic Properties", style = "color: #5A5A5A; margin-top: 20px; font-weight: 500;"),
+              tags$h4("Basic Properties", style = "color: #4A4A4A; margin-top: 20px; font-weight: 500;"),
               
               fluidRow(
                 column(6,
@@ -373,7 +379,7 @@ ui <- dashboardPage(
               
               hr(),
               
-              tags$h4("✨ Amenities", style = "color: #5A5A5A; margin-top: 20px; font-weight: 500;"),
+              tags$h4("Amenities", style = "color: #4A4A4A; margin-top: 20px; font-weight: 500;"),
               
               tags$div(
                 style = "max-height: 300px; overflow-y: auto; border: 1px solid #E0E0E0; padding: 15px; border-radius: 5px; background-color: #F5F5F5;",
@@ -405,7 +411,7 @@ ui <- dashboardPage(
               
               actionButton(
                 "predict_btn",
-                "🚀 Predict Price",
+                "Update Prediction",
                 class = "btn-primary",
                 style = "width: 100%; font-size: 18px; padding: 15px; margin-top: 20px;"
               )
@@ -416,7 +422,7 @@ ui <- dashboardPage(
           column(
             width = 4,
             box(
-              title = tags$h3("💰 Baseline Price", style = "color: #4A4A4A; margin: 0; font-weight: 600;"),
+              title = tags$h3("Predicted Baseline Price", style = "color: #2C3E50; margin: 0; font-weight: 600;"),
               width = NULL,
               solidHeader = TRUE,
               status = "primary",
@@ -437,13 +443,13 @@ ui <- dashboardPage(
                 condition = "!output.price_predicted",
                 tags$div(
                   style = "text-align: center; padding: 50px; color: #AAAAAA;",
-                  tags$p("👆 Fill in property information and click Predict", style = "font-size: 14px;")
+                  tags$p("Fill in property information and click Update Prediction", style = "font-size: 14px;")
                 )
               )
             ),
             
             box(
-              title = tags$h3("📈 Occupancy Prediction", style = "color: #4A4A4A; margin: 0; font-weight: 600;"),
+              title = tags$h3("Occupancy Prediction", style = "color: #2C3E50; margin: 0; font-weight: 600;"),
               width = NULL,
               solidHeader = TRUE,
               status = "info",
@@ -466,7 +472,7 @@ ui <- dashboardPage(
             ),
             
             box(
-              title = tags$h3("💵 Annual Revenue", style = "color: #4A4A4A; margin: 0; font-weight: 600;"),
+              title = tags$h3("Annual Revenue", style = "color: #2C3E50; margin: 0; font-weight: 600;"),
               width = NULL,
               solidHeader = TRUE,
               status = "success",
@@ -493,7 +499,7 @@ ui <- dashboardPage(
           column(
             width = 4,
             box(
-              title = tags$h3("💡 Amenity Recommendations", style = "color: #4A4A4A; margin: 0; font-weight: 600; font-size: 18px;"),
+              title = tags$h3("Amenity Recommendations", style = "color: #2C3E50; margin: 0; font-weight: 600; font-size: 18px;"),
               width = NULL,
               solidHeader = TRUE,
               status = "warning",
@@ -516,7 +522,7 @@ ui <- dashboardPage(
             ),
             
             box(
-              title = tags$h3("🗺️ Location Map", style = "color: #4A4A4A; margin: 0; font-weight: 600;"),
+              title = tags$h3("Location Context", style = "color: #2C3E50; margin: 0; font-weight: 600;"),
               width = NULL,
               solidHeader = TRUE,
               status = "info",
@@ -534,7 +540,7 @@ ui <- dashboardPage(
           column(
             width = 12,
             box(
-              title = tags$h3("📊 London Market Indicators", style = "color: #4A4A4A; margin: 0; font-weight: 600;"),
+              title = tags$h3("London Market Indicators", style = "color: #2C3E50; margin: 0; font-weight: 600;"),
               width = NULL,
               solidHeader = TRUE,
               status = "primary",
@@ -543,7 +549,7 @@ ui <- dashboardPage(
                 column(3,
                   tags$div(
                     style = "text-align: center; padding: 15px; background: linear-gradient(135deg, #3498DB15 0%, #3498DB30 100%); border-radius: 8px;",
-                    tags$h5("🚇 TfL Daily Journeys", style = "color: #5A5A5A; margin-bottom: 5px;"),
+                    tags$h5("TfL Daily Journeys", style = "color: #4A4A4A; margin-bottom: 5px;"),
                     tags$div(style = "font-size: 24px; font-weight: bold; color: #3498DB;", textOutput("tfl_avg_display")),
                     tags$small("million/day", style = "color: #888;")
                   )
@@ -551,7 +557,7 @@ ui <- dashboardPage(
                 column(3,
                   tags$div(
                     style = "text-align: center; padding: 15px; background: linear-gradient(135deg, #27AE6015 0%, #27AE6030 100%); border-radius: 8px;",
-                    tags$h5("✈️ Int'l Tourism", style = "color: #5A5A5A; margin-bottom: 5px;"),
+                    tags$h5("International Tourism", style = "color: #4A4A4A; margin-bottom: 5px;"),
                     tags$div(style = "font-size: 24px; font-weight: bold; color: #27AE60;", textOutput("tourism_avg_display")),
                     tags$small("thousand/quarter", style = "color: #888;")
                   )
@@ -559,7 +565,7 @@ ui <- dashboardPage(
                 column(3,
                   tags$div(
                     style = "text-align: center; padding: 15px; background: linear-gradient(135deg, #F39C1215 0%, #F39C1230 100%); border-radius: 8px;",
-                    tags$h5("🌡️ Avg Temperature", style = "color: #5A5A5A; margin-bottom: 5px;"),
+                    tags$h5("Average Temperature", style = "color: #4A4A4A; margin-bottom: 5px;"),
                     tags$div(style = "font-size: 24px; font-weight: bold; color: #F39C12;", textOutput("temp_avg_display")),
                     tags$small("°C", style = "color: #888;")
                   )
@@ -567,7 +573,7 @@ ui <- dashboardPage(
                 column(3,
                   tags$div(
                     style = "text-align: center; padding: 15px; background: linear-gradient(135deg, #9B59B615 0%, #9B59B630 100%); border-radius: 8px;",
-                    tags$h5("☀️ Weather Quality", style = "color: #5A5A5A; margin-bottom: 5px;"),
+                    tags$h5("Weather Quality", style = "color: #4A4A4A; margin-bottom: 5px;"),
                     tags$div(style = "font-size: 24px; font-weight: bold; color: #9B59B6;", textOutput("weather_quality_display")),
                     tags$small("(0-1 scale)", style = "color: #888;")
                   )
@@ -587,7 +593,7 @@ ui <- dashboardPage(
           column(
             width = 8,
             box(
-              title = tags$h4("🚇 TfL Transport Trends", style = "color: #4A4A4A; margin: 0; font-weight: 600;"),
+              title = tags$h4("TfL Transport Trends", style = "color: #2C3E50; margin: 0; font-weight: 600;"),
               width = NULL,
               solidHeader = TRUE,
               status = "info",
@@ -597,7 +603,7 @@ ui <- dashboardPage(
           column(
             width = 4,
             box(
-              title = tags$h4("📅 TfL by Year", style = "color: #4A4A4A; margin: 0; font-weight: 600;"),
+              title = tags$h4("TfL by Year", style = "color: #2C3E50; margin: 0; font-weight: 600;"),
               width = NULL,
               solidHeader = TRUE,
               status = "info",
@@ -611,7 +617,7 @@ ui <- dashboardPage(
           column(
             width = 6,
             box(
-              title = tags$h4("✈️ International Tourism", style = "color: #4A4A4A; margin: 0; font-weight: 600;"),
+              title = tags$h4("International Tourism", style = "color: #2C3E50; margin: 0; font-weight: 600;"),
               width = NULL,
               solidHeader = TRUE,
               status = "success",
@@ -621,7 +627,7 @@ ui <- dashboardPage(
           column(
             width = 6,
             box(
-              title = tags$h4("📆 Weekly Patterns", style = "color: #4A4A4A; margin: 0; font-weight: 600;"),
+              title = tags$h4("Weekly Patterns", style = "color: #2C3E50; margin: 0; font-weight: 600;"),
               width = NULL,
               solidHeader = TRUE,
               status = "success",
@@ -635,7 +641,7 @@ ui <- dashboardPage(
           column(
             width = 6,
             box(
-              title = tags$h4("🌡️ Temperature Trends", style = "color: #4A4A4A; margin: 0; font-weight: 600;"),
+              title = tags$h4("Temperature Trends", style = "color: #2C3E50; margin: 0; font-weight: 600;"),
               width = NULL,
               solidHeader = TRUE,
               status = "warning",
@@ -645,7 +651,7 @@ ui <- dashboardPage(
           column(
             width = 6,
             box(
-              title = tags$h4("🍂 Seasonal Temperature", style = "color: #4A4A4A; margin: 0; font-weight: 600;"),
+              title = tags$h4("Seasonal Temperature", style = "color: #2C3E50; margin: 0; font-weight: 600;"),
               width = NULL,
               solidHeader = TRUE,
               status = "warning",
@@ -659,7 +665,7 @@ ui <- dashboardPage(
           column(
             width = 6,
             box(
-              title = tags$h4("☀️ Weather Quality", style = "color: #4A4A4A; margin: 0; font-weight: 600;"),
+              title = tags$h4("Weather Quality", style = "color: #2C3E50; margin: 0; font-weight: 600;"),
               width = NULL,
               solidHeader = TRUE,
               plotlyOutput("weather_quality_dist", height = "280px")
@@ -668,7 +674,7 @@ ui <- dashboardPage(
           column(
             width = 6,
             box(
-              title = tags$h4("🔗 Component Correlations", style = "color: #4A4A4A; margin: 0; font-weight: 600;"),
+              title = tags$h4("Component Correlations", style = "color: #2C3E50; margin: 0; font-weight: 600;"),
               width = NULL,
               solidHeader = TRUE,
               plotlyOutput("component_correlation", height = "280px")
@@ -681,7 +687,7 @@ ui <- dashboardPage(
           column(
             width = 12,
             box(
-              title = tags$h4("💡 Market Insights", style = "color: #4A4A4A; margin: 0; font-weight: 600;"),
+              title = tags$h4("Market Insights", style = "color: #2C3E50; margin: 0; font-weight: 600;"),
               width = NULL,
               solidHeader = TRUE,
               status = "primary",
@@ -693,19 +699,19 @@ ui <- dashboardPage(
                   
                   tags$div(
                     style = "flex: 1; min-width: 250px; padding: 15px; background-color: #F8F8F8; border-radius: 8px; border-left: 4px solid #3498DB;",
-                    tags$h5("🚇 Transport Impact", style = "color: #3498DB; margin-top: 0;"),
+                    tags$h5("Transport Impact", style = "color: #3498DB; margin-top: 0;"),
                     tags$p("Higher TfL journey volumes indicate more potential visitors in London. Weekdays typically see higher commuter traffic.", style = "color: #666; font-size: 13px; margin-bottom: 0;")
                   ),
                   
                   tags$div(
                     style = "flex: 1; min-width: 250px; padding: 15px; background-color: #F8F8F8; border-radius: 8px; border-left: 4px solid #27AE60;",
-                    tags$h5("✈️ Tourism Seasons", style = "color: #27AE60; margin-top: 0;"),
+                    tags$h5("Tourism Seasons", style = "color: #27AE60; margin-top: 0;"),
                     tags$p("International tourism peaks in summer (Q2-Q3). Properties near tourist attractions benefit most during these periods.", style = "color: #666; font-size: 13px; margin-bottom: 0;")
                   ),
                   
                   tags$div(
                     style = "flex: 1; min-width: 250px; padding: 15px; background-color: #F8F8F8; border-radius: 8px; border-left: 4px solid #F39C12;",
-                    tags$h5("🌤️ Weather Effect", style = "color: #F39C12; margin-top: 0;"),
+                    tags$h5("Weather Effect", style = "color: #F39C12; margin-top: 0;"),
                     tags$p("Good weather increases outdoor activity and tourism. Consider dynamic pricing during favorable weather periods.", style = "color: #666; font-size: 13px; margin-bottom: 0;")
                   )
                 )
@@ -731,12 +737,12 @@ ui <- dashboardPage(
             tags$hr(),
             tags$h5("Features:", style = "color: #2C3E50;"),
             tags$ul(
-              tags$li("📍 Automatic address/postcode to coordinates conversion"),
-              tags$li("🏠 Support for various property attributes"),
-              tags$li("✨ Rich amenities selection"),
-              tags$li("💰 Smart price prediction"),
-              tags$li("🗺️ Location visualization"),
-              tags$li("📊 Market insights with TfL, Tourism, and Weather data")
+              tags$li("Automatic address/postcode to coordinates conversion"),
+              tags$li("Support for various property attributes"),
+              tags$li("Rich amenities selection"),
+              tags$li("Smart price prediction"),
+              tags$li("Location visualization"),
+              tags$li("Market insights with TfL, Tourism, and Weather data")
             ),
             tags$hr(),
             tags$h5("Model Information:", style = "color: #2C3E50;"),
@@ -795,7 +801,7 @@ server <- function(input, output, session) {
             st_transform(4326) %>%  # Transform to WGS84
             st_union()  # Merge all boroughs into one boundary
           london_boundary(boundary)
-          message("✓ Loaded London boundary from: ", shp_path)
+          message("Loaded London boundary from: ", shp_path)
           return(boundary)
         }, error = function(e) {
           message("Error loading boundary: ", e$message)
@@ -1214,14 +1220,14 @@ server <- function(input, output, session) {
           if (nchar(display_name) > 50) {
             display_name <- paste0(substr(display_name, 1, 47), "...")
           }
-          geocode_status(paste0("✓ Location found: ", display_name))
+          geocode_status(paste0("Location found: ", display_name))
         } else {
           geocode_result(NULL)
-          geocode_status("⚠ Cannot find this address, please check your input")
+          geocode_status("Cannot find this address, please check your input")
         }
       }, error = function(e) {
         geocode_result(NULL)
-        geocode_status("⚠ Error searching location, please try again later")
+          geocode_status("Error searching location, please try again later")
       })
     })
   }, ignoreInit = TRUE)
@@ -1236,12 +1242,12 @@ server <- function(input, output, session) {
     status <- geocode_status()
     if (nchar(status) == 0) return(NULL)
     
-    if (grepl("✓", status)) {
+    if (grepl("Location found", status)) {
       tags$div(
         status,
         style = "color: #27AE60; font-weight: bold; padding: 10px; background-color: #D5F4E6; border-radius: 5px;"
       )
-    } else if (grepl("⚠", status)) {
+    } else if (grepl("Cannot find|Error", status)) {
       tags$div(
         status,
         style = "color: #E74C3C; font-weight: bold; padding: 10px; background-color: #FADBD8; border-radius: 5px;"
@@ -1364,7 +1370,7 @@ server <- function(input, output, session) {
   })
   
   output$price_note <- renderText({
-    "Baseline price per night (GBP)"
+    "per night (estimated)"
   })
   
   output$input_summary <- renderText({
@@ -1581,28 +1587,18 @@ server <- function(input, output, session) {
       tagList(
         tags$div(
           style = "margin-bottom: 15px;",
-          tags$h4("Top Recommended Amenities", style = "color: #4A4A4A; margin-top: 0; margin-bottom: 10px; font-weight: 600; font-size: 16px;"),
+          tags$h4("Top Recommended Amenities", style = "color: #2C3E50; margin-top: 0; margin-bottom: 10px; font-weight: 600; font-size: 16px;"),
           tags$p("(Only showing amenities that can increase price)", style = "color: #888888; font-size: 11px; margin-top: 5px; font-style: italic;")
         ),
         
         tags$div(
           lapply(1:nrow(recs), function(i) {
             rec <- recs[i, ]
-            tags$div(
-              style = "background-color: #F8F8F8; padding: 12px; border-left: 3px solid #88D8C0; margin-bottom: 10px; border-radius: 5px;",
-              tags$h5(
-                paste0(i, ". ", rec$amenity_name),
-                style = "color: #4A4A4A; margin-top: 0; margin-bottom: 8px; font-weight: 600; font-size: 14px;"
-              ),
-              tags$p(
-                tags$strong("Price Increase: ", style = "color: #666666; font-size: 12px;"),
-                tags$span(paste0("£", round(rec$price_impact, 2), " (", round(rec$price_impact_pct, 2), "%)"), 
-                         style = "color: #4ECDC4; font-weight: bold; font-size: 13px;")
-              ),
-              tags$p(
-                tags$strong("New Price: ", style = "color: #666666; font-size: 12px;"),
-                tags$span(paste0("£", round(rec$new_price, 2)), style = "color: #6BC4C4; font-weight: bold; font-size: 13px;")
-              )
+            tags$button(
+              paste0("+ ", rec$amenity_name, " (£", round(rec$price_impact, 0), "/night)"),
+              style = "background-color: #14B8A6; color: #FFFFFF; padding: 10px 16px; border-radius: 6px; font-size: 13px; font-weight: 500; border: none; cursor: pointer; width: 100%; text-align: left; margin-bottom: 8px; transition: background-color 0.2s;",
+              onmouseover = "this.style.backgroundColor='#0D9488'",
+              onmouseout = "this.style.backgroundColor='#14B8A6'"
             )
           })
         )
