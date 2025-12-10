@@ -331,7 +331,7 @@ ui <- dashboardPage(
               width = NULL,
               solidHeader = TRUE,
               status = "primary",
-              style = "margin-bottom: 0; height: 100%; display: flex; flex-direction: column;",
+              style = "margin-bottom: 0; flex: 1; display: flex; flex-direction: column; min-height: 0;",
               
               # Postcode input with status on the right
               fluidRow(
@@ -357,10 +357,11 @@ ui <- dashboardPage(
                 )
               ),
               
-              hr(style = "margin: 15px 0;"),
+              hr(style = "margin: 12px 0;"),
               
               # Two columns: Basic Properties (left) and Amenities (right)
               fluidRow(
+                style = "display: flex; align-items: stretch; flex: 1; min-height: 0;",
                 # Left column - Basic Properties
                 column(
                   width = 6,
@@ -430,7 +431,7 @@ ui <- dashboardPage(
                   tags$h4("Amenities", style = "color: #4A4A4A; margin-top: 0; margin-bottom: 12px; font-weight: 600; font-size: 14px;"),
                   
                   tags$div(
-                    style = "flex: 1; margin-top: 40px; overflow-y: auto; border: 1px solid #E0E0E0; padding: 10px; border-radius: 5px; background-color: #F5F5F5;",
+                    style = "flex: 1; margin-top: 40px; overflow-y: auto; border: 1px solid #E0E0E0; padding: 10px; border-radius: 5px; background-color: #F5F5F5; display: flex; flex-direction: column;",
                     checkboxGroupInput(
                       "amenities",
                       NULL,
@@ -455,11 +456,11 @@ ui <- dashboardPage(
                     )
                   )
                 )
-              ),
+                ),
               
               # Button at the bottom
               tags$div(
-                style = "margin-top: auto; padding-top: 15px;",
+                style = "margin-top: 12px;",
                 actionButton(
                   "predict_btn",
                   "Update Prediction",
