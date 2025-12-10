@@ -152,8 +152,13 @@ ui <- dashboardPage(
           margin: 10px 0;
         }
         #map {
-          height: 600px;
+          height: 500px;
           border-radius: 8px;
+          overflow: hidden;
+        }
+        .leaflet-container {
+          height: 500px !important;
+          overflow: hidden !important;
         }
         .content {
           padding: 10px 15px !important;
@@ -438,11 +443,11 @@ ui <- dashboardPage(
               column(
                 width = 6,
                 box(
-                  title = tags$h3("Predicted Baseline Price", style = "color: #2C3E50; margin: 0; font-weight: 600;"),
+                  title = tags$h3("Predicted Baseline Price", style = "color: #2C3E50; margin: 0; font-weight: 600; font-size: 18px;"),
                   width = NULL,
                   solidHeader = TRUE,
                   status = "primary",
-                  style = "min-height: 280px; display: flex; flex-direction: column;",
+                  style = "min-height: 200px; display: flex; flex-direction: column;",
                   
                   conditionalPanel(
                     condition = "output.price_predicted",
@@ -477,7 +482,7 @@ ui <- dashboardPage(
                   width = NULL,
                   solidHeader = TRUE,
                   status = "warning",
-                  style = "min-height: 280px; display: flex; flex-direction: column;",
+                  style = "min-height: 200px; display: flex; flex-direction: column;",
                   
                   conditionalPanel(
                     condition = "output.price_predicted",
@@ -508,7 +513,7 @@ ui <- dashboardPage(
                   solidHeader = TRUE,
                   status = "info",
                   
-                  leafletOutput("map", height = "600px")
+                  leafletOutput("map", height = "500px")
                 )
               )
             )
@@ -1569,9 +1574,8 @@ server <- function(input, output, session) {
       
       tagList(
         tags$div(
-          style = "margin-bottom: 15px;",
-          tags$h4("Top Recommended Amenities", style = "color: #2C3E50; margin-top: 0; margin-bottom: 10px; font-weight: 600; font-size: 16px;"),
-          tags$p("(Only showing amenities that can increase price)", style = "color: #888888; font-size: 11px; margin-top: 5px; font-style: italic;")
+          style = "margin-bottom: 10px;",
+          tags$h4("Top Recommended Amenities", style = "color: #2C3E50; margin-top: 0; margin-bottom: 8px; font-weight: 600; font-size: 16px;")
         ),
         
         tags$div(
