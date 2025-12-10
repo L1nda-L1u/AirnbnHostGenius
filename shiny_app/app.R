@@ -114,8 +114,18 @@ ui <- dashboardPage(
           margin-bottom: 15px !important;
           margin-left: 5px !important;
           margin-right: 5px !important;
+          display: flex;
+          flex-direction: column;
+        }
+        .box-body {
+          padding: 15px !important;
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          min-height: 0;
         }
         .box-header {
+          flex-shrink: 0;
           background-color: #FFFFFF !important;
           border-bottom: 1px solid #E0E0E0;
           border-radius: 8px 8px 0 0;
