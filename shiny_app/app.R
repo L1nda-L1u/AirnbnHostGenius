@@ -157,12 +157,16 @@ ui <- dashboardPage(
           margin: 10px 0;
         }
         #map {
-          height: 300px;
+          height: calc(100vh - 550px);
+          min-height: 250px;
+          max-height: 400px;
           border-radius: 8px;
           overflow: hidden;
         }
         .leaflet-container {
-          height: 300px !important;
+          height: calc(100vh - 550px) !important;
+          min-height: 250px !important;
+          max-height: 400px !important;
           overflow: hidden !important;
         }
         .content {
@@ -323,40 +327,39 @@ ui <- dashboardPage(
               status = "primary",
               style = "margin-bottom: 0; height: 100%; display: flex; flex-direction: column;",
               
-              textInput(
-                "address",
-                label = tags$strong("Address or Postcode"),
-                placeholder = "e.g., London, UK or SW1A 1AA",
-                width = "100%"
-              ),
-              
-              actionButton(
-                "predict_btn",
-                "Update Prediction",
-                class = "btn-primary",
-                style = "width: 100%; font-size: 16px; padding: 12px; margin-top: 10px; margin-bottom: 10px;"
-              ),
-              
-              conditionalPanel(
-                condition = "output.geocode_status",
-                tags$div(
-                  style = "margin-bottom: 10px; min-height: 40px; display: flex; align-items: center;",
-                  uiOutput("geocode_status_text")
-                )
-              ),
-              conditionalPanel(
-                condition = "!output.geocode_status",
-                tags$div(
-                  style = "margin-bottom: 10px; min-height: 40px;"
-                )
-              ),
-              
-              hr(style = "margin: 10px 0;"),
-              
-              tags$h4("Basic Properties", style = "color: #4A4A4A; margin-top: 10px; margin-bottom: 10px; font-weight: 500; font-size: 14px;"),
-              
+              # Postcode input with status on the right
               fluidRow(
-                column(6,
+                column(
+                  width = 7,
+                  textInput(
+                    "address",
+                    label = tags$strong("Postcode"),
+                    placeholder = "e.g., SW1A 1AA",
+                    width = "100%"
+                  )
+                ),
+                column(
+                  width = 5,
+                  style = "display: flex; align-items: flex-end; padding-left: 8px;",
+                  conditionalPanel(
+                    condition = "output.geocode_status",
+                    tags$div(
+                      style = "width: 100%;",
+                      uiOutput("geocode_status_text")
+                    )
+                  )
+                )
+              ),
+              
+              hr(style = "margin: 15px 0;"),
+              
+              # Two columns: Basic Properties (left) and Amenities (right)
+              fluidRow(
+                # Left column - Basic Properties
+                column(
+                  width = 6,
+                  tags$h4("Basic Properties", style = "color: #4A4A4A; margin-top: 0; margin-bottom: 12px; font-weight: 500; font-size: 14px;"),
+                  
                   numericInput(
                     "bedrooms",
                     "Bedrooms",
@@ -365,9 +368,8 @@ ui <- dashboardPage(
                     max = 20,
                     step = 1,
                     width = "100%"
-                  )
-                ),
-                column(6,
+                  ),
+                  
                   numericInput(
                     "bathrooms",
                     "Bathrooms",
@@ -376,12 +378,8 @@ ui <- dashboardPage(
                     max = 10,
                     step = 0.5,
                     width = "100%"
-                  )
-                )
-              ),
-              
-              fluidRow(
-                column(6,
+                  ),
+                  
                   numericInput(
                     "accommodates",
                     "Accommodates",
@@ -390,9 +388,8 @@ ui <- dashboardPage(
                     max = 20,
                     step = 1,
                     width = "100%"
-                  )
-                ),
-                column(6,
+                  ),
+                  
                   numericInput(
                     "beds",
                     "Beds",
@@ -401,49 +398,62 @@ ui <- dashboardPage(
                     max = 20,
                     step = 1,
                     width = "100%"
+                  ),
+                  
+                  selectInput(
+                    "room_type",
+                    "Room Type",
+                    choices = list(
+                      "Entire home/apt" = "Entire home/apt",
+                      "Private room" = "Private room",
+                      "Shared room" = "Shared room"
+                    ),
+                    selected = "Entire home/apt",
+                    width = "100%"
+                  )
+                ),
+                
+                # Right column - Amenities
+                column(
+                  width = 6,
+                  tags$h4("Amenities", style = "color: #4A4A4A; margin-top: 0; margin-bottom: 12px; font-weight: 500; font-size: 14px;"),
+                  
+                  tags$div(
+                    style = "max-height: 280px; overflow-y: auto; border: 1px solid #E0E0E0; padding: 10px; border-radius: 5px; background-color: #F5F5F5;",
+                    checkboxGroupInput(
+                      "amenities",
+                      NULL,
+                      choices = list(
+                        "WiFi" = "Wifi",
+                        "Kitchen" = "Kitchen",
+                        "Washer" = "Washer",
+                        "TV" = "TV",
+                        "Heating" = "Heating",
+                        "Air Conditioning" = "Air conditioning",
+                        "Free Parking" = "Free parking",
+                        "Breakfast" = "Breakfast",
+                        "Dedicated Workspace" = "Dedicated workspace",
+                        "Pets Allowed" = "Pets allowed",
+                        "Smoking Allowed" = "Smoking allowed",
+                        "Elevator" = "Elevator",
+                        "Gym" = "Gym",
+                        "Pool" = "Pool",
+                        "Hot Tub" = "Hot tub"
+                      ),
+                      selected = c("Wifi", "Kitchen", "Heating")
+                    )
                   )
                 )
               ),
               
-              selectInput(
-                "room_type",
-                "Room Type",
-                choices = list(
-                  "Entire home/apt" = "Entire home/apt",
-                  "Private room" = "Private room",
-                  "Shared room" = "Shared room"
-                ),
-                selected = "Entire home/apt",
-                width = "100%"
-              ),
-              
-              hr(style = "margin: 10px 0;"),
-              
-              tags$h4("Amenities", style = "color: #4A4A4A; margin-top: 10px; margin-bottom: 10px; font-weight: 500; font-size: 14px;"),
-              
+              # Button at the bottom
               tags$div(
-                style = "max-height: 120px; overflow-y: auto; border: 1px solid #E0E0E0; padding: 8px; border-radius: 5px; background-color: #F5F5F5;",
-                checkboxGroupInput(
-                  "amenities",
-                  NULL,
-                  choices = list(
-                    "WiFi" = "Wifi",
-                    "Kitchen" = "Kitchen",
-                    "Washer" = "Washer",
-                    "TV" = "TV",
-                    "Heating" = "Heating",
-                    "Air Conditioning" = "Air conditioning",
-                    "Free Parking" = "Free parking",
-                    "Breakfast" = "Breakfast",
-                    "Dedicated Workspace" = "Dedicated workspace",
-                    "Pets Allowed" = "Pets allowed",
-                    "Smoking Allowed" = "Smoking allowed",
-                    "Elevator" = "Elevator",
-                    "Gym" = "Gym",
-                    "Pool" = "Pool",
-                    "Hot Tub" = "Hot tub"
-                  ),
-                  selected = c("Wifi", "Kitchen", "Heating")
+                style = "margin-top: auto; padding-top: 15px;",
+                actionButton(
+                  "predict_btn",
+                  "Update Prediction",
+                  class = "btn-primary",
+                  style = "width: 100%; font-size: 16px; padding: 12px;"
                 )
               )
             )
@@ -462,7 +472,7 @@ ui <- dashboardPage(
                   width = NULL,
                   solidHeader = TRUE,
                   status = "primary",
-                  style = "height: 150px; display: flex; flex-direction: column;",
+                  style = "height: 180px; display: flex; flex-direction: column;",
                   
                   conditionalPanel(
                     condition = "output.price_predicted",
@@ -497,7 +507,7 @@ ui <- dashboardPage(
                   width = NULL,
                   solidHeader = TRUE,
                   status = "warning",
-                  style = "height: 150px; display: flex; flex-direction: column;",
+                  style = "height: 180px; display: flex; flex-direction: column;",
                   
                   conditionalPanel(
                     condition = "output.price_predicted",
@@ -529,7 +539,7 @@ ui <- dashboardPage(
                   status = "info",
                   style = "flex: 1; display: flex; flex-direction: column;",
                   
-                  leafletOutput("map", height = "300px")
+                  leafletOutput("map", height = "100%")
                 )
               )
             )
@@ -1248,18 +1258,18 @@ server <- function(input, output, session) {
     
     if (grepl("Location found", status)) {
       tags$div(
-        status,
-        style = "color: #0D9488; font-weight: 500; padding: 8px 12px; background-color: #E0F2F1; border-radius: 5px; font-size: 13px; width: 100%;"
+        tags$span(sub("Location found: ", "", status), style = "font-size: 12px;"),
+        style = "color: #0D9488; font-weight: 500; padding: 6px 10px; background-color: #E0F2F1; border-radius: 5px; font-size: 12px; width: 100%; line-height: 1.4; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"
       )
     } else if (grepl("Cannot find|Error", status)) {
       tags$div(
         status,
-        style = "color: #0D9488; font-weight: 500; padding: 8px 12px; background-color: #E0F2F1; border-radius: 5px; font-size: 13px; width: 100%;"
+        style = "color: #0D9488; font-weight: 500; padding: 6px 10px; background-color: #E0F2F1; border-radius: 5px; font-size: 12px; width: 100%; line-height: 1.4;"
       )
     } else {
       tags$div(
         status,
-        style = "color: #0D9488; font-weight: 500; padding: 8px 12px; background-color: #E0F2F1; border-radius: 5px; font-size: 13px; width: 100%;"
+        style = "color: #0D9488; font-weight: 500; padding: 6px 10px; background-color: #E0F2F1; border-radius: 5px; font-size: 12px; width: 100%; line-height: 1.4;"
       )
     }
   })
