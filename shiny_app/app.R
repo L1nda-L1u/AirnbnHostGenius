@@ -540,7 +540,7 @@ ui <- dashboardPage(
                       style = "flex: 1; display: flex; flex-direction: column; justify-content: center;",
                       tags$div(
                         class = "price-display",
-                        style = "font-size: 72px; padding: 0 15px; margin: 15px 0 5px 0; font-weight: bold; color: #2C7A7B; line-height: 1;",
+                        style = "font-size: 72px; padding: 0 15px; margin: 20px 0 5px 0; font-weight: bold; color: #2C7A7B; line-height: 1;",
                         textOutput("predicted_price")
                       ),
                       tags$div(
