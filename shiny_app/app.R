@@ -159,19 +159,22 @@ ui <- dashboardPage(
           margin: 10px 0;
         }
         #map {
-          height: 350px !important;
+          height: 100% !important;
+          min-height: 300px !important;
           border-radius: 8px;
           overflow: hidden;
           position: relative;
         }
         .leaflet-container {
-          height: 350px !important;
+          height: 100% !important;
+          min-height: 300px !important;
           width: 100% !important;
           overflow: hidden !important;
           position: relative;
         }
         .map-container {
-          height: 350px;
+          flex: 1;
+          min-height: 300px;
         }
         .content {
           padding: 15px 10px !important;
@@ -540,17 +543,18 @@ ui <- dashboardPage(
             fluidRow(
               column(
                 width = 12,
+                style = "display: flex; flex-direction: column; flex: 1; min-height: 0;",
                 box(
                   title = tags$h3("Location Context", style = "color: #2C3E50; margin: 0; font-weight: 600; font-size: 18px;"),
                   width = NULL,
                   solidHeader = TRUE,
                   status = "info",
-                  style = "display: flex; flex-direction: column;",
+                  style = "flex: 1; display: flex; flex-direction: column; min-height: 0; margin-bottom: 0;",
                   
                   tags$div(
                     class = "map-container",
-                    style = "height: 350px; position: relative;",
-                    leafletOutput("map", height = "350px")
+                    style = "flex: 1; min-height: 300px; position: relative;",
+                    leafletOutput("map", height = "100%")
                   )
                 )
               )
