@@ -219,7 +219,7 @@ ui <- dashboardPage(
         .amenities-scrollable {
           overflow-y: auto !important;
           overflow-x: hidden !important;
-          max-height: 100% !important;
+          position: relative;
         }
         .amenities-scrollable::-webkit-scrollbar {
           width: 8px;
