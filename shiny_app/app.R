@@ -518,10 +518,10 @@ ui <- dashboardPage(
           # Right column - Predictions, Recommendations, and Map
           column(
             width = 8,
-            style = "display: flex; flex-direction: column;",
+            style = "display: flex; flex-direction: column; height: 100%;",
             # Top row - Price and Recommendations side by side (equal height)
             fluidRow(
-              style = "display: flex; align-items: stretch;",
+              style = "display: flex; align-items: stretch; flex-shrink: 0;",
               column(
                 width = 6,
                 style = "display: flex; flex-direction: column;",
@@ -592,7 +592,7 @@ ui <- dashboardPage(
               style = "display: flex; flex: 1; min-height: 0; margin-top: 0;",
               column(
                 width = 12,
-                style = "display: flex; flex-direction: column; height: 100%;",
+                style = "display: flex; flex-direction: column; height: 100%; width: 100%; padding-left: 15px; padding-right: 15px;",
                 box(
                   title = tags$h3("Location Context", style = "color: #2C3E50; margin: 0; font-weight: 600; font-size: 18px;"),
                   width = NULL,
