@@ -44,19 +44,19 @@ ui <- dashboardPage(
   dashboardHeader(
     title = tags$div(
       tags$span("Airbnb", style = "font-size: 20px; font-weight: bold; color: #FF5A5F; margin-right: 8px;"),
-      tags$span("Baseline Pricing Tool", 
+      tags$span("HostGenius", 
                 style = "font-size: 20px; font-weight: bold; color: #2C3E50;")
     ),
     titleWidth = 350
   ),
   
   dashboardSidebar(
-    width = 300,
-    collapsed = TRUE,  # Default to collapsed
+    width = 150,
+    collapsed = FALSE,  # Always visible
     sidebarMenu(
       id = "tabs",
-      menuItem("Overview", tabName = "overview", icon = icon("map")),
-      menuItem("Price Prediction", tabName = "predict", icon = icon("calculator")),
+      menuItem("Overview", tabName = "overview", icon = icon("home")),
+      menuItem("Price Prediction", tabName = "predict", icon = icon("dollar-sign")),
       menuItem("Market Insights", tabName = "market", icon = icon("chart-line")),
       menuItem("About", tabName = "about", icon = icon("info-circle"))
     ),
@@ -142,14 +142,14 @@ ui <- dashboardPage(
           box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         .price-display {
-          font-size: 48px;
+          font-size: 42px;
           font-weight: bold;
           color: #2C3E50;
           text-align: center;
-          padding: 30px 15px;
+          padding: 20px 15px;
           background-color: #FFFFFF;
           border-radius: 8px;
-          margin: 15px 0;
+          margin: 10px 0;
         }
         #map {
           height: 600px;
@@ -309,14 +309,14 @@ ui <- dashboardPage(
               conditionalPanel(
                 condition = "output.geocode_status",
                 tags$div(
-                  style = "margin-bottom: 15px;",
+                  style = "margin-bottom: 10px;",
                   uiOutput("geocode_status_text")
                 )
               ),
               
-              hr(),
+              hr(style = "margin: 10px 0;"),
               
-              tags$h4("Basic Properties", style = "color: #4A4A4A; margin-top: 20px; font-weight: 500;"),
+              tags$h4("Basic Properties", style = "color: #4A4A4A; margin-top: 10px; margin-bottom: 10px; font-weight: 500; font-size: 14px;"),
               
               fluidRow(
                 column(6,
@@ -380,12 +380,12 @@ ui <- dashboardPage(
                 width = "100%"
               ),
               
-              hr(),
+              hr(style = "margin: 10px 0;"),
               
-              tags$h4("Amenities", style = "color: #4A4A4A; margin-top: 20px; font-weight: 500;"),
+              tags$h4("Amenities", style = "color: #4A4A4A; margin-top: 10px; margin-bottom: 10px; font-weight: 500; font-size: 14px;"),
               
               tags$div(
-                style = "max-height: 300px; overflow-y: auto; border: 1px solid #E0E0E0; padding: 15px; border-radius: 5px; background-color: #F5F5F5;",
+                style = "max-height: 120px; overflow-y: auto; border: 1px solid #E0E0E0; padding: 8px; border-radius: 5px; background-color: #F5F5F5;",
                 checkboxGroupInput(
                   "amenities",
                   NULL,
@@ -410,13 +410,11 @@ ui <- dashboardPage(
                 )
               ),
               
-              hr(),
-              
               actionButton(
                 "predict_btn",
                 "Update Prediction",
                 class = "btn-primary",
-                style = "width: 100%; font-size: 18px; padding: 15px; margin-top: 20px;"
+                style = "width: 100%; font-size: 16px; padding: 12px; margin-top: 15px;"
               )
             )
           ),
@@ -424,7 +422,7 @@ ui <- dashboardPage(
           # Right column - Predictions, Recommendations, and Map
           column(
             width = 8,
-            # Top row - Price and Recommendations side by side
+            # Top row - Price and Recommendations side by side (equal height)
             fluidRow(
               column(
                 width = 6,
@@ -433,23 +431,28 @@ ui <- dashboardPage(
                   width = NULL,
                   solidHeader = TRUE,
                   status = "primary",
+                  style = "min-height: 280px; display: flex; flex-direction: column;",
                   
                   conditionalPanel(
                     condition = "output.price_predicted",
                     tags$div(
-                      class = "price-display",
-                      textOutput("predicted_price")
-                    ),
-                    tags$div(
-                      style = "text-align: center; color: #888888; margin-top: 10px; font-size: 14px;",
-                      textOutput("price_note")
+                      style = "flex: 1; display: flex; flex-direction: column; justify-content: center;",
+                      tags$div(
+                        class = "price-display",
+                        style = "font-size: 42px; padding: 20px 15px;",
+                        textOutput("predicted_price")
+                      ),
+                      tags$div(
+                        style = "text-align: center; color: #888888; margin-top: 5px; font-size: 14px;",
+                        textOutput("price_note")
+                      )
                     )
                   ),
                   
                   conditionalPanel(
                     condition = "!output.price_predicted",
                     tags$div(
-                      style = "text-align: center; padding: 50px; color: #AAAAAA;",
+                      style = "text-align: center; padding: 30px; color: #AAAAAA; flex: 1; display: flex; align-items: center; justify-content: center;",
                       tags$p("Fill in property information and click Update Prediction", style = "font-size: 14px;")
                     )
                   )
@@ -463,11 +466,12 @@ ui <- dashboardPage(
                   width = NULL,
                   solidHeader = TRUE,
                   status = "warning",
+                  style = "min-height: 280px; display: flex; flex-direction: column;",
                   
                   conditionalPanel(
                     condition = "output.price_predicted",
                     tags$div(
-                      style = "padding: 15px;",
+                      style = "padding: 15px; flex: 1; overflow-y: auto;",
                       uiOutput("amenity_recommendations")
                     )
                   ),
@@ -475,7 +479,7 @@ ui <- dashboardPage(
                   conditionalPanel(
                     condition = "!output.price_predicted",
                     tags$div(
-                      style = "text-align: center; padding: 30px; color: #AAAAAA;",
+                      style = "text-align: center; padding: 30px; color: #AAAAAA; flex: 1; display: flex; align-items: center; justify-content: center;",
                       tags$p("Get price prediction to see recommendations", style = "font-size: 14px;")
                     )
                   )
