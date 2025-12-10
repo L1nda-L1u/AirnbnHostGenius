@@ -1,14 +1,15 @@
 # =============================================
-# 评估所有基线模型并生成对比图
+# Evaluate All Baseline Models and Generate Comparison Plots
 # =============================================
 # 
-# 评估五个基线模型：
+# Evaluates baseline models:
 # 1. Linear Regression
 # 2. Random Forest (ranger, 500 trees, mtry=3)
 # 3. KNN Regression (k=5)
 # 4. KNN Regression (k=10)
-# 5. XGBoost (eta=0.05, max_depth=8, subsample=0.8, 500 rounds)
-# 6. Neural Network (4-layer MLP, 256-128-64 units, 150 epochs)
+# 5. XGBoost (pre-trained model)
+# 6. Neural Network (pre-trained model)
+# 7. Stacking (XGBoost + Neural Network, pre-trained model)
 #
 # =============================================
 
@@ -22,33 +23,33 @@ library(gridExtra)
 library(reticulate)
 library(tidyr)
 
-# 设置随机种子
+# Set random seed
 set.seed(42)
 
 # =============================================
-# 1. 加载和准备数据
+# 1. Load and Prepare Data
 # =============================================
 cat("========================================\n")
 cat("Loading and preparing data...\n")
 cat("========================================\n\n")
 
-# 尝试找到 nn_price_training_v4.csv 文件
-# 构建所有可能的路径
+# Try to find nn_price_training_v4.csv file
+# Build all possible paths
 current_dir <- getwd()
 
-# 首先尝试最常见的路径（基于用户的工作目录结构）
+# First try the most likely paths (based on user's working directory structure)
 data_paths <- c(
-  # 最可能的路径：从 AirbnbHostGeniusR 到 baseline_price_predict
+  # Most likely path: from AirbnbHostGeniusR to baseline_price_predict
   file.path(current_dir, "baseline_price_predict", "baseprice_model", "nn_price_training_v4.csv"),
-  # 当前目录及子目录
+  # Current directory and subdirectories
   file.path(current_dir, "nn_price_training_v4.csv"),
   file.path(current_dir, "baseprice_model", "nn_price_training_v4.csv"),
   file.path(current_dir, "R_scripts", "best_model", "nn_price_training_v4.csv"),
   file.path(current_dir, "baseline_price_predict", "nn_price_training_v4.csv"),
-  # 父目录及子目录
+  # Parent directory and subdirectories
   file.path(dirname(current_dir), "baseline_price_predict", "baseprice_model", "nn_price_training_v4.csv"),
   file.path(dirname(current_dir), "nn_price_training_v4.csv"),
-  # 相对路径
+  # Relative paths
   "baseline_price_predict/baseprice_model/nn_price_training_v4.csv",
   "nn_price_training_v4.csv",
   "../baseprice_model/nn_price_training_v4.csv",
@@ -56,9 +57,9 @@ data_paths <- c(
   "../../baseline_price_predict/baseprice_model/nn_price_training_v4.csv"
 )
 
-# 尝试找到脚本所在目录（通过检查调用栈）
+# Try to find script directory (by checking call stack)
 script_path <- tryCatch({
-  # 方法1: 检查 sys.frame
+  # Method 1: Check sys.frame
   frames <- sys.frames()
   for (frame in frames) {
     if (exists("ofile", envir = frame)) {
@@ -68,7 +69,7 @@ script_path <- tryCatch({
       }
     }
   }
-  # 方法2: 如果脚本在 R_scripts 目录下
+  # Method 2: If script is in R_scripts directory
   if (grepl("R_scripts", current_dir) || file.exists(file.path(current_dir, "R_scripts"))) {
     return(file.path(current_dir, "R_scripts"))
   }
@@ -76,7 +77,7 @@ script_path <- tryCatch({
 }, error = function(e) NULL)
 
 if (!is.null(script_path)) {
-  # 添加脚本目录相关的路径
+  # Add script directory related paths
   data_paths <- c(
     file.path(script_path, "..", "baseprice_model", "nn_price_training_v4.csv"),
     file.path(script_path, "..", "..", "baseprice_model", "nn_price_training_v4.csv"),
@@ -85,7 +86,7 @@ if (!is.null(script_path)) {
   )
 }
 
-# 添加从 AirbnbHostGeniusR 到 baseline_price_predict 的路径
+# Add path from AirbnbHostGeniusR to baseline_price_predict
 if (grepl("AirbnbHostGeniusR", current_dir)) {
   baseline_path <- file.path(current_dir, "baseline_price_predict", "baseprice_model", "nn_price_training_v4.csv")
   if (!baseline_path %in% data_paths) {
@@ -93,12 +94,12 @@ if (grepl("AirbnbHostGeniusR", current_dir)) {
   }
 }
 
-# 去重并尝试每个路径
+# Remove duplicates and try each path
 data_paths <- unique(data_paths)
 
-# 如果仍然找不到，尝试递归搜索（最多搜索2层深度）
+# If still not found, try recursive search (max 2 levels deep)
 if (length(data_paths) > 0) {
-  # 添加一些常见的项目结构路径
+  # Add some common project structure paths
   possible_base_dirs <- c(
     current_dir,
     dirname(current_dir),
@@ -122,22 +123,22 @@ data_file <- NULL
 cat("Searching for nn_price_training_v4.csv...\n")
 cat(sprintf("Current directory: %s\n", current_dir))
 
-# 优先检查最可能的路径（从当前目录到 baseline_price_predict）
+# Prioritize checking the most likely path (from current directory to baseline_price_predict)
 most_likely_path <- file.path(current_dir, "baseline_price_predict", "baseprice_model", "nn_price_training_v4.csv")
 if (file.exists(most_likely_path)) {
   data_file <- normalizePath(most_likely_path)
   cat(sprintf("Found data file: %s\n", data_file))
 } else {
-  # 如果最可能的路径不存在，尝试所有其他路径
+  # If the most likely path doesn't exist, try all other paths
   for (path in data_paths) {
-    # 尝试直接检查（不展开路径，因为相对路径可能无法normalize）
+    # Try direct check (without expanding path, as relative paths may not normalize)
     if (file.exists(path)) {
       data_file <- normalizePath(path)
       cat(sprintf("Found data file: %s\n", data_file))
       break
     }
     
-    # 也尝试展开路径
+    # Also try expanding path
     expanded_path <- tryCatch({
       normalizePath(path, mustWork = FALSE)
     }, error = function(e) {
@@ -153,7 +154,7 @@ if (file.exists(most_likely_path)) {
 }
 
 if (is.null(data_file)) {
-  # 提供更详细的错误信息
+  # Provide more detailed error information
   cat("\nTried the following paths:\n")
   for (path in data_paths) {
     expanded_path <- tryCatch({
@@ -171,27 +172,27 @@ if (is.null(data_file)) {
        "Expected location: baseline_price_predict/baseprice_model/nn_price_training_v4.csv")
 }
 
-# 加载数据
+# Load data
 cat("Loading data...\n")
 df_original <- read.csv(data_file, stringsAsFactors = FALSE)
 cat(sprintf("Original data: %d rows, %d columns\n", nrow(df_original), ncol(df_original)))
 
-# 检查目标变量
+# Check target variable
 target_col <- "price_num"
 if (!target_col %in% colnames(df_original)) {
   stop(sprintf("Target variable '%s' not found in data. Available columns: %s\n",
                target_col, paste(colnames(df_original), collapse = ", ")))
 }
 
-# 获取特征列
+# Get feature columns
 feature_cols <- setdiff(colnames(df_original), target_col)
 cat(sprintf("Features: %d\n", length(feature_cols)))
 
-# 数据清理（与 train_xgb.R 和 train_nn.R 一致）
+# Data cleaning (consistent with train_xgb.R and train_nn.R)
 cat("\nCleaning outliers...\n")
 df <- df_original
 
-# 清理规则
+# Cleaning rules
 df <- df[!((df$accommodates <= 2) & (df$price_num > 400)), ]
 df <- df[!((df$accommodates <= 4) & (df$price_num > 600)), ]
 df <- df[!((df$accommodates <= 6) & (df$price_num > 800)), ]
@@ -202,7 +203,7 @@ rownames(df) <- NULL
 cat(sprintf("After cleaning: %d rows (removed %d rows)\n", 
             nrow(df), nrow(df_original) - nrow(df)))
 
-# 确保所有特征都是数值型
+# Ensure all features are numeric
 X_df <- df[, feature_cols, drop = FALSE]
 for (col in feature_cols) {
   X_df[[col]] <- as.numeric(X_df[[col]])
@@ -210,16 +211,21 @@ for (col in feature_cols) {
 
 y_raw <- as.numeric(df[[target_col]])
 
-# 移除包含NA的行
+# Remove rows with NA
 complete_cases <- complete.cases(X_df) & !is.na(y_raw)
 X_df <- X_df[complete_cases, , drop = FALSE]
 y_raw <- y_raw[complete_cases]
 
 cat(sprintf("After removing NA: %d rows\n", nrow(X_df)))
 
-# 划分训练集和测试集（使用相同的随机种子确保一致性）
+# Split training and test sets
+# IMPORTANT: Use the same splitting method as train_xgb.R and train_nn.R
+# - Use log-transformed price for splitting (y_log)
+# - Use 90% training set (consistent with training scripts)
+# - This ensures the test set matches the one used during training
 set.seed(42)
-train_index <- createDataPartition(y_raw, p = 0.8, list = FALSE)
+y_log <- log1p(y_raw)  # Log transformation (consistent with training scripts)
+train_index <- createDataPartition(y_log, p = 0.90, list = FALSE)  # 90% train (consistent with training scripts)
 
 X_train <- X_df[train_index, , drop = FALSE]
 X_test <- X_df[-train_index, , drop = FALSE]
@@ -230,10 +236,10 @@ cat(sprintf("\nTrain size: %d\n", nrow(X_train)))
 cat(sprintf("Test size: %d\n", nrow(X_test)))
 cat("\n")
 
-# 存储所有模型的预测结果
+# Store predictions from all models
 results <- list()
 
-# 为Linear Regression和Random Forest准备数据框（包含目标变量）
+# Prepare data frames for Linear Regression and Random Forest (with target variable)
 train_df <- cbind(X_train, price_num = y_train)
 test_df <- cbind(X_test, price_num = y_test)
 
@@ -287,18 +293,18 @@ cat("\n")
 # =============================================
 cat("Training KNN Regression (k=5)...\n")
 
-# KNN需要标准化后的数值矩阵
+# KNN requires standardized numeric matrix
 if (!require(FNN, quietly = TRUE)) {
   install.packages("FNN")
 }
 library(FNN)
 
-# 标准化
+# Standardize
 preProc_knn <- preProcess(X_train, method = c("center", "scale"))
 X_train_scaled <- predict(preProc_knn, X_train)
 X_test_scaled <- predict(preProc_knn, X_test)
 
-# 转换为矩阵
+# Convert to matrix
 X_train_scaled <- as.matrix(X_train_scaled)
 X_test_scaled <- as.matrix(X_test_scaled)
 
@@ -346,67 +352,108 @@ cat(sprintf("  R²: %.4f, RMSE: %.2f, MAE: %.2f\n",
 cat("\n")
 
 # =============================================
-# 6. XGBoost
+# 6. XGBoost (Load Pre-trained Model)
 # =============================================
-cat("Training XGBoost (eta=0.05, max_depth=8, subsample=0.8, 500 rounds)...\n")
+cat("Loading pre-trained XGBoost model...\n")
 
-# XGBoost需要矩阵格式
-X_train_matrix <- as.matrix(X_train)
-X_test_matrix <- as.matrix(X_test)
-
-dtrain <- xgb.DMatrix(data = X_train_matrix, label = y_train)
-dtest <- xgb.DMatrix(data = X_test_matrix, label = y_test)
-
-params_xgb <- list(
-  booster = "gbtree",
-  objective = "reg:squarederror",
-  eta = 0.05,
-  max_depth = 8,
-  subsample = 0.8,
-  colsample_bytree = 0.8,
-  min_child_weight = 3
-)
-
-model_xgb <- xgb.train(
-  params = params_xgb,
-  data = dtrain,
-  nrounds = 500,
-  watchlist = list(train = dtrain, test = dtest),
-  print_every_n = 50,
-  early_stopping_rounds = 50,
-  verbose = 0
-)
-
-pred_xgb <- predict(model_xgb, newdata = dtest)
-
-results[["XGBoost"]] <- list(
-  predictions = pred_xgb,
-  r2 = cor(pred_xgb, y_test)^2,
-  rmse = sqrt(mean((pred_xgb - y_test)^2)),
-  mae = mean(abs(pred_xgb - y_test))
-)
-cat(sprintf("  R²: %.4f, RMSE: %.2f, MAE: %.2f\n", 
-            results[["XGBoost"]]$r2,
-            results[["XGBoost"]]$rmse,
-            results[["XGBoost"]]$mae))
-cat("\n")
+tryCatch({
+  # Find XGBoost model file
+  xgb_paths <- c(
+    file.path(getwd(), "baseprice_model", "best_xgb_log_model.xgb"),
+    file.path(getwd(), "baseline_price_predict", "baseprice_model", "best_xgb_log_model.xgb"),
+    file.path(dirname(getwd()), "baseprice_model", "best_xgb_log_model.xgb"),
+    "baseprice_model/best_xgb_log_model.xgb",
+    "../baseprice_model/best_xgb_log_model.xgb"
+  )
+  
+  xgb_file <- NULL
+  for (path in xgb_paths) {
+    if (file.exists(path)) {
+      xgb_file <- normalizePath(path)
+      break
+    }
+  }
+  
+  if (is.null(xgb_file)) {
+    stop("Cannot find best_xgb_log_model.xgb. Please train the model first using train_xgb.R")
+  }
+  
+  # Find scaler file
+  scaler_xgb_paths <- c(
+    file.path(getwd(), "baseprice_model", "scaler_xgb.rds"),
+    file.path(getwd(), "baseline_price_predict", "baseprice_model", "scaler_xgb.rds"),
+    file.path(dirname(getwd()), "baseprice_model", "scaler_xgb.rds"),
+    "baseprice_model/scaler_xgb.rds",
+    "../baseprice_model/scaler_xgb.rds"
+  )
+  
+  scaler_xgb_file <- NULL
+  for (path in scaler_xgb_paths) {
+    if (file.exists(path)) {
+      scaler_xgb_file <- normalizePath(path)
+      break
+    }
+  }
+  
+  if (is.null(scaler_xgb_file)) {
+    stop("Cannot find scaler_xgb.rds. Please train the model first using train_xgb.R")
+  }
+  
+  cat(sprintf("  Model file: %s\n", xgb_file))
+  cat(sprintf("  Scaler file: %s\n", scaler_xgb_file))
+  
+  # Load model and scaler
+  xgb_model <- xgb.load(xgb_file)
+  scaler_xgb <- readRDS(scaler_xgb_file)
+  
+  # Prepare test data (standardize using scaler)
+  X_test_df <- as.data.frame(X_test)
+  colnames(X_test_df) <- feature_cols
+  X_test_scaled <- predict(scaler_xgb, X_test_df)
+  X_test_scaled <- as.matrix(X_test_scaled)
+  
+  # Create DMatrix and predict
+  dtest <- xgb.DMatrix(data = X_test_scaled)
+  pred_xgb_log <- predict(xgb_model, dtest)
+  
+  # XGBoost model was trained in log space, need to convert back to original space
+  pred_xgb <- expm1(pred_xgb_log)
+  
+  results[["XGBoost"]] <- list(
+    predictions = pred_xgb,
+    r2 = cor(pred_xgb, y_test)^2,
+    rmse = sqrt(mean((pred_xgb - y_test)^2)),
+    mae = mean(abs(pred_xgb - y_test))
+  )
+  cat(sprintf("  R²: %.4f, RMSE: %.2f, MAE: %.2f\n", 
+              results[["XGBoost"]]$r2,
+              results[["XGBoost"]]$rmse,
+              results[["XGBoost"]]$mae))
+  cat("\n")
+}, error = function(e) {
+  cat(sprintf("  Error loading XGBoost model: %s\n", e$message))
+  cat("  Skipping XGBoost\n\n")
+})
 
 # =============================================
-# 7. Neural Network (PyTorch via reticulate)
+# 7. Neural Network (Load Pre-trained Model)
 # =============================================
-cat("Training Neural Network (4-layer MLP, 256-128-64 units, 150 epochs)...\n")
+cat("Loading pre-trained Neural Network model...\n")
 
-# 检查Python环境
-if (!py_available()) {
+# Check Python environment (don't need py_available(), just need to import torch)
+if (!py_module_available("torch")) {
   cat("  Python not available, attempting to configure...\n")
   
-  # 尝试自动配置 Python
+  # Try to automatically configure Python
   config_script <- file.path(getwd(), "R_scripts", "configure_python_simple.R")
   if (!file.exists(config_script)) {
-    # 尝试其他路径
+    # Try other paths
     config_script <- file.path(dirname(getwd()), "R_scripts", "configure_python_simple.R")
     if (!file.exists(config_script)) {
-      config_script <- "configure_python_simple.R"
+      config_script <- file.path(getwd(), "baseline_price_predict", "R_scripts", "configure_python_simple.R")
+      if (!file.exists(config_script)) {
+        config_script <- "configure_python_simple.R"
+      }
     }
   }
   
@@ -417,97 +464,204 @@ if (!py_available()) {
     }, error = function(e) {
       cat(sprintf("  Configuration script error: %s\n", e$message))
     })
+  } else {
+    cat("  Configuration script not found, trying manual configuration...\n")
+    # Try to manually find Python
+    python_paths <- c(
+      Sys.which("python"),
+      Sys.which("python3"),
+      "C:/Python39/python.exe",
+      "C:/Python310/python.exe",
+      "C:/Python311/python.exe",
+      "C:/Python312/python.exe"
+    )
+    python_paths <- python_paths[python_paths != ""]
+    
+    for (py_path in python_paths) {
+      if (file.exists(py_path)) {
+        tryCatch({
+          use_python(py_path, required = FALSE)
+          if (py_available()) {
+            cat(sprintf("  ✓ Found Python at: %s\n", py_path))
+            break
+          }
+        }, error = function(e) {
+          # Continue to next
+        })
+      }
+    }
   }
   
-  # 再次检查
-  if (!py_available()) {
-    cat("  Warning: Python not available, skipping Neural Network\n")
+  # Check again
+  if (!py_module_available("torch")) {
+    cat("  Warning: PyTorch not available, skipping Neural Network\n")
     cat("  (Neural Network requires Python and PyTorch)\n")
     cat("  To configure Python, run: source('R_scripts/configure_python_simple.R')\n\n")
   } else {
-    cat("  ✓ Python configured successfully\n")
+    cat("  ✓ PyTorch is available\n")
   }
 }
 
-# 如果 Python 可用，继续训练
-if (py_available()) {
+# =============================================
+# 7. Neural Network (Load Pre-trained Model)
+# =============================================
+# If Python is available, load pre-trained model
+if (py_module_available("torch")) {
   tryCatch({
-    # 准备数据（使用标准化后的特征，复用KNN的标准化器）
-    X_train_nn <- X_train_scaled
-    X_test_nn <- X_test_scaled
-    y_train_nn <- y_train
-    y_test_nn <- y_test
+    cat("  Loading pre-trained Neural Network model...\n")
     
-    # 传递给Python
+    # Find model file paths
+    model_paths <- c(
+      file.path(getwd(), "baseprice_model", "best_price_A2_log_pytorch.pt"),
+      file.path(getwd(), "baseline_price_predict", "baseprice_model", "best_price_A2_log_pytorch.pt"),
+      file.path(dirname(getwd()), "baseprice_model", "best_price_A2_log_pytorch.pt"),
+      "baseprice_model/best_price_A2_log_pytorch.pt",
+      "../baseprice_model/best_price_A2_log_pytorch.pt"
+    )
+    
+    model_file <- NULL
+    for (path in model_paths) {
+      if (file.exists(path)) {
+        model_file <- normalizePath(path)
+        break
+      }
+    }
+    
+    if (is.null(model_file)) {
+      stop("Cannot find best_price_A2_log_pytorch.pt. Please train the model first using train_nn.R")
+    }
+    
+    # Find scaler file
+    scaler_paths <- c(
+      file.path(getwd(), "baseprice_model", "scaler_price_pytorch.rds"),
+      file.path(getwd(), "baseline_price_predict", "baseprice_model", "scaler_price_pytorch.rds"),
+      file.path(dirname(getwd()), "baseprice_model", "scaler_price_pytorch.rds"),
+      "baseprice_model/scaler_price_pytorch.rds",
+      "../baseprice_model/scaler_price_pytorch.rds"
+    )
+    
+    scaler_file <- NULL
+    for (path in scaler_paths) {
+      if (file.exists(path)) {
+        scaler_file <- normalizePath(path)
+        break
+      }
+    }
+    
+    if (is.null(scaler_file)) {
+      stop("Cannot find scaler_price_pytorch.rds. Please train the model first using train_nn.R")
+    }
+    
+    # Find meta file
+    meta_paths <- c(
+      file.path(getwd(), "baseprice_model", "best_price_A2_log_pytorch_meta.pt"),
+      file.path(getwd(), "baseline_price_predict", "baseprice_model", "best_price_A2_log_pytorch_meta.pt"),
+      file.path(dirname(getwd()), "baseprice_model", "best_price_A2_log_pytorch_meta.pt"),
+      "baseprice_model/best_price_A2_log_pytorch_meta.pt",
+      "../baseprice_model/best_price_A2_log_pytorch_meta.pt"
+    )
+    
+    meta_file <- NULL
+    for (path in meta_paths) {
+      if (file.exists(path)) {
+        meta_file <- normalizePath(path)
+        break
+      }
+    }
+    
+    cat(sprintf("  Model file: %s\n", model_file))
+    cat(sprintf("  Scaler file: %s\n", scaler_file))
+    if (!is.null(meta_file)) {
+      cat(sprintf("  Meta file: %s\n", meta_file))
+    }
+    
+    # Load scaler (for standardizing test data)
+    scaler <- readRDS(scaler_file)
+    # Ensure X_test is data.frame format with correct column names
+    X_test_df <- as.data.frame(X_test)
+    colnames(X_test_df) <- feature_cols
+    X_test_scaled_nn <- as.matrix(predict(scaler, X_test_df))
+    
+    # Pass to Python
     py_run_string("
 import numpy as np
 import torch
 import torch.nn as nn
-import torch.optim as optim
-from torch.utils.data import TensorDataset, DataLoader
-")
-    
-    py$X_train_nn <- X_train_nn
-    py$X_test_nn <- X_test_nn
-    py$y_train_nn <- as.numeric(y_train_nn)
-    py$y_test_nn <- as.numeric(y_test_nn)
-    
-    # 在Python中定义和训练模型
-    py_run_string("
-# 定义神经网络
-class MLP(nn.Module):
-    def __init__(self, input_dim):
-        super(MLP, self).__init__()
-        self.net = nn.Sequential(
-            nn.Linear(input_dim, 256),
-            nn.BatchNorm1d(256),
-            nn.SiLU(),
-            nn.Dropout(0.3),
-            nn.Linear(256, 128),
-            nn.BatchNorm1d(128),
-            nn.SiLU(),
-            nn.Dropout(0.3),
-            nn.Linear(128, 64),
-            nn.BatchNorm1d(64),
-            nn.SiLU(),
-            nn.Dropout(0.2),
-            nn.Linear(64, 1)
-        )
+import os
+
+# Define model architecture (consistent with train_nn.R)
+class PricePredictor(nn.Module):
+    def __init__(self, input_size):
+        super(PricePredictor, self).__init__()
+        self.fc1 = nn.Linear(input_size, 256)
+        self.bn1 = nn.BatchNorm1d(256)
+        self.fc2 = nn.Linear(256, 128)
+        self.bn2 = nn.BatchNorm1d(128)
+        self.fc3 = nn.Linear(128, 64)
+        self.fc4 = nn.Linear(64, 1)
+        self.dropout = nn.Dropout(0.1)
     
     def forward(self, x):
-        return self.net(x).squeeze()
+        x = self.fc1(x)
+        x = self.bn1(x)
+        x = torch.nn.functional.silu(x)
+        x = self.dropout(x)
+        x = self.fc2(x)
+        x = self.bn2(x)
+        x = torch.nn.functional.silu(x)
+        x = self.dropout(x)
+        x = self.fc3(x)
+        x = torch.nn.functional.silu(x)
+        x = self.fc4(x)
+        return x
+")
+    
+    # Load model metadata to get input_dim
+    py$meta_file <- meta_file
+    py$model_file <- model_file
+    py$X_test_scaled_nn <- X_test_scaled_nn
+    
+    py_run_string("
+# Load metadata
+if meta_file and os.path.exists(meta_file):
+    meta = torch.load(meta_file, map_location='cpu')
+    input_dim = meta['input_dim']
+    print(f'Loaded input_dim from meta: {input_dim}')
+else:
+    # If no meta file, use test data dimension
+    input_dim = X_test_scaled_nn.shape[1]
+    print(f'Using input_dim from test data: {input_dim}')
 
-device = torch.device('cpu')
-input_dim = X_train_nn.shape[1]
-
-model_nn = MLP(input_dim).to(device)
-criterion = nn.MSELoss()
-optimizer = optim.Adam(model_nn.parameters(), lr=0.001)
-
-# 转换为tensor
-X_train_tensor = torch.FloatTensor(X_train_nn).to(device)
-y_train_tensor = torch.FloatTensor(y_train_nn).to(device)
-X_test_tensor = torch.FloatTensor(X_test_nn).to(device)
-
-# 训练
-model_nn.train()
-for epoch in range(150):
-    optimizer.zero_grad()
-    outputs = model_nn(X_train_tensor)
-    loss = criterion(outputs, y_train_tensor)
-    loss.backward()
-    optimizer.step()
-    if (epoch + 1) % 30 == 0:
-        print(f'Epoch [{epoch+1}/150], Loss: {loss.item():.4f}')
-
-# 预测
+# Create model and load weights
+model_nn = PricePredictor(input_dim)
+model_nn.load_state_dict(torch.load(model_file, map_location='cpu'))
 model_nn.eval()
+print('Model loaded successfully')
+")
+    
+    # Make predictions
+    py_run_string("
+# Convert to tensor and predict
+X_test_tensor = torch.FloatTensor(X_test_scaled_nn)
 with torch.no_grad():
-    pred_nn = model_nn(X_test_tensor).cpu().numpy()
+    pred_log_tensor = model_nn(X_test_tensor)
+    pred_log = pred_log_tensor.numpy().flatten()
+
+# Convert predictions from log space back to original space
+pred_nn = np.expm1(pred_log)
+
+print(f'Prediction shape: {pred_nn.shape}')
+print(f'Prediction range: [{pred_nn.min():.2f}, {pred_nn.max():.2f}]')
 ")
     
     pred_nn <- py$pred_nn
     
+    # Ensure prediction result is a 1D vector
+    if (length(dim(pred_nn)) > 1) {
+      pred_nn <- as.vector(pred_nn)
+    }
+    
+    # Calculate metrics
     results[["Neural Network"]] <- list(
       predictions = pred_nn,
       r2 = cor(pred_nn, y_test)^2,
@@ -520,21 +674,122 @@ with torch.no_grad():
                 results[["Neural Network"]]$mae))
     cat("\n")
   }, error = function(e) {
-    cat(sprintf("  Error training Neural Network: %s\n", e$message))
+    cat(sprintf("  Error loading Neural Network: %s\n", e$message))
+    cat("  Full error details:\n")
+    if (exists("py_last_error", envir = asNamespace("reticulate"))) {
+      tryCatch({
+        py_error <- reticulate::py_last_error()
+        cat(sprintf("    Python error: %s\n", py_error$message))
+      }, error = function(e2) {
+        # Ignore
+      })
+    }
     cat("  Skipping Neural Network\n\n")
   })
 } else {
-  cat("  Skipping Neural Network (Python not available)\n\n")
+  cat("  Skipping Neural Network (PyTorch not available)\n\n")
 }
 
 # =============================================
-# 8. 汇总结果并生成对比图
+# 8. Stacking Model (Load Pre-trained Model)
+# =============================================
+cat("Loading Stacking Model (XGBoost + Neural Network)...\n")
+
+tryCatch({
+  # Find stacking model files
+  stacking_paths <- c(
+    file.path(getwd(), "baseprice_model", "meta_ridge_model.rds"),
+    file.path(getwd(), "baseline_price_predict", "baseprice_model", "meta_ridge_model.rds"),
+    file.path(dirname(getwd()), "baseprice_model", "meta_ridge_model.rds"),
+    "baseprice_model/meta_ridge_model.rds",
+    "../baseprice_model/meta_ridge_model.rds"
+  )
+  
+  stacking_file <- NULL
+  for (path in stacking_paths) {
+    if (file.exists(path)) {
+      stacking_file <- normalizePath(path)
+      break
+    }
+  }
+  
+  if (is.null(stacking_file)) {
+    cat("  ⚠ Stacking model not found, skipping...\n")
+    cat("  (Run train_stacking.R first to create the stacking model)\n\n")
+  } else {
+    # Load stacking model
+    meta_ridge <- readRDS(stacking_file)
+    
+    # Find CV model (for lambda.min)
+    cv_paths <- c(
+      file.path(getwd(), "baseprice_model", "meta_ridge_cv.rds"),
+      file.path(getwd(), "baseline_price_predict", "baseprice_model", "meta_ridge_cv.rds"),
+      file.path(dirname(getwd()), "baseprice_model", "meta_ridge_cv.rds"),
+      "baseprice_model/meta_ridge_cv.rds",
+      "../baseprice_model/meta_ridge_cv.rds"
+    )
+    
+    meta_ridge_cv <- NULL
+    for (path in cv_paths) {
+      if (file.exists(path)) {
+        meta_ridge_cv <- readRDS(path)
+        break
+      }
+    }
+    
+    # Get XGBoost and NN predictions (must be already calculated)
+    if ("XGBoost" %in% names(results) && "Neural Network" %in% names(results)) {
+      xgb_pred <- results[["XGBoost"]]$predictions
+      nn_pred <- results[["Neural Network"]]$predictions
+      
+      # Ensure consistent length
+      min_len <- min(length(y_test), length(xgb_pred), length(nn_pred))
+      y_test_stack <- y_test[1:min_len]
+      xgb_pred <- xgb_pred[1:min_len]
+      nn_pred <- nn_pred[1:min_len]
+      
+      # Prepare stacking input (predictions from both models)
+      X_meta <- cbind(
+        xgb_pred = xgb_pred,
+        nn_pred = nn_pred
+      )
+      
+      # Stacking prediction
+      if (!is.null(meta_ridge_cv)) {
+        stack_pred <- predict(meta_ridge, newx = X_meta, s = meta_ridge_cv$lambda.min)[, 1]
+      } else {
+        # If no CV model, use default lambda
+        stack_pred <- predict(meta_ridge, newx = X_meta)[, 1]
+      }
+      
+      results[["Stacking (XGB+NN)"]] <- list(
+        predictions = stack_pred,
+        r2 = cor(stack_pred, y_test_stack)^2,
+        rmse = sqrt(mean((stack_pred - y_test_stack)^2)),
+        mae = mean(abs(stack_pred - y_test_stack))
+      )
+      cat(sprintf("  R²: %.4f, RMSE: %.2f, MAE: %.2f\n", 
+                  results[["Stacking (XGB+NN)"]]$r2,
+                  results[["Stacking (XGB+NN)"]]$rmse,
+                  results[["Stacking (XGB+NN)"]]$mae))
+      cat("\n")
+    } else {
+      cat("  ⚠ Cannot create stacking predictions: XGBoost or Neural Network predictions not available\n\n")
+    }
+  }
+}, error = function(e) {
+  cat(sprintf("  Error loading Stacking model: %s\n", e$message))
+  cat("  Skipping Stacking\n\n")
+})
+
+# =============================================
+# 9. Summarize Results and Generate Comparison Plots
 # =============================================
 cat("========================================\n")
 cat("Generating comparison plots...\n")
 cat("========================================\n\n")
 
-# 创建结果汇总表
+# Create results summary table
 summary_df <- data.frame(
   Model = names(results),
   R2 = sapply(results, function(x) x$r2),
@@ -542,16 +797,16 @@ summary_df <- data.frame(
   MAE = sapply(results, function(x) x$mae)
 )
 
-# 按R²排序
+# Sort by R²
 summary_df <- summary_df[order(-summary_df$R2), ]
 
 print(summary_df)
 
 # =============================================
-# 9. 生成可视化图表
+# 10. Generate Visualization Charts
 # =============================================
 
-# 9.1 R²对比柱状图
+# 10.1 R² comparison bar chart
 p1 <- ggplot(summary_df, aes(x = reorder(Model, R2), y = R2, fill = R2)) +
   geom_bar(stat = "identity") +
   coord_flip() +
@@ -570,7 +825,7 @@ p1 <- ggplot(summary_df, aes(x = reorder(Model, R2), y = R2, fill = R2)) +
   ) +
   geom_text(aes(label = sprintf("%.4f", R2)), hjust = -0.1, size = 3.5)
 
-# 9.2 RMSE对比柱状图
+# 10.2 RMSE comparison bar chart
 p2 <- ggplot(summary_df, aes(x = reorder(Model, -RMSE), y = RMSE, fill = RMSE)) +
   geom_bar(stat = "identity") +
   coord_flip() +
@@ -589,7 +844,7 @@ p2 <- ggplot(summary_df, aes(x = reorder(Model, -RMSE), y = RMSE, fill = RMSE)) 
   ) +
   geom_text(aes(label = sprintf("%.2f", RMSE)), hjust = -0.1, size = 3.5)
 
-# 9.3 MAE对比柱状图
+# 10.3 MAE comparison bar chart
 p3 <- ggplot(summary_df, aes(x = reorder(Model, -MAE), y = MAE, fill = MAE)) +
   geom_bar(stat = "identity") +
   coord_flip() +
@@ -608,20 +863,20 @@ p3 <- ggplot(summary_df, aes(x = reorder(Model, -MAE), y = MAE, fill = MAE)) +
   ) +
   geom_text(aes(label = sprintf("%.2f", MAE)), hjust = -0.1, size = 3.5)
 
-# 9.4 综合对比图（三个指标）
+# 10.4 Comprehensive comparison chart (all three metrics)
 summary_long <- summary_df %>%
   tidyr::pivot_longer(cols = c(R2, RMSE, MAE), 
                       names_to = "Metric", 
                       values_to = "Value") %>%
   mutate(Metric = factor(Metric, levels = c("R2", "RMSE", "MAE")))
 
-# 标准化值用于对比（R²越大越好，RMSE和MAE越小越好）
+# Normalize values for comparison (R² higher is better, RMSE and MAE lower is better)
 summary_long_norm <- summary_long %>%
   group_by(Metric) %>%
   mutate(
     ValueNorm = ifelse(Metric == "R2", 
-                       Value,  # R²直接使用
-                       max(Value) - Value)  # RMSE和MAE取反
+                       Value,  # R² use directly
+                       max(Value) - Value)  # RMSE and MAE invert
   ) %>%
   ungroup()
 
@@ -641,7 +896,7 @@ p4 <- ggplot(summary_long, aes(x = Model, y = Value, fill = Metric)) +
     strip.text = element_text(size = 11, face = "bold")
   )
 
-# 9.5 散点图：预测 vs 真实值（每个模型）
+# 10.5 Scatter plots: Predicted vs True values (for each model)
 scatter_plots <- list()
 for (i in seq_along(results)) {
   model_name <- names(results)[i]
@@ -665,30 +920,30 @@ for (i in seq_along(results)) {
     theme(plot.title = element_text(hjust = 0.5, size = 10))
 }
 
-# 保存所有图表
+# Save all charts
 cat("Saving plots...\n")
 
-# 保存R²对比图
+# Save R² comparison chart
 ggsave("baseline_models_r2_comparison.png", p1, 
        width = 10, height = 6, dpi = 300)
 cat("  Saved: baseline_models_r2_comparison.png\n")
 
-# 保存RMSE对比图
+# Save RMSE comparison chart
 ggsave("baseline_models_rmse_comparison.png", p2, 
        width = 10, height = 6, dpi = 300)
 cat("  Saved: baseline_models_rmse_comparison.png\n")
 
-# 保存MAE对比图
+# Save MAE comparison chart
 ggsave("baseline_models_mae_comparison.png", p3, 
        width = 10, height = 6, dpi = 300)
 cat("  Saved: baseline_models_mae_comparison.png\n")
 
-# 保存综合对比图
+# Save comprehensive comparison chart
 ggsave("baseline_models_all_metrics.png", p4, 
        width = 14, height = 5, dpi = 300)
 cat("  Saved: baseline_models_all_metrics.png\n")
 
-# 保存散点图网格
+# Save scatter plot grid
 if (length(scatter_plots) > 0) {
   png("baseline_models_scatter_plots.png", width = 15, height = 10, 
       units = "in", res = 300)
@@ -697,7 +952,93 @@ if (length(scatter_plots) > 0) {
   cat("  Saved: baseline_models_scatter_plots.png\n")
 }
 
-# 保存结果汇总表
+# 10.6 Comprehensive large plot (all metrics + scatter plots)
+cat("\nGenerating comprehensive comparison plot...\n")
+
+# Adjust font size for large plot
+p1_large <- p1 + theme(
+  plot.title = element_text(hjust = 0.5, size = 16, face = "bold"),
+  axis.text = element_text(size = 11),
+  axis.title = element_text(size = 12)
+)
+
+p2_large <- p2 + theme(
+  plot.title = element_text(hjust = 0.5, size = 16, face = "bold"),
+  axis.text = element_text(size = 11),
+  axis.title = element_text(size = 12)
+)
+
+p3_large <- p3 + theme(
+  plot.title = element_text(hjust = 0.5, size = 16, face = "bold"),
+  axis.text = element_text(size = 11),
+  axis.title = element_text(size = 12)
+)
+
+# Adjust scatter plot fonts
+if (length(scatter_plots) > 0) {
+  scatter_plots_large <- lapply(scatter_plots, function(p) {
+    p + theme(
+      plot.title = element_text(hjust = 0.5, size = 12, face = "bold"),
+      axis.text = element_text(size = 10),
+      axis.title = element_text(size = 11)
+    )
+  })
+  
+  # Calculate layout: top row 3 metric charts, bottom rows scatter plots
+  n_cols <- 3
+  n_scatter <- length(scatter_plots_large)
+  n_scatter_rows <- ceiling(n_scatter / n_cols)
+  
+  # Calculate height
+  plot_height <- 6 + 5 * n_scatter_rows
+  
+  # Create comprehensive large plot
+  png("baseline_models_comprehensive.png", width = 20, height = plot_height, 
+      units = "in", res = 300)
+  
+  # Method: arrange top and bottom rows separately, then combine
+  # Top row: 3 metric charts
+  top_plots <- list(p1_large, p2_large, p3_large)
+  
+  # Bottom rows: scatter plots, if not multiple of 3, add blank plots
+  n_scatter_needed <- n_scatter_rows * n_cols
+  n_empty <- n_scatter_needed - n_scatter
+  
+  if (n_empty > 0) {
+    # Create blank plot
+    empty_plot <- ggplot() + 
+      theme_void() + 
+      theme(plot.margin = margin(0, 0, 0, 0))
+    scatter_plots_filled <- c(scatter_plots_large, rep(list(empty_plot), n_empty))
+  } else {
+    scatter_plots_filled <- scatter_plots_large
+  }
+  
+  # Combine all plots: first top row 3, then all scatter plots
+  all_plots <- c(top_plots, scatter_plots_filled)
+  total_rows <- 1 + n_scatter_rows
+  
+  # Use grid.arrange
+  gridExtra::grid.arrange(
+    grobs = all_plots,
+    ncol = n_cols,
+    nrow = total_rows,
+    heights = c(1, rep(1, n_scatter_rows))
+  )
+  
+  dev.off()
+  cat(sprintf("  Saved: baseline_models_comprehensive.png (20x%.1f inches, 300 DPI)\n", 
+              plot_height))
+} else {
+  # If no scatter plots, only save three metric charts
+  png("baseline_models_comprehensive.png", width = 20, height = 8, 
+      units = "in", res = 300)
+  gridExtra::grid.arrange(p1_large, p2_large, p3_large, ncol = 3)
+  dev.off()
+  cat("  Saved: baseline_models_comprehensive.png (20x8 inches)\n")
+}
+
+# Save results summary table
 write.csv(summary_df, "baseline_models_summary.csv", row.names = FALSE)
 cat("  Saved: baseline_models_summary.csv\n")
 
@@ -705,7 +1046,7 @@ cat("\n========================================\n")
 cat("All plots saved successfully!\n")
 cat("========================================\n")
 
-# 打印最终汇总
+# Print final summary
 cat("\nFinal Summary:\n")
 cat("==============\n")
 print(summary_df)

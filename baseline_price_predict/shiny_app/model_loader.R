@@ -174,28 +174,12 @@ print('Neural Network model loaded successfully')
     cat("  source('../sensitivity_analysis/configure_python.R')\n")
   }
   
-  # 4. Load Meta model (Stacking, only if NN is available)
-  if (models$use_nn) {
-    cat("Loading Meta model (Stacking)...\n")
-    if (file.exists("meta_ridge_model.rds")) {
-      models$meta_model <<- readRDS("meta_ridge_model.rds")
-      models$meta_cv <<- readRDS("meta_ridge_cv.rds")
-      cat("Meta model loaded\n")
-    } else {
-      cat("Warning: meta_ridge_model.rds not found. Using XGBoost only.\n")
-      models$use_nn <<- FALSE
-    }
-  } else {
-    cat("Skipping Meta model (using XGBoost-only mode)\n")
-  }
+  # 4. Skip Meta model (Stacking) - using XGBoost only
+  cat("Skipping Meta model (using XGBoost-only mode)\n")
+  models$use_nn <<- FALSE  # Disable NN to ensure XGBoost-only mode
   
   models$loaded <<- TRUE
-  
-  if (models$use_nn) {
-    cat("All models loaded successfully! (XGBoost + Neural Network + Stacking)\n")
-  } else {
-    cat("XGBoost model loaded successfully! (XGBoost-only mode)\n")
-  }
+  cat("XGBoost model loaded successfully! (XGBoost-only mode)\n")
   
   # Verify models are actually loaded
   if (!models$loaded) {
@@ -246,42 +230,7 @@ predict_baseline_price <- function(feature_vector) {
     stop("XGBoost prediction failed: ", e$message)
   })
   
-  # If NN model is available, use Stacking; otherwise use XGBoost only
-  if (models$use_nn && !is.null(models$scaler_nn) && !is.null(models$meta_model)) {
-    # Neural Network prediction
-    tryCatch({
-      cat("Running Neural Network prediction...\n")
-      X_nn_scaled <- predict(models$scaler_nn, X_df)
-      X_nn_scaled <- as.matrix(X_nn_scaled)
-      
-      py$X_nn_scaled <- X_nn_scaled
-      py_run_string("
-X_test_tensor = torch.FloatTensor(X_nn_scaled)
-with torch.no_grad():
-    pred_log_tensor = model(X_test_tensor)
-    pred_log = pred_log_tensor.numpy().flatten()
-")
-      
-      nn_pred_log <- py$pred_log[1]
-      nn_pred <- expm1(nn_pred_log)
-      cat("NN prediction:", nn_pred, "\n")
-      
-      # Stacking prediction
-      cat("Running Stacking prediction...\n")
-      stack_input <- matrix(c(xgb_pred, nn_pred), nrow = 1)
-      stack_pred <- predict(models$meta_model, newx = stack_input, 
-                           s = models$meta_cv$lambda.min)[1, 1]
-      cat("Stacking prediction:", stack_pred, "\n")
-      
-      return(stack_pred)
-    }, error = function(e) {
-      # If NN prediction fails, fall back to XGBoost
-      cat("Warning: NN prediction failed, using XGBoost only:", e$message, "\n")
-      return(xgb_pred)
-    })
-  } else {
-    # Use XGBoost only
-    cat("Using XGBoost-only mode (NN not available)\n")
-    return(xgb_pred)
-  }
+  # Use XGBoost only (no Stacking)
+  cat("Using XGBoost-only mode\n")
+  return(xgb_pred)
 }
