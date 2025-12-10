@@ -309,8 +309,9 @@ ui <- dashboardPage(
       
       tabItem(
         tabName = "predict",
+        style = "height: calc(100vh - 100px); overflow: hidden;",
         fluidRow(
-          style = "display: flex; align-items: stretch;",
+          style = "display: flex; align-items: stretch; height: 100%;",
           # Left column - Property Information
           column(
             width = 4,
