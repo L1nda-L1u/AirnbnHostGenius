@@ -76,6 +76,8 @@ ui <- dashboardPage(
           background-color: #FFFFFF !important;
           color: #2C3E50 !important;
           font-weight: bold;
+          text-align: left !important;
+          padding-left: 20px !important;
         }
         .skin-blue .main-header .logo:hover {
           background-color: #F5F5F5 !important;
@@ -538,7 +540,7 @@ ui <- dashboardPage(
                       style = "flex: 1; display: flex; flex-direction: column; justify-content: center;",
                       tags$div(
                         class = "price-display",
-                        style = "font-size: 42px; padding: 20px 15px;",
+                        style = "font-size: 90px; padding: 10px 15px; font-weight: bold; color: #2C7A7B;",
                         textOutput("predicted_price")
                       ),
                       tags$div(
