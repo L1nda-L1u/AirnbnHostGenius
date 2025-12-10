@@ -530,7 +530,7 @@ ui <- dashboardPage(
                   width = NULL,
                   solidHeader = TRUE,
                   status = "primary",
-                  style = "height: 200px; display: flex; flex-direction: column; margin-bottom: 15px;",
+                  style = "height: 170px; display: flex; flex-direction: column; margin-bottom: 15px;",
                   
                   conditionalPanel(
                     condition = "output.price_predicted",
@@ -566,12 +566,12 @@ ui <- dashboardPage(
                   width = NULL,
                   solidHeader = TRUE,
                   status = "warning",
-                  style = "height: 200px; display: flex; flex-direction: column; margin-bottom: 15px;",
+                  style = "height: 170px; display: flex; flex-direction: column; margin-bottom: 15px;",
                   
                   conditionalPanel(
                     condition = "output.price_predicted",
                     tags$div(
-                      style = "padding: 5px 15px; flex: 1; overflow-y: auto; overflow-x: hidden;",
+                      style = "padding: 0 15px 5px 15px; flex: 1; overflow-y: auto; overflow-x: hidden;",
                       uiOutput("amenity_recommendations")
                     )
                   ),
@@ -1673,9 +1673,12 @@ server <- function(input, output, session) {
           lapply(1:nrow(recs), function(i) {
             rec <- recs[i, ]
             tags$div(
-              style = "padding: 6px 0; border-bottom: 1px solid #E0E0E0; margin-bottom: 6px;",
+              style = paste0(
+                "padding: 6px 0; margin-bottom: 6px;",
+                if(i < nrow(recs)) " border-bottom: 1px solid #E0E0E0;" else ""
+              ),
               tags$div(
-                style = "font-weight: 600; color: #2C3E50; margin-bottom: 3px; font-size: 14px;",
+                style = "font-weight: 600; color: #2C3E50; margin-bottom: 2px; font-size: 14px;",
                 rec$amenity_name
               ),
               tags$div(
