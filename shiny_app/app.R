@@ -215,6 +215,21 @@ ui <- dashboardPage(
         .control-label {
           color: #4A4A4A !important;
         }
+        /* Custom scrollbar for amenities */
+        .amenities-scrollable::-webkit-scrollbar {
+          width: 8px;
+        }
+        .amenities-scrollable::-webkit-scrollbar-track {
+          background: #F5F5F5;
+          border-radius: 4px;
+        }
+        .amenities-scrollable::-webkit-scrollbar-thumb {
+          background: #B0B0B0;
+          border-radius: 4px;
+        }
+        .amenities-scrollable::-webkit-scrollbar-thumb:hover {
+          background: #909090;
+        }
       "))
     ),
     
@@ -336,7 +351,7 @@ ui <- dashboardPage(
               # Postcode input with status on the right
               fluidRow(
                 column(
-                  width = 7,
+                  width = 6,
                   textInput(
                     "address",
                     label = tags$strong("Postcode"),
@@ -365,7 +380,7 @@ ui <- dashboardPage(
                 # Left column - Basic Properties
                 column(
                   width = 6,
-                  style = "display: flex; flex-direction: column;",
+                  style = "display: flex; flex-direction: column; height: 100%;",
                   tags$h4("Basic Properties", style = "color: #4A4A4A; margin-top: 0; margin-bottom: 12px; font-weight: 600; font-size: 14px;"),
                   
                   tags$div(
@@ -427,11 +442,12 @@ ui <- dashboardPage(
                 # Right column - Amenities
                 column(
                   width = 6,
-                  style = "display: flex; flex-direction: column;",
+                  style = "display: flex; flex-direction: column; height: 100%;",
                   tags$h4("Amenities", style = "color: #4A4A4A; margin-top: 0; margin-bottom: 12px; font-weight: 600; font-size: 14px;"),
                   
                   tags$div(
-                    style = "flex: 1; margin-top: 40px; overflow-y: auto; border: 1px solid #E0E0E0; padding: 10px; border-radius: 5px; background-color: #F5F5F5; display: flex; flex-direction: column;",
+                    class = "amenities-scrollable",
+                    style = "flex: 1; overflow-y: auto; overflow-x: hidden; border: 1px solid #E0E0E0; padding: 10px; border-radius: 5px; background-color: #F5F5F5; max-height: 100%; min-height: 0;",
                     checkboxGroupInput(
                       "amenities",
                       NULL,
