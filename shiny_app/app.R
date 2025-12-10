@@ -346,7 +346,7 @@ ui <- dashboardPage(
                 ),
                 column(
                   width = 5,
-                  style = "display: flex; align-items: flex-end; padding-left: 8px;",
+                  style = "display: flex; align-items: center; padding-left: 8px; padding-top: 25px;",
                   conditionalPanel(
                     condition = "output.geocode_status",
                     tags$div(
@@ -425,7 +425,7 @@ ui <- dashboardPage(
                   tags$h4("Amenities", style = "color: #4A4A4A; margin-top: 0; margin-bottom: 12px; font-weight: 600; font-size: 14px;"),
                   
                   tags$div(
-                    style = "margin-top: 40px; max-height: 280px; overflow-y: auto; border: 1px solid #E0E0E0; padding: 10px; border-radius: 5px; background-color: #F5F5F5;",
+                    style = "margin-top: 40px; max-height: 350px; overflow-y: auto; border: 1px solid #E0E0E0; padding: 10px; border-radius: 5px; background-color: #F5F5F5;",
                     checkboxGroupInput(
                       "amenities",
                       NULL,
@@ -518,7 +518,7 @@ ui <- dashboardPage(
                   conditionalPanel(
                     condition = "output.price_predicted",
                     tags$div(
-                      style = "padding: 15px; flex: 1; overflow-y: auto; overflow-x: hidden;",
+                      style = "padding: 8px 15px; flex: 1; overflow-y: auto; overflow-x: hidden;",
                       uiOutput("amenity_recommendations")
                     )
                   ),
@@ -543,11 +543,11 @@ ui <- dashboardPage(
                   width = NULL,
                   solidHeader = TRUE,
                   status = "info",
-                  style = "flex: 1; display: flex; flex-direction: column;",
+                  style = "flex: 1; display: flex; flex-direction: column; min-height: 0;",
                   
                   tags$div(
                     class = "map-container",
-                    style = "flex: 1; min-height: 300px; height: 100%; position: relative;",
+                    style = "flex: 1; min-height: 300px; height: 100%; position: relative; overflow: hidden;",
                     leafletOutput("map", height = "100%")
                   )
                 )
@@ -1267,9 +1267,13 @@ server <- function(input, output, session) {
     if (nchar(status) == 0) return(NULL)
     
     if (grepl("Location found", status)) {
+      location_text <- sub("Location found: ", "", status)
+      if (nchar(location_text) > 25) {
+        location_text <- paste0(substr(location_text, 1, 22), "...")
+      }
       tags$div(
-        tags$span(sub("Location found: ", "", status), style = "font-size: 12px;"),
-        style = "color: #0D9488; font-weight: 500; padding: 6px 10px; background-color: #E0F2F1; border-radius: 5px; font-size: 12px; width: 100%; line-height: 1.4; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"
+        tags$span(location_text, style = "font-size: 11px;"),
+        style = "color: #0D9488; font-weight: 500; padding: 4px 8px; background-color: #E0F2F1; border-radius: 5px; font-size: 11px; width: 100%; line-height: 1.3; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;"
       )
     } else if (grepl("Cannot find|Error", status)) {
       tags$div(
