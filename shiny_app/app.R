@@ -540,7 +540,7 @@ ui <- dashboardPage(
                       style = "flex: 1; display: flex; flex-direction: column; justify-content: center;",
                       tags$div(
                         class = "price-display",
-                        style = "font-size: 90px; padding: 10px 15px; font-weight: bold; color: #2C7A7B;",
+                        style = "font-size: 72px; padding: 10px 15px; font-weight: bold; color: #2C7A7B;",
                         textOutput("predicted_price")
                       ),
                       tags$div(
@@ -1680,7 +1680,7 @@ server <- function(input, output, session) {
                   if(i < nrow(recs)) " border-bottom: 1px solid #E0E0E0;" else ""
                 ),
               tags$div(
-                style = "font-weight: 600; color: #2C3E50; margin-bottom: 2px; font-size: 14px;",
+                style = "font-weight: 600; color: #2C7A7B; margin-bottom: 2px; font-size: 14px;",
                 rec$amenity_name
               ),
               tags$div(
