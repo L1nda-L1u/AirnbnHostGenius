@@ -56,11 +56,10 @@ COMPONENT_DATA_PATH <- find_component_data_path()
 # ==================================================================================
 
 #' Load Component Predictions Data
-#' @return A list with tfl, tourism, weather data frames
+#' @return A list with tfl, weather data frames
 load_market_data <- function() {
   result <- list(
     tfl = NULL,
-    tourism = NULL,
     weather = NULL,
     daily = NULL,
     loaded = FALSE
@@ -104,12 +103,11 @@ load_market_data <- function() {
 #' Get component values for a specific date
 #' @param date The date to query
 #' @param data The loaded market data
-#' @return A list with tfl, tourism, weather values
+#' @return A list with tfl, weather values
 get_components_for_date <- function(date, data) {
   if (is.null(data$daily) || !data$loaded) {
     return(list(
       tfl = NA,
-      tourism = NA,
       temp = NA,
       weather_quality = NA,
       is_holiday = FALSE,
@@ -126,7 +124,6 @@ get_components_for_date <- function(date, data) {
     # Date not in data - return averages
     return(list(
       tfl = mean(data$daily$tfl_daily_avg_m, na.rm = TRUE),
-      tourism = mean(data$daily$tourism_quarterly_visits_k, na.rm = TRUE),
       temp = mean(data$daily$temp_c, na.rm = TRUE),
       weather_quality = mean(data$daily$weather_quality, na.rm = TRUE),
       is_holiday = FALSE,
@@ -136,7 +133,6 @@ get_components_for_date <- function(date, data) {
   
   return(list(
     tfl = result$tfl_daily_avg_m[1],
-    tourism = result$tourism_quarterly_visits_k[1],
     temp = result$temp_c[1],
     weather_quality = result$weather_quality[1],
     is_holiday = ifelse(!is.null(result$is_holiday), result$is_holiday[1], FALSE),
@@ -380,7 +376,7 @@ create_component_correlation <- function(data) {
   }
   
   cor_data <- data$daily %>%
-    select(any_of(c("temp_c", "tfl_daily_avg_m", "tourism_quarterly_visits_k", 
+    select(any_of(c("temp_c", "tfl_daily_avg_m", 
                     "weather_quality", "is_weekend", "is_holiday"))) %>%
     mutate(across(c(is_weekend, is_holiday), as.numeric)) %>%
     na.omit()
@@ -390,7 +386,7 @@ create_component_correlation <- function(data) {
   }
   
   # Rename columns for display
-  names(cor_data) <- c("Temp", "TfL", "Tourism", "Weather", "Weekend", "Holiday")[1:ncol(cor_data)]
+  names(cor_data) <- c("Temp", "TfL", "Weather", "Weekend", "Holiday")[1:ncol(cor_data)]
   
   cor_matrix <- cor(cor_data, use = "complete.obs")
   
@@ -420,7 +416,6 @@ get_market_summary <- function(data) {
   if (is.null(data$daily) || !data$loaded) {
     return(list(
       tfl_avg = "N/A",
-      tourism_avg = "N/A",
       temp_avg = "N/A",
       weather_quality_avg = "N/A",
       date_range = "No data available"
@@ -431,7 +426,6 @@ get_market_summary <- function(data) {
   
   list(
     tfl_avg = round(mean(daily$tfl_daily_avg_m, na.rm = TRUE), 2),
-    tourism_avg = round(mean(daily$tourism_quarterly_visits_k, na.rm = TRUE), 0),
     temp_avg = round(mean(daily$temp_c, na.rm = TRUE), 1),
     weather_quality_avg = round(mean(daily$weather_quality, na.rm = TRUE), 2),
     date_range = paste(min(daily$date, na.rm = TRUE), "to", max(daily$date, na.rm = TRUE))

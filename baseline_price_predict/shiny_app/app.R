@@ -540,7 +540,7 @@ ui <- dashboardPage(
               status = "primary",
               
               fluidRow(
-                column(3,
+                column(4,
                   tags$div(
                     style = "text-align: center; padding: 15px; background: linear-gradient(135deg, #3498DB15 0%, #3498DB30 100%); border-radius: 8px;",
                     tags$h5("🚇 TfL Daily Journeys", style = "color: #5A5A5A; margin-bottom: 5px;"),
@@ -548,15 +548,7 @@ ui <- dashboardPage(
                     tags$small("million/day", style = "color: #888;")
                   )
                 ),
-                column(3,
-                  tags$div(
-                    style = "text-align: center; padding: 15px; background: linear-gradient(135deg, #27AE6015 0%, #27AE6030 100%); border-radius: 8px;",
-                    tags$h5("✈️ Int'l Tourism", style = "color: #5A5A5A; margin-bottom: 5px;"),
-                    tags$div(style = "font-size: 24px; font-weight: bold; color: #27AE60;", textOutput("tourism_avg_display")),
-                    tags$small("thousand/quarter", style = "color: #888;")
-                  )
-                ),
-                column(3,
+                column(4,
                   tags$div(
                     style = "text-align: center; padding: 15px; background: linear-gradient(135deg, #F39C1215 0%, #F39C1230 100%); border-radius: 8px;",
                     tags$h5("🌡️ Avg Temperature", style = "color: #5A5A5A; margin-bottom: 5px;"),
@@ -564,7 +556,7 @@ ui <- dashboardPage(
                     tags$small("°C", style = "color: #888;")
                   )
                 ),
-                column(3,
+                column(4,
                   tags$div(
                     style = "text-align: center; padding: 15px; background: linear-gradient(135deg, #9B59B615 0%, #9B59B630 100%); border-radius: 8px;",
                     tags$h5("☀️ Weather Quality", style = "color: #5A5A5A; margin-bottom: 5px;"),
@@ -606,20 +598,10 @@ ui <- dashboardPage(
           )
         ),
         
-        # Tourism Row
+        # Weekly Patterns Row
         fluidRow(
           column(
-            width = 6,
-            box(
-              title = tags$h4("✈️ International Tourism", style = "color: #4A4A4A; margin: 0; font-weight: 600;"),
-              width = NULL,
-              solidHeader = TRUE,
-              status = "success",
-              plotlyOutput("tourism_timeseries", height = "280px")
-            )
-          ),
-          column(
-            width = 6,
+            width = 12,
             box(
               title = tags$h4("📆 Weekly Patterns", style = "color: #4A4A4A; margin: 0; font-weight: 600;"),
               width = NULL,
@@ -692,21 +674,15 @@ ui <- dashboardPage(
                   style = "display: flex; gap: 20px; flex-wrap: wrap;",
                   
                   tags$div(
-                    style = "flex: 1; min-width: 250px; padding: 15px; background-color: #F8F8F8; border-radius: 8px; border-left: 4px solid #3498DB;",
+                    style = "flex: 1; min-width: 300px; padding: 15px; background-color: #F8F8F8; border-radius: 8px; border-left: 4px solid #3498DB;",
                     tags$h5("🚇 Transport Impact", style = "color: #3498DB; margin-top: 0;"),
-                    tags$p("Higher TfL journey volumes indicate more potential visitors in London. Weekdays typically see higher commuter traffic.", style = "color: #666; font-size: 13px; margin-bottom: 0;")
+                    tags$p("Higher TfL journey volumes indicate more potential visitors in London. Weekdays typically see higher commuter traffic, while weekends show tourist patterns.", style = "color: #666; font-size: 13px; margin-bottom: 0;")
                   ),
                   
                   tags$div(
-                    style = "flex: 1; min-width: 250px; padding: 15px; background-color: #F8F8F8; border-radius: 8px; border-left: 4px solid #27AE60;",
-                    tags$h5("✈️ Tourism Seasons", style = "color: #27AE60; margin-top: 0;"),
-                    tags$p("International tourism peaks in summer (Q2-Q3). Properties near tourist attractions benefit most during these periods.", style = "color: #666; font-size: 13px; margin-bottom: 0;")
-                  ),
-                  
-                  tags$div(
-                    style = "flex: 1; min-width: 250px; padding: 15px; background-color: #F8F8F8; border-radius: 8px; border-left: 4px solid #F39C12;",
+                    style = "flex: 1; min-width: 300px; padding: 15px; background-color: #F8F8F8; border-radius: 8px; border-left: 4px solid #F39C12;",
                     tags$h5("🌤️ Weather Effect", style = "color: #F39C12; margin-top: 0;"),
-                    tags$p("Good weather increases outdoor activity and tourism. Consider dynamic pricing during favorable weather periods.", style = "color: #666; font-size: 13px; margin-bottom: 0;")
+                    tags$p("Good weather increases outdoor activity and visitor demand. Consider dynamic pricing during favorable weather periods and seasonal peaks.", style = "color: #666; font-size: 13px; margin-bottom: 0;")
                   )
                 )
               )
@@ -736,7 +712,7 @@ ui <- dashboardPage(
               tags$li("✨ Rich amenities selection"),
               tags$li("💰 Smart price prediction"),
               tags$li("🗺️ Location visualization"),
-              tags$li("📊 Market insights with TfL, Tourism, and Weather data")
+              tags$li("📊 Market insights with TfL and Weather data")
             ),
             tags$hr(),
             tags$h5("Model Information:", style = "color: #2C3E50;"),
@@ -750,7 +726,6 @@ ui <- dashboardPage(
             tags$h5("Market Data Sources:", style = "color: #2C3E50;"),
             tags$ul(
               tags$li("Transport for London (TfL) journey statistics"),
-              tags$li("International tourism visitor data"),
               tags$li("Weather data (temperature, precipitation, quality)"),
               tags$li("UK bank holidays and major events")
             )
@@ -1446,13 +1421,6 @@ server <- function(input, output, session) {
     paste0(summary$tfl_avg, "M")
   })
   
-  output$tourism_avg_display <- renderText({
-    data <- market_data()
-    if (is.null(data) || !data$loaded) return("--")
-    summary <- get_market_summary(data)
-    paste0(format(summary$tourism_avg, big.mark = ","), "K")
-  })
-  
   output$temp_avg_display <- renderText({
     data <- market_data()
     if (is.null(data) || !data$loaded) return("--")
@@ -1489,15 +1457,6 @@ server <- function(input, output, session) {
       return(create_empty_plot() %>% layout(title = "Loading..."))
     }
     create_tfl_yearly_comparison(data)
-  })
-  
-  # Tourism Visualization
-  output$tourism_timeseries <- renderPlotly({
-    data <- market_data()
-    if (is.null(data) || !data$loaded) {
-      return(create_empty_plot() %>% layout(title = "Loading tourism data..."))
-    }
-    create_tourism_timeseries(data)
   })
   
   # Day of Week Pattern
