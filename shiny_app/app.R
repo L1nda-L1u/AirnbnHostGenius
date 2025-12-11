@@ -883,64 +883,56 @@ ui <- dashboardPage(
           ),
           
           # Right side - Controls and Legend
-           column(
-             width = 4,
-             box(
+          column(
+            width = 4,
+            box(
                title = tags$h3("Filter Options", style = "color: #2C3E50; margin: 0; font-weight: 600;"),
-               width = NULL,
-               solidHeader = TRUE,
-               status = "info",
-               
+              width = NULL,
+              solidHeader = TRUE,
+              status = "info",
+              
                # Color coding and distribution
-               selectInput(
-                 "color_by",
-                 label = tags$strong("Color Points By:"),
-                 choices = list(
-                   "Room Type" = "room_type",
-                   "Neighbourhood" = "neighbourhood"
-                 ),
-                 selected = "room_type",
-                 width = "100%"
-               ),
-               
+              selectInput(
+                "color_by",
+                label = tags$strong("Color Points By:"),
+                choices = list(
+                  "Room Type" = "room_type",
+                  "Neighbourhood" = "neighbourhood"
+                ),
+                selected = "room_type",
+                width = "100%"
+              ),
+              
                tags$h5("Distribution (Click to Filter)", style = "color: #4A4A4A; font-weight: 600; margin-top: 10px;"),
-               uiOutput("category_bars"),
-               
-               hr(),
-               
+              uiOutput("category_bars"),
+              
+              hr(),
+              
                # Summary stats (auto-updates after filters and bar selection)
-               tags$h5("Summary Statistics", style = "color: #4A4A4A; font-weight: 600;"),
+              tags$h5("Summary Statistics", style = "color: #4A4A4A; font-weight: 600;"),
                uiOutput("overview_stats"),
                
                hr(),
                
                # Filters
-               selectInput(
-                 "filter_room_type",
-                 label = "Room Type:",
-                 choices = c("All" = "all"),
-                 selected = "all",
-                 width = "100%"
-               ),
-               
-               sliderInput(
-                 "filter_price",
-                 label = "Price Range (£):",
-                 min = 0,
+              sliderInput(
+                "filter_price",
+                label = "Price Range (£):",
+                min = 0,
                  max = 500,
-                 value = c(0, 500),
-                 step = 10,
-                 width = "100%"
-               ),
-               
-               actionButton(
-                 "apply_filter",
-                 "Apply Filters",
-                 class = "btn-primary",
-                 style = "width: 100%; margin-top: 10px;"
-               )
-             )
-           )
+                value = c(0, 500),
+                step = 10,
+                width = "100%"
+              ),
+              
+              actionButton(
+                "apply_filter",
+                "Apply Filters",
+                class = "btn-primary",
+                style = "width: 100%; margin-top: 10px;"
+              )
+            )
+          )
         )
       ),
       
@@ -1549,7 +1541,7 @@ server <- function(input, output, session) {
       updateSelectInput(session, "filter_room_type", choices = room_types)
       
        max_price <- 500
-       updateSliderInput(session, "filter_price", max = max_price, value = c(0, max_price))
+      updateSliderInput(session, "filter_price", max = max_price, value = c(0, max_price))
     }
   })
   
@@ -1558,14 +1550,8 @@ server <- function(input, output, session) {
     data <- load_listings()
     if (is.null(data)) return(NULL)
     
-    # Apply filters
-    filtered <- data
-    
-    if (input$filter_room_type != "all") {
-      filtered <- filtered %>% filter(room_type == input$filter_room_type)
-    }
-    
-    filtered <- filtered %>%
+    # Apply price filter only; room_type handled via color_by + bar selection
+    filtered <- data %>%
       filter(price >= input$filter_price[1], price <= input$filter_price[2])
     
     # Apply category selection from Distribution bars
