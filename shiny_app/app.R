@@ -1351,9 +1351,8 @@ ui <- dashboardPage(
           tags$div(
             style = "padding: 20px;",
             tags$h4("Airbnb Baseline Price Predictor", style = "color: #1ABC9C;"),
+            tags$p("AirbnbHostGenius is an intelligent, data-driven platform designed to help Airbnb hosts maximize their annual revenue through machine learning-powered pricing recommendations and occupancy predictions."),
             tags$p("Creators: Linda Liu & Shirley Xiong"),
-            tags$p("A machine learning-based tool for predicting Airbnb baseline prices."),
-            tags$p("Model: Gradient Boosted Trees (XGBoost) trained on historical Airbnb data."),
             tags$hr(),
             tags$h5("Pages:", style = "color: #2C3E50;"),
             tags$ul(
@@ -1373,22 +1372,7 @@ ui <- dashboardPage(
               tags$li("Location visualization"),
               tags$li("Market insights with TfL, Tourism, and Weather data")
             ),
-            tags$hr(),
-            tags$h5("Model Information:", style = "color: #2C3E50;"),
-            tags$p("Model trained on historical Airbnb data using:"),
-            tags$ul(
-              tags$li("Geographic location (coordinates, area clusters)"),
-              tags$li("Property attributes (bedrooms, bathrooms, accommodates, etc.)"),
-              tags$li("Amenities (WiFi, kitchen, washer, etc.)")
-            ),
-            tags$hr(),
-            tags$h5("Market Data Sources:", style = "color: #2C3E50;"),
-            tags$ul(
-              tags$li("Transport for London (TfL) journey statistics"),
-              tags$li("International tourism visitor data"),
-              tags$li("Weather data (temperature, precipitation, quality)"),
-              tags$li("UK bank holidays and major events")
-            )
+            tags$hr()
           )
         )
       )
