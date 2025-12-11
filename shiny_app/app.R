@@ -1280,7 +1280,7 @@ ui <- dashboardPage(
         fluidRow(
         column(6,
           div(class = "card",
-            div(class = "section-title", "Tourism (International Visitors)"),
+            div(class = "section-title", "TfL Transport Activity"),
             plotlyOutput("tourism_chart", height = "280px")
           )
         ),
@@ -2963,17 +2963,32 @@ server <- function(input, output, session) {
   # ==================== MARKET DATA ====================
   
   output$tourism_chart <- renderPlotly({
-    tourism_plot <- tourism_data %>% 
-      filter(date >= Sys.Date() - 365) %>%
-      mutate(value_k = value / 1000)  # Convert to thousands
+    # Read tfl.csv directly
+    df <- tryCatch({
+      read.csv("tfl.csv")
+    }, error = function(e) {
+      tryCatch({
+        read.csv(file.path("shiny_app", "tfl.csv"))
+      }, error = function(e2) {
+        NULL
+      })
+    })
     
-    plot_ly(tourism_plot, x = ~date, y = ~value_k, type = "scatter", mode = "lines",
+    if (is.null(df)) {
+      return(plotly_empty() %>% layout(title = "TfL data not found"))
+    }
+    
+    df$date <- as.Date(df$date)
+    # Only show 2026 data
+    df <- df[df$date >= as.Date("2026-01-01") & df$date <= as.Date("2026-12-31"), ]
+    
+    plot_ly(df, x = ~date, y = ~value, type = "scatter", mode = "lines",
             line = list(color = "#2A8C82", width = 2)) %>%
       layout(
         xaxis = list(title = "", gridcolor = "#D0D0D0", color = "#7F8C8D"),
-        yaxis = list(title = "International Visitors (K)", gridcolor = "#D0D0D0", color = "#7F8C8D"),
-        paper_bgcolor = "transparent",
-        plot_bgcolor = "transparent",
+        yaxis = list(title = "Daily Journeys (M)", gridcolor = "#D0D0D0", color = "#7F8C8D"),
+        paper_bgcolor = "white",
+        plot_bgcolor = "white",
         font = list(color = "#2C3E50")
       )
   })
@@ -3009,11 +3024,11 @@ server <- function(input, output, session) {
     }
     
     df$date <- as.Date(df$date)
-    df <- df[df$date >= as.Date("2024-01-01") & df$date <= as.Date("2027-12-31"), ]
+    # Only show 2026 data
+    df <- df[df$date >= as.Date("2026-01-01") & df$date <= as.Date("2026-12-31"), ]
     
     if (nrow(df) == 0) {
-      df <- read.csv("weather.csv")
-      df$date <- as.Date(df$date)
+      return(plotly_empty() %>% layout(title = "No 2026 weather data"))
     }
     
     fig <- plot_ly(df, x = ~date)
