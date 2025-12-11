@@ -1281,8 +1281,8 @@ ui <- dashboardPage(
         fluidRow(
         column(6,
           div(class = "card",
-            div(class = "section-title", "TfL Transport Activity"),
-            plotlyOutput("tfl_chart", height = "280px")
+            div(class = "section-title", "Tourism (International Visitors)"),
+            plotlyOutput("tourism_chart", height = "280px")
           )
         ),
         column(6,
@@ -2987,6 +2987,22 @@ server <- function(input, output, session) {
   })
   
   # ==================== MARKET DATA ====================
+  
+  output$tourism_chart <- renderPlotly({
+    tourism_plot <- tourism_data %>% 
+      filter(date >= Sys.Date() - 365) %>%
+      mutate(value_k = value / 1000)  # Convert to thousands
+    
+    plot_ly(tourism_plot, x = ~date, y = ~value_k, type = "scatter", mode = "lines",
+            line = list(color = "#2A8C82", width = 2)) %>%
+      layout(
+        xaxis = list(title = "", gridcolor = "#D0D0D0", color = "#7F8C8D"),
+        yaxis = list(title = "International Visitors (K)", gridcolor = "#D0D0D0", color = "#7F8C8D"),
+        paper_bgcolor = "transparent",
+        plot_bgcolor = "transparent",
+        font = list(color = "#2C3E50")
+      )
+  })
   
   output$tfl_chart <- renderPlotly({
     tfl_plot <- tfl_data %>% filter(date >= Sys.Date() - 365)
