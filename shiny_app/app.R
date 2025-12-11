@@ -3019,8 +3019,14 @@ server <- function(input, output, session) {
   })
   
   output$weather_chart <- renderPlotly({
+    # Show last 2 years of data
     weather_plot <- weather_data %>%
-      filter(date >= Sys.Date() - 365, date <= Sys.Date() + 90)
+      filter(date >= as.Date("2024-01-01"), date <= as.Date("2027-12-31"))
+    
+    if (nrow(weather_plot) == 0) {
+      # If no recent data, show all data
+      weather_plot <- weather_data
+    }
     
     plot_ly(weather_plot, x = ~date, y = ~temp_c, type = "scatter", mode = "lines",
             line = list(color = "#F5B085", width = 2)) %>%
