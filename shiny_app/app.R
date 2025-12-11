@@ -3019,45 +3019,46 @@ server <- function(input, output, session) {
   })
   
   output$weather_chart <- renderPlotly({
-    # Load weather data directly
-    weather_paths <- c(
-      "weather.csv",
-      file.path("shiny_app", "weather.csv"),
-      file.path(getwd(), "weather.csv"),
-      file.path(dirname(getwd()), "shiny_app", "weather.csv")
+    # Read weather.csv directly with absolute path
+    app_dir <- dirname(rstudioapi::getSourceEditorContext()$path)
+    if (is.null(app_dir) || app_dir == "") {
+      app_dir <- getwd()
+    }
+    
+    weather_file <- file.path(app_dir, "weather.csv")
+    if (!file.exists(weather_file)) {
+      weather_file <- "weather.csv"
+    }
+    if (!file.exists(weather_file)) {
+      weather_file <- file.path("shiny_app", "weather.csv")
+    }
+    
+    if (!file.exists(weather_file)) {
+      return(plotly_empty() %>% layout(title = list(text = "Weather data file not found", font = list(color = "#2C3E50"))))
+    }
+    
+    df <- read.csv(weather_file)
+    df$date <- as.Date(df$date)
+    df <- df[df$date >= as.Date("2024-01-01") & df$date <= as.Date("2027-12-31"), ]
+    
+    if (nrow(df) == 0) {
+      df <- read.csv(weather_file)
+      df$date <- as.Date(df$date)
+    }
+    
+    fig <- plot_ly(df, x = ~date)
+    fig <- fig %>% add_lines(y = ~temp_c, name = "Temperature (°C)", line = list(color = "#F5B085", width = 2))
+    fig <- fig %>% add_lines(y = ~sunshine_hours, name = "Sunshine (h)", yaxis = "y2", line = list(color = "#8DD3C7", width = 2))
+    fig <- fig %>% layout(
+      yaxis = list(title = "Temp °C", color = "#7F8C8D"),
+      yaxis2 = list(title = "Sunshine h", overlaying = "y", side = "right", color = "#7F8C8D"),
+      xaxis = list(title = "", color = "#7F8C8D"),
+      paper_bgcolor = "white",
+      plot_bgcolor = "white",
+      font = list(color = "#2C3E50"),
+      legend = list(orientation = "h", y = 1.1)
     )
-    
-    weather_plot <- NULL
-    for (path in weather_paths) {
-      if (file.exists(path)) {
-        tryCatch({
-          weather_plot <- fread(path) %>% 
-            mutate(date = as.Date(date)) %>%
-            filter(date >= as.Date("2024-01-01"), date <= as.Date("2027-12-31"))
-          break
-        }, error = function(e) NULL)
-      }
-    }
-    
-    if (is.null(weather_plot) || nrow(weather_plot) == 0) {
-      return(plot_ly() %>% layout(title = "No weather data available"))
-    }
-    
-    # Create dual-axis chart: Temperature (left) + Sunshine Hours (right)
-    plot_ly(weather_plot, x = ~date) %>%
-      add_trace(y = ~temp_c, name = "Temperature (°C)", type = "scatter", mode = "lines",
-                line = list(color = "#F5B085", width = 2)) %>%
-      add_trace(y = ~sunshine_hours, name = "Sunshine (hours)", type = "scatter", mode = "lines",
-                line = list(color = "#8DD3C7", width = 2), yaxis = "y2") %>%
-      layout(
-        xaxis = list(title = "", gridcolor = "#D0D0D0", color = "#7F8C8D"),
-        yaxis = list(title = "Temperature (°C)", gridcolor = "#D0D0D0", color = "#7F8C8D", side = "left"),
-        yaxis2 = list(title = "Sunshine (hours)", overlaying = "y", side = "right", color = "#7F8C8D"),
-        paper_bgcolor = "transparent",
-        plot_bgcolor = "transparent",
-        font = list(color = "#2C3E50"),
-        legend = list(orientation = "h", y = 1.1)
-      )
+    fig
   })
   
   output$events_table <- renderDT({
