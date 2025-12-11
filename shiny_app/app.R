@@ -3019,23 +3019,44 @@ server <- function(input, output, session) {
   })
   
   output$weather_chart <- renderPlotly({
-    # Show last 2 years of data
-    weather_plot <- weather_data %>%
-      filter(date >= as.Date("2024-01-01"), date <= as.Date("2027-12-31"))
+    # Load weather data directly
+    weather_paths <- c(
+      "weather.csv",
+      file.path("shiny_app", "weather.csv"),
+      file.path(getwd(), "weather.csv"),
+      file.path(dirname(getwd()), "shiny_app", "weather.csv")
+    )
     
-    if (nrow(weather_plot) == 0) {
-      # If no recent data, show all data
-      weather_plot <- weather_data
+    weather_plot <- NULL
+    for (path in weather_paths) {
+      if (file.exists(path)) {
+        tryCatch({
+          weather_plot <- fread(path) %>% 
+            mutate(date = as.Date(date)) %>%
+            filter(date >= as.Date("2024-01-01"), date <= as.Date("2027-12-31"))
+          break
+        }, error = function(e) NULL)
+      }
     }
     
-    plot_ly(weather_plot, x = ~date, y = ~temp_c, type = "scatter", mode = "lines",
-            line = list(color = "#F5B085", width = 2)) %>%
+    if (is.null(weather_plot) || nrow(weather_plot) == 0) {
+      return(plot_ly() %>% layout(title = "No weather data available"))
+    }
+    
+    # Create dual-axis chart: Temperature (left) + Sunshine Hours (right)
+    plot_ly(weather_plot, x = ~date) %>%
+      add_trace(y = ~temp_c, name = "Temperature (°C)", type = "scatter", mode = "lines",
+                line = list(color = "#F5B085", width = 2)) %>%
+      add_trace(y = ~sunshine_hours, name = "Sunshine (hours)", type = "scatter", mode = "lines",
+                line = list(color = "#8DD3C7", width = 2), yaxis = "y2") %>%
       layout(
         xaxis = list(title = "", gridcolor = "#D0D0D0", color = "#7F8C8D"),
-        yaxis = list(title = "Temperature (°C)", gridcolor = "#D0D0D0", color = "#7F8C8D"),
+        yaxis = list(title = "Temperature (°C)", gridcolor = "#D0D0D0", color = "#7F8C8D", side = "left"),
+        yaxis2 = list(title = "Sunshine (hours)", overlaying = "y", side = "right", color = "#7F8C8D"),
         paper_bgcolor = "transparent",
         plot_bgcolor = "transparent",
-        font = list(color = "#2C3E50")
+        font = list(color = "#2C3E50"),
+        legend = list(orientation = "h", y = 1.1)
       )
   })
   
