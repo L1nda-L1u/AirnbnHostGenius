@@ -3020,7 +3020,7 @@ server <- function(input, output, session) {
   
   output$weather_chart <- renderPlotly({
     weather_plot <- weather_data %>%
-      filter(date >= Sys.Date() - 30, date <= Sys.Date() + 30)
+      filter(date >= Sys.Date() - 365, date <= Sys.Date() + 90)
     
     plot_ly(weather_plot, x = ~date, y = ~temp_c, type = "scatter", mode = "lines",
             line = list(color = "#F5B085", width = 2)) %>%
