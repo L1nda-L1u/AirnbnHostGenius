@@ -357,17 +357,26 @@ ui <- dashboardPage(
       
       /* Calendar Styles */
       .calendar-header {
-        display: flex;
-        justify-content: space-between;
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
         align-items: center;
         margin-bottom: 8px;
         padding: 0 8px;
+      }
+      
+      .calendar-header > div:first-child {
+        justify-self: start;
+      }
+      
+      .calendar-header > div:last-child {
+        justify-self: end;
       }
       
       .calendar-title {
         font-size: 20px;
         font-weight: 600;
         color: #2C3E50;
+        justify-self: center;
       }
       
       .calendar-nav-btn {
@@ -1223,7 +1232,7 @@ ui <- dashboardPage(
             ),
             div(class = "card",
               div(class = "section-title", "High Demand Days This Month"),
-              div(style = "height: 100px !important; overflow-y: auto;",
+              div(style = "height: 70px !important; overflow-y: auto;",
                 DTOutput("high_demand_table")
               )
             )
