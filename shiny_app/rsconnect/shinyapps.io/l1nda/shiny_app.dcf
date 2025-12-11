@@ -5,7 +5,7 @@ account: l1nda
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 16292770
-bundleId: 11308028
+bundleId: 11308100
 url: https://l1nda.shinyapps.io/shiny_app/
 version: 1
 asMultiple: FALSE

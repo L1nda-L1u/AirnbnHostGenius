@@ -378,6 +378,28 @@ ui <- dashboardPage(
         border-bottom: 1px solid #D0D0D0;
         box-shadow: 0 1px 3px rgba(0,0,0,0.05);
       }
+      /* Sidebar toggle (hamburger) */
+      .main-header .navbar .sidebar-toggle {
+        color: #9CA3AF !important;           /* lighter gray bars */
+        background: transparent !important;  /* no background */
+        border: none !important;             /* remove border */
+        box-shadow: none !important;         /* remove shadow */
+        opacity: 1 !important;
+        padding: 10px 12px !important;
+        margin-top: 4px !important;
+        margin-bottom: 4px !important;
+      }
+      .main-header .navbar .sidebar-toggle:hover,
+      .main-header .navbar .sidebar-toggle:focus {
+        color: #6B7280 !important;           /* slightly darker on hover */
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        opacity: 1 !important;
+      }
+      .main-header .navbar .sidebar-toggle .fa-bars {
+        color: inherit !important;
+      }
       .navbar-brand { 
         color: #2A8C82 !important; 
         font-weight: 700;

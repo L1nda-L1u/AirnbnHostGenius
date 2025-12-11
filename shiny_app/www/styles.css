@@ -177,3 +177,21 @@ table.dataTable thead th {
   overflow-y: auto;
 }
 
+/* Make the hamburger menu icon visible in brand green */
+.main-header .navbar .sidebar-toggle {
+  color: #2A8C82 !important;        /* base green */
+  background: #FFFFFF !important;   /* ensure contrast */
+  border-radius: 6px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  opacity: 1 !important;
+}
+.main-header .navbar .sidebar-toggle:hover,
+.main-header .navbar .sidebar-toggle:focus {
+  color: #26746C !important;        /* darker on hover */
+  background: #F5F5F5 !important;
+  opacity: 1 !important;
+}
+.main-header .navbar .sidebar-toggle .fa-bars {
+  color: inherit !important;        /* follow parent color */
+}
+
