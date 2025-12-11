@@ -320,7 +320,6 @@ ui <- dashboardPage(
       menuItem("Calendar", tabName = "calendar", icon = icon("calendar")),
       menuItem("Demand Trends", tabName = "trends", icon = icon("chart-line")),
       menuItem("Price Calculator", tabName = "calculator", icon = icon("calculator")),
-      menuItem("Market Data", tabName = "market", icon = icon("database")),
       menuItem("About", tabName = "about", icon = icon("info-circle"))
     ),
     tags$div(
@@ -1322,31 +1321,6 @@ ui <- dashboardPage(
           div(class = "card",
             div(class = "section-title", "Price Timeline"),
             plotlyOutput("price_timeline", height = "280px")
-          )
-        )
-      )
-    ),
-      
-      tabItem(tabName = "market",
-        fluidRow(
-        column(6,
-          div(class = "card",
-            div(class = "section-title", "TfL Transport Activity"),
-            plotlyOutput("tfl_chart", height = "280px")
-          )
-        ),
-        column(6,
-          div(class = "card",
-            div(class = "section-title", "Weather Forecast"),
-            plotlyOutput("weather_chart", height = "280px")
-          )
-        )
-      ),
-        fluidRow(
-        column(12,
-          div(class = "card",
-            div(class = "section-title", "Upcoming Holidays (gov.uk API)"),
-            DTOutput("events_table")
             )
           )
         )
