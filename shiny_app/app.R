@@ -2963,27 +2963,24 @@ server <- function(input, output, session) {
   # ==================== MARKET DATA ====================
   
   output$tourism_chart <- renderPlotly({
-    # Read tfl.csv directly
-    df <- tryCatch({
-      read.csv("tfl.csv")
-    }, error = function(e) {
-      tryCatch({
-        read.csv(file.path("shiny_app", "tfl.csv"))
-      }, error = function(e2) {
-        NULL
-      })
-    })
+    # Use the globally loaded tfl_data
+    df <- tfl_data
     
-    if (is.null(df)) {
-      return(plotly_empty() %>% layout(title = "TfL data not found"))
+    if (is.null(df) || nrow(df) == 0) {
+      return(plotly_empty() %>% layout(title = "TfL data not loaded"))
     }
     
-    df$date <- as.Date(df$date)
     # From today to one year from now
     df <- df[df$date >= Sys.Date() & df$date <= Sys.Date() + 365, ]
     
     if (nrow(df) == 0) {
-      return(plotly_empty() %>% layout(title = "No TfL data for next year"))
+      # If no future data, show last year of data instead
+      df <- tfl_data
+      df <- df[df$date >= Sys.Date() - 365 & df$date <= Sys.Date(), ]
+    }
+    
+    if (nrow(df) == 0) {
+      return(plotly_empty() %>% layout(title = "No TfL data available"))
     }
     
     plot_ly(df, x = ~date, y = ~value, type = "scatter", mode = "lines",
@@ -3012,27 +3009,24 @@ server <- function(input, output, session) {
   })
   
   output$weather_chart <- renderPlotly({
-    # Simply read weather.csv - Shiny runs from shiny_app folder
-    df <- tryCatch({
-      read.csv("weather.csv")
-    }, error = function(e) {
-      tryCatch({
-        read.csv(file.path("shiny_app", "weather.csv"))
-      }, error = function(e2) {
-        NULL
-      })
-    })
+    # Use the globally loaded weather_data
+    df <- weather_data
     
-    if (is.null(df)) {
-      return(plotly_empty() %>% layout(title = "Weather data not found"))
+    if (is.null(df) || nrow(df) == 0) {
+      return(plotly_empty() %>% layout(title = "Weather data not loaded"))
     }
     
-    df$date <- as.Date(df$date)
     # From today to one year from now
     df <- df[df$date >= Sys.Date() & df$date <= Sys.Date() + 365, ]
     
     if (nrow(df) == 0) {
-      return(plotly_empty() %>% layout(title = "No weather data for next year"))
+      # If no future data, show last year of data instead
+      df <- weather_data
+      df <- df[df$date >= Sys.Date() - 365 & df$date <= Sys.Date(), ]
+    }
+    
+    if (nrow(df) == 0) {
+      return(plotly_empty() %>% layout(title = "No weather data available"))
     }
     
     # Use markers + lines for more visible data points (jagged look)
