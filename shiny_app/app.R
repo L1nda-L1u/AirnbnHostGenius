@@ -1295,7 +1295,7 @@ ui <- dashboardPage(
       
       tabItem(tabName = "calculator",
         fluidRow(
-          style = "display: flex; align-items: stretch; margin-bottom: 15px;",
+          style = "display: flex; align-items: stretch; margin-bottom: 8px;",
         column(4,
           div(class = "card", style = "height: 100%;",
             div(class = "section-title", "Settings"),
@@ -2968,43 +2968,37 @@ server <- function(input, output, session) {
     max_price <- max(pd$recommended_price, na.rm = TRUE)
     high_demand_days <- sum(pd$price_multiplier >= 1.15, na.rm = TRUE)
     
-    # Weekend premium calculation
-    pd$is_weekend <- weekdays(pd$date) %in% c("Saturday", "Sunday")
-    weekend_avg <- mean(pd$recommended_price[pd$is_weekend], na.rm = TRUE)
-    weekday_avg <- mean(pd$recommended_price[!pd$is_weekend], na.rm = TRUE)
-    weekend_premium <- round((weekend_avg / weekday_avg - 1) * 100, 0)
-    
-    # Beautiful summary grid - 3 columns x 2 rows
+    # 6 colors from palette: Mint, Deep Teal, Light Grey, Sky Blue, Peach, Charcoal
     div(style = "display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;",
-      # Days
-      div(style = "background: #EAF6F5; border-radius: 8px; padding: 10px; text-align: center;",
+      # 1. Days - Mint (#8DD3C7)
+      div(style = "background: #D4F0EA; border-radius: 8px; padding: 10px; text-align: center;",
         div(style = "font-size: 22px; font-weight: 700; color: #2A8C82;", total_days),
         div(style = "font-size: 10px; color: #7F8C8D; text-transform: uppercase;", "Days")
       ),
-      # Avg Price
-      div(style = "background: #FEF5E7; border-radius: 8px; padding: 10px; text-align: center;",
-        div(style = "font-size: 22px; font-weight: 700; color: #F5B085;", paste0("£", avg_price)),
+      # 2. Avg Price - Deep Teal (#2A8C82)
+      div(style = "background: #E8F8F5; border-radius: 8px; padding: 10px; text-align: center;",
+        div(style = "font-size: 22px; font-weight: 700; color: #2A8C82;", paste0("£", avg_price)),
         div(style = "font-size: 10px; color: #7F8C8D; text-transform: uppercase;", "Avg Price")
       ),
-      # Total Revenue
-      div(style = "background: #E8F8F5; border-radius: 8px; padding: 10px; text-align: center;",
-        div(style = "font-size: 22px; font-weight: 700; color: #2A8C82;", paste0("£", format(total_revenue, big.mark = ","))),
+      # 3. Total Revenue - Light Grey (#D0D0D0)
+      div(style = "background: #F5F5F5; border-radius: 8px; padding: 10px; text-align: center;",
+        div(style = "font-size: 22px; font-weight: 700; color: #2C3E50;", paste0("£", format(total_revenue, big.mark = ","))),
         div(style = "font-size: 10px; color: #7F8C8D; text-transform: uppercase;", "Est. Revenue")
       ),
-      # Price Range
-      div(style = "background: #F5F5F5; border-radius: 8px; padding: 10px; text-align: center;",
-        div(style = "font-size: 18px; font-weight: 700; color: #2C3E50;", paste0("£", min_price, "-", max_price)),
+      # 4. Price Range - Sky Blue (#A0D8EF)
+      div(style = "background: #E3F4FC; border-radius: 8px; padding: 10px; text-align: center;",
+        div(style = "font-size: 18px; font-weight: 700; color: #5DADE2;", paste0("£", min_price, "-", max_price)),
         div(style = "font-size: 10px; color: #7F8C8D; text-transform: uppercase;", "Price Range")
       ),
-      # High Demand Days
-      div(style = "background: #F0F9FD; border-radius: 8px; padding: 10px; text-align: center;",
-        div(style = "font-size: 22px; font-weight: 700; color: #A0D8EF;", high_demand_days),
+      # 5. High Demand - Peach (#F5B085)
+      div(style = "background: #FEF0E5; border-radius: 8px; padding: 10px; text-align: center;",
+        div(style = "font-size: 22px; font-weight: 700; color: #E67E5F;", high_demand_days),
         div(style = "font-size: 10px; color: #7F8C8D; text-transform: uppercase;", "High Demand")
       ),
-      # Weekend Premium
-      div(style = "background: #FEF5E7; border-radius: 8px; padding: 10px; text-align: center;",
-        div(style = "font-size: 22px; font-weight: 700; color: #F5B085;", paste0("+", weekend_premium, "%")),
-        div(style = "font-size: 10px; color: #7F8C8D; text-transform: uppercase;", "Wknd Premium")
+      # 6. Peak Day - Charcoal (#2C3E50)
+      div(style = "background: #E8EBF0; border-radius: 8px; padding: 10px; text-align: center;",
+        div(style = "font-size: 18px; font-weight: 700; color: #2C3E50;", paste0("£", peak_price)),
+        div(style = "font-size: 10px; color: #7F8C8D; text-transform: uppercase;", paste0("Peak: ", peak_date))
       )
     )
   })
