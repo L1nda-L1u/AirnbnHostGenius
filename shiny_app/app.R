@@ -2979,11 +2979,15 @@ server <- function(input, output, session) {
     }
     
     df$date <- as.Date(df$date)
-    # Only show 2026 data
-    df <- df[df$date >= as.Date("2026-01-01") & df$date <= as.Date("2026-12-31"), ]
+    # From today to one year from now
+    df <- df[df$date >= Sys.Date() & df$date <= Sys.Date() + 365, ]
+    
+    if (nrow(df) == 0) {
+      return(plotly_empty() %>% layout(title = "No TfL data for next year"))
+    }
     
     plot_ly(df, x = ~date, y = ~value, type = "scatter", mode = "lines",
-            line = list(color = "#2A8C82", width = 2)) %>%
+            line = list(color = "#2A8C82", width = 1.5, shape = "linear")) %>%
       layout(
         xaxis = list(title = "", gridcolor = "#D0D0D0", color = "#7F8C8D"),
         yaxis = list(title = "Daily Journeys (M)", gridcolor = "#D0D0D0", color = "#7F8C8D"),
@@ -3024,16 +3028,19 @@ server <- function(input, output, session) {
     }
     
     df$date <- as.Date(df$date)
-    # Only show 2026 data
-    df <- df[df$date >= as.Date("2026-01-01") & df$date <= as.Date("2026-12-31"), ]
+    # From today to one year from now
+    df <- df[df$date >= Sys.Date() & df$date <= Sys.Date() + 365, ]
     
     if (nrow(df) == 0) {
-      return(plotly_empty() %>% layout(title = "No 2026 weather data"))
+      return(plotly_empty() %>% layout(title = "No weather data for next year"))
     }
     
+    # Use markers + lines for more visible data points (jagged look)
     fig <- plot_ly(df, x = ~date)
-    fig <- fig %>% add_lines(y = ~temp_c, name = "Temperature (°C)", line = list(color = "#F5B085", width = 2))
-    fig <- fig %>% add_lines(y = ~sunshine_hours, name = "Sunshine (h)", yaxis = "y2", line = list(color = "#8DD3C7", width = 2))
+    fig <- fig %>% add_trace(y = ~temp_c, name = "Temperature (°C)", type = "scatter", mode = "lines",
+                              line = list(color = "#F5B085", width = 1.5, shape = "linear"))
+    fig <- fig %>% add_trace(y = ~sunshine_hours, name = "Sunshine (h)", type = "scatter", mode = "lines",
+                              yaxis = "y2", line = list(color = "#8DD3C7", width = 1.5, shape = "linear"))
     fig <- fig %>% layout(
       yaxis = list(title = "Temp °C", color = "#7F8C8D"),
       yaxis2 = list(title = "Sunshine h", overlaying = "y", side = "right", color = "#7F8C8D"),
