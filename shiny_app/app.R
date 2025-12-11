@@ -1726,8 +1726,15 @@ server <- function(input, output, session) {
   
   # Render Interactive Bar Chart using HTML/CSS (more reliable than plotly)
   output$category_bars <- renderUI({
-    data <- filtered_listings()
+    raw_data <- load_listings()
     color_by <- input$color_by
+    
+    # Use only price-filtered data to keep all categories visible
+    data <- NULL
+    if (!is.null(raw_data)) {
+      data <- raw_data %>%
+        filter(price >= input$filter_price[1], price <= input$filter_price[2])
+    }
     
     if (is.null(data) || nrow(data) == 0 || is.null(color_by)) {
       return(tags$p("Loading...", style = "color: #888; text-align: center; padding: 20px;"))
@@ -1735,7 +1742,7 @@ server <- function(input, output, session) {
     
     color_info <- get_color_palette(data, color_by)
     
-    # Count per category
+    # Count per category (price-filtered only, no room/neighbourhood selection)
     counts <- data %>%
       group_by(category = !!sym(color_by)) %>%
       summarise(count = n(), .groups = "drop") %>%
