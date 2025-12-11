@@ -1189,7 +1189,7 @@ ui <- dashboardPage(
           style = "display: flex; align-items: stretch;",
         column(8,
           div(class = "card",
-            style = "height: 640px;",
+            style = "height: 95%;",
             div(class = "calendar-header",
               div(style = "display: flex; gap: 8px;",
                 uiOutput("prev_btn"),
@@ -1224,7 +1224,7 @@ ui <- dashboardPage(
             ),
             div(class = "card",
               div(class = "section-title", "High Demand Days This Month"),
-              div(style = "height: 100px; overflow-y: auto;",
+              div(style = "height: 100px !important; overflow-y: auto;",
                 DTOutput("high_demand_table")
               )
             )
