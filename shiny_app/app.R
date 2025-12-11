@@ -304,14 +304,14 @@ cat("Daily data loaded:", nrow(daily_data), "days from",
 ui <- dashboardPage(
   dashboardHeader(
     title = tags$div(
-      tags$span("Airbnb", style = "font-size: 20px; font-weight: bold; color: #2A8C82; margin-right: 8px;"),
-      tags$span("HostGenius", style = "font-size: 20px; font-weight: bold; color: #2C3E50;")
+      tags$span("Airbnb", style = "font-size: 18px; font-weight: bold; color: #2A8C82; margin-right: 6px;"),
+      tags$span("HostGenius", style = "font-size: 18px; font-weight: bold; color: #2C3E50;")
     ),
-    titleWidth = 190
+    titleWidth = 220
   ),
   
   dashboardSidebar(
-    width = 160,
+    width = 220,
     collapsed = FALSE,
     sidebarMenu(
       id = "tabs",
@@ -319,7 +319,7 @@ ui <- dashboardPage(
       menuItem("Price Prediction", tabName = "predict", icon = icon("dollar-sign")),
       menuItem("Calendar", tabName = "calendar", icon = icon("calendar")),
       menuItem("Demand Trends", tabName = "trends", icon = icon("chart-line")),
-      menuItem("Price Calculator", tabName = "calculator", icon = icon("calculator")),
+      menuItem("Dynamic Price", tabName = "calculator", icon = icon("calculator")),
       menuItem("About", tabName = "about", icon = icon("info-circle"))
     ),
     tags$div(
@@ -728,6 +728,12 @@ ui <- dashboardPage(
         .form-control:focus {
           border-color: #2A8C82 !important;
           box-shadow: 0 0 5px rgba(42, 140, 130, 0.5) !important;
+        }
+        .input-daterange {
+          width: 100% !important;
+        }
+        .input-daterange .input-group-addon {
+          min-width: 30px;
         }
         .btn-primary {
           background-color: #2A8C82 !important;
@@ -1299,20 +1305,24 @@ ui <- dashboardPage(
         column(4,
           div(class = "card", style = "height: 100%;",
             div(class = "section-title", "Settings"),
-            numericInput("base_price", "Base Nightly Rate (GBP)", value = 120, min = 20, max = 1000),
-            dateRangeInput("date_range", "Date Range",
-                          start = Sys.Date(),
-                          end = Sys.Date() + 30,
-                          min = DATA_START,
-                          max = DATA_END),
-            div(style = "margin-top: 15px;",
+            div(style = "width: 100%;",
+              numericInput("base_price", "Base Nightly Rate (GBP)", value = 120, min = 20, max = 1000, width = "100%")
+            ),
+            div(style = "width: 100%;",
+              dateRangeInput("date_range", "Date Range",
+                            start = Sys.Date(),
+                            end = Sys.Date() + 30,
+                            min = DATA_START,
+                            max = DATA_END)
+            ),
+            div(style = "margin-top: 15px; width: 100%;",
               actionButton("calculate", "Calculate Prices", class = "btn-primary", style = "width: 100%;")
             )
           )
         ),
         column(8,
           # Price Summary Card (moved to right)
-          div(class = "card", style = "height: 100%;",
+          div(class = "card", style = "height: 90%;",
             div(class = "section-title", "Price Summary"),
             uiOutput("price_summary_panel")
           )
