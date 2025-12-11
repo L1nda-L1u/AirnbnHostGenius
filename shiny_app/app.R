@@ -551,8 +551,9 @@ ui <- dashboardPage(
         justify-content: center;
         align-items: center;
         gap: 24px;
-        margin-top: 8px;
-        padding-top: 0;
+        margin-top: 12px;
+        padding-top: 12px;
+        border-top: 1px solid #D0D0D0;
       }
       .legend-item {
         display: flex;
