@@ -172,13 +172,13 @@ create_tfl_timeseries <- function(data) {
     add_lines(
       x = ~date, y = ~tfl_daily_avg_m,
       name = "Daily",
-      line = list(color = "#3498DB", width = 1),
+      line = list(color = "#2A8C82", width = 1),
       opacity = 0.4
     ) %>%
     add_lines(
       x = ~date, y = ~tfl_rolling,
       name = "30-Day Avg",
-      line = list(color = "#E74C3C", width = 2)
+      line = list(color = "#F5B085", width = 2)
     ) %>%
     layout(
       title = list(text = "TfL Daily Journeys (Millions)", font = list(size = 14)),
@@ -214,7 +214,7 @@ create_tfl_yearly_comparison <- function(data) {
     add_bars(
       x = ~factor(year), y = ~mean,
       name = "Mean",
-      marker = list(color = "#3498DB"),
+      marker = list(color = "#2A8C82"),
       text = ~paste0(round(mean, 1), "M"),
       textposition = "outside"
     ) %>%
@@ -257,9 +257,9 @@ create_tourism_timeseries <- function(data) {
     add_lines(
       x = ~date, y = ~tourism,
       name = "Quarterly Visits",
-      line = list(color = "#27AE60", width = 2),
+      line = list(color = "#2A8C82", width = 2),
       fill = "tozeroy",
-      fillcolor = "rgba(39, 174, 96, 0.2)"
+      fillcolor = "rgba(42, 140, 130, 0.2)"
     ) %>%
     layout(
       title = list(text = "International Tourism (Quarterly Visits, Thousands)", font = list(size = 14)),
@@ -293,13 +293,13 @@ create_weather_timeseries <- function(data) {
     add_lines(
       x = ~date, y = ~temp_c,
       name = "Daily",
-      line = list(color = "#F39C12", width = 1),
+      line = list(color = "#8DD3C7", width = 1),
       opacity = 0.4
     ) %>%
     add_lines(
       x = ~date, y = ~temp_rolling,
       name = "30-Day Avg",
-      line = list(color = "#E74C3C", width = 2)
+      line = list(color = "#F5B085", width = 2)
     ) %>%
     layout(
       title = list(text = "Daily Temperature (°C)", font = list(size = 14)),
@@ -328,10 +328,10 @@ create_seasonal_temperature <- function(data) {
   
   # Define colors for seasons
   season_colors <- c(
-    "Spring" = "#2ECC71",
-    "Summer" = "#F39C12",
+    "Spring" = "#8DD3C7",
+    "Summer" = "#8DD3C7",
     "Autumn" = "#E67E22",
-    "Winter" = "#3498DB"
+    "Winter" = "#2A8C82"
   )
   
   plot_ly(weather_data, x = ~season, y = ~temp_c, color = ~season,
@@ -361,7 +361,7 @@ create_weather_quality_dist <- function(data) {
   }
   
   plot_ly(weather_data, x = ~weather_quality, type = "histogram",
-          marker = list(color = "#3498DB", line = list(color = "white", width = 1)),
+          marker = list(color = "#2A8C82", line = list(color = "white", width = 1)),
           nbinsx = 30) %>%
     layout(
       title = list(text = "Weather Quality Distribution (0-1)", font = list(size = 14)),
@@ -459,7 +459,7 @@ create_day_of_week_pattern <- function(data) {
   }
   
   # Weekday vs weekend colors
-  colors <- c(rep("#3498DB", 5), rep("#E74C3C", 2))
+  colors <- c(rep("#2A8C82", 5), rep("#F5B085", 2))
   
   plot_ly(dow_data) %>%
     add_bars(

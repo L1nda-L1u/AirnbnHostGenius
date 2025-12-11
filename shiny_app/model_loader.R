@@ -273,11 +273,11 @@ load_competitor_data <- function() {
   # Load only necessary columns to save memory
   # latitude, longitude, price_num, bedrooms, bathrooms, accommodates
   tryCatch({
-    df <- fread(training_file, select = c("latitude", "longitude", "price_num", "bedrooms", "accommodates", "room_type_id"))
+    df <- fread(training_file, select = c("latitude", "longitude", "price_num", "bedrooms", "accommodates", "room_type_id", "neighbourhood_id"))
     return(df)
   }, error = function(e) {
     # Fallback if fread fails or is not available (though data.table is loaded in app.R)
     df <- read.csv(training_file)
-    return(df[, c("latitude", "longitude", "price_num", "bedrooms", "accommodates", "room_type_id")])
+    return(df[, c("latitude", "longitude", "price_num", "bedrooms", "accommodates", "room_type_id", "neighbourhood_id")])
   })
 }
