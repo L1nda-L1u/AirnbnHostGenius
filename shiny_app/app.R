@@ -1304,7 +1304,7 @@ ui <- dashboardPage(
         fluidRow(
           style = "display: flex; align-items: stretch; margin-bottom: 8px;",
         column(4,
-          div(class = "card", style = "height: 100%;",
+          div(class = "card", style = "height: 80%;",
             div(class = "section-title", "Settings"),
             div(style = "width: 100%;",
               numericInput("base_price", "Base Nightly Rate (GBP)", value = 120, min = 20, max = 1000, width = "100%")
@@ -1323,7 +1323,7 @@ ui <- dashboardPage(
         ),
         column(8,
           # Price Summary Card (moved to right)
-          div(class = "card", style = "height: 100%; display: flex; flex-direction: column;",
+          div(class = "card", style = "height: 80%; display: flex; flex-direction: column;",
             div(class = "section-title", "Price Summary"),
             div(style = "flex: 1;",
               uiOutput("price_summary_panel")
@@ -2984,34 +2984,34 @@ server <- function(input, output, session) {
     # 6 colors shuffled: Light Green, Sky Blue, Light Grey, Peach, Deep Teal, Charcoal
     div(style = "display: grid; grid-template-columns: 1fr 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 8px; height: 100%;",
       # 1. Days - Light Green (Mint)
-      div(style = "background: #D4F0EA; border-radius: 8px; padding: 8px; text-align: center; display: flex; flex-direction: column; justify-content: center;",
-        div(style = "font-size: 20px; font-weight: 700; color: #2A8C82;", total_days),
-        div(style = "font-size: 9px; color: #7F8C8D; text-transform: uppercase;", "Days")
+      div(style = "background: #D4F0EA; border-radius: 8px; padding: 15px 8px; text-align: center; display: flex; flex-direction: column; justify-content: center;",
+        div(style = "font-size: 22px; font-weight: 700; color: #2A8C82;", total_days),
+        div(style = "font-size: 10px; color: #7F8C8D; text-transform: uppercase;", "Days")
       ),
       # 2. Avg Price - Peach (Orange)
-      div(style = "background: #FEF0E5; border-radius: 8px; padding: 8px; text-align: center; display: flex; flex-direction: column; justify-content: center;",
-        div(style = "font-size: 20px; font-weight: 700; color: #E67E5F;", paste0("£", avg_price)),
-        div(style = "font-size: 9px; color: #7F8C8D; text-transform: uppercase;", "Avg Price")
+      div(style = "background: #FEF0E5; border-radius: 8px; padding: 15px 8px; text-align: center; display: flex; flex-direction: column; justify-content: center;",
+        div(style = "font-size: 22px; font-weight: 700; color: #E67E5F;", paste0("£", avg_price)),
+        div(style = "font-size: 10px; color: #7F8C8D; text-transform: uppercase;", "Avg Price")
       ),
       # 3. Total Revenue - Deep Teal
-      div(style = "background: #E8F8F5; border-radius: 8px; padding: 8px; text-align: center; display: flex; flex-direction: column; justify-content: center;",
-        div(style = "font-size: 20px; font-weight: 700; color: #2A8C82;", paste0("£", format(total_revenue, big.mark = ","))),
-        div(style = "font-size: 9px; color: #7F8C8D; text-transform: uppercase;", "Est. Revenue")
+      div(style = "background: #E8F8F5; border-radius: 8px; padding: 15px 8px; text-align: center; display: flex; flex-direction: column; justify-content: center;",
+        div(style = "font-size: 22px; font-weight: 700; color: #2A8C82;", paste0("£", format(total_revenue, big.mark = ","))),
+        div(style = "font-size: 10px; color: #7F8C8D; text-transform: uppercase;", "Est. Revenue")
       ),
       # 4. Price Range - Sky Blue
-      div(style = "background: #E3F4FC; border-radius: 8px; padding: 8px; text-align: center; display: flex; flex-direction: column; justify-content: center;",
-        div(style = "font-size: 16px; font-weight: 700; color: #5DADE2;", paste0("£", min_price, "-", max_price)),
-        div(style = "font-size: 9px; color: #7F8C8D; text-transform: uppercase;", "Price Range")
+      div(style = "background: #E3F4FC; border-radius: 8px; padding: 15px 8px; text-align: center; display: flex; flex-direction: column; justify-content: center;",
+        div(style = "font-size: 18px; font-weight: 700; color: #5DADE2;", paste0("£", min_price, "-", max_price)),
+        div(style = "font-size: 10px; color: #7F8C8D; text-transform: uppercase;", "Price Range")
       ),
       # 5. High Demand - Light Grey
-      div(style = "background: #F5F5F5; border-radius: 8px; padding: 8px; text-align: center; display: flex; flex-direction: column; justify-content: center;",
-        div(style = "font-size: 20px; font-weight: 700; color: #2C3E50;", high_demand_days),
-        div(style = "font-size: 9px; color: #7F8C8D; text-transform: uppercase;", "High Demand")
+      div(style = "background: #F5F5F5; border-radius: 8px; padding: 15px 8px; text-align: center; display: flex; flex-direction: column; justify-content: center;",
+        div(style = "font-size: 22px; font-weight: 700; color: #2C3E50;", high_demand_days),
+        div(style = "font-size: 10px; color: #7F8C8D; text-transform: uppercase;", "High Demand")
       ),
       # 6. Peak Day - Charcoal Grey
-      div(style = "background: #E8EBF0; border-radius: 8px; padding: 8px; text-align: center; display: flex; flex-direction: column; justify-content: center;",
-        div(style = "font-size: 16px; font-weight: 700; color: #2C3E50;", paste0("£", peak_price)),
-        div(style = "font-size: 9px; color: #7F8C8D; text-transform: uppercase;", paste0("Peak: ", peak_date))
+      div(style = "background: #E8EBF0; border-radius: 8px; padding: 15px 8px; text-align: center; display: flex; flex-direction: column; justify-content: center;",
+        div(style = "font-size: 18px; font-weight: 700; color: #2C3E50;", paste0("£", peak_price)),
+        div(style = "font-size: 10px; color: #7F8C8D; text-transform: uppercase;", paste0("Peak: ", peak_date))
       )
     )
   })
