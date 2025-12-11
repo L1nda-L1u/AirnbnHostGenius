@@ -422,9 +422,11 @@ ui <- dashboardPage(
       .calendar-nav-btn.today-btn {
         background: #C7E9F8;
         color: #2C3E50;
+        border: none;
       }
       .calendar-nav-btn.today-btn:hover {
         background: #B3E0F2;
+        border: none;
       }
       .calendar-nav-btn.disabled {
         background: #f1f5f9;
@@ -1252,7 +1254,7 @@ ui <- dashboardPage(
               div(class = "legend-divider"),
               # Markers
               div(class = "legend-item", div(class = "legend-dot", style = "background: #F5B085;"), tags$span("Holiday")),
-              div(class = "legend-item", div(class = "legend-color", style = "background: #8DD3C7;"), tags$span("Today")),
+              div(class = "legend-item", div(class = "legend-color", style = "background: #C7E9F8;"), tags$span("Today")),
               div(class = "legend-item", div(class = "legend-color", style = "border: 2px solid #1e293b; background: transparent;"), tags$span("Selected"))
             )
           )
