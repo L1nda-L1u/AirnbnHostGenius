@@ -1351,10 +1351,20 @@ ui <- dashboardPage(
           tags$div(
             style = "padding: 20px;",
             tags$h4("Airbnb Baseline Price Predictor", style = "color: #1ABC9C;"),
+            tags$p("Creators: Linda Liu & Shirley Xiong"),
             tags$p("A machine learning-based tool for predicting Airbnb baseline prices."),
-            tags$p("Uses Stacking model (XGBoost + Neural Network) for price prediction."),
+            tags$p("Model: Gradient Boosted Trees (XGBoost) trained on historical Airbnb data."),
             tags$hr(),
-            tags$h5("Features:", style = "color: #2C3E50;"),
+            tags$h5("Pages:", style = "color: #2C3E50;"),
+            tags$ul(
+              tags$li("Overview: London map + filters to explore listings distribution and price levels."),
+              tags$li("Price Prediction: Enter address & property details to get baseline price (XGBoost)."),
+              tags$li("Dynamic Price: Apply calendar-based adjustments (+15%, +30%, holidays) to the baseline."),
+              tags$li("Calendar: Visual calendar showing day-level adjustments and demand tags."),
+              tags$li("Demand Trends: TfL transport and weather forecasts for demand signals.")
+            ),
+            tags$hr(),
+            tags$h5("Key Features:", style = "color: #2C3E50;"),
             tags$ul(
               tags$li("Automatic address/postcode to coordinates conversion"),
               tags$li("Support for various property attributes"),
