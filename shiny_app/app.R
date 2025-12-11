@@ -883,50 +883,46 @@ ui <- dashboardPage(
           ),
           
           # Right side - Controls and Legend
-          column(
-            width = 4,
-            box(
-              title = tags$h3("Color Coding Options", style = "color: #2C3E50; margin: 0; font-weight: 600;"),
-              width = NULL,
-              solidHeader = TRUE,
-              status = "info",
-              
-              selectInput(
-                "color_by",
-                label = tags$strong("Color Points By:"),
-                choices = list(
-                  "Room Type" = "room_type",
-                  "Neighbourhood" = "neighbourhood"
-                ),
-                selected = "room_type",
-                width = "100%"
-              ),
-              
-              hr(),
-              
-              tags$h5("Distribution (Click to Filter)", style = "color: #4A4A4A; font-weight: 600;"),
-              uiOutput("category_bars"),
-              
-              hr(),
-              
-              tags$h5("Summary Statistics", style = "color: #4A4A4A; font-weight: 600;"),
-              uiOutput("overview_stats")
-            ),
-            
-            box(
-              title = tags$h3("Filter Options", style = "color: #2C3E50; margin: 0; font-weight: 600;"),
-              width = NULL,
-              solidHeader = TRUE,
-              status = "warning",
-              
-              selectInput(
-                "filter_room_type",
-                label = "Room Type:",
-                choices = c("All" = "all"),
-                selected = "all",
-                width = "100%"
-              ),
-              
+           column(
+             width = 4,
+             box(
+               title = tags$h3("Filter Options", style = "color: #2C3E50; margin: 0; font-weight: 600;"),
+               width = NULL,
+               solidHeader = TRUE,
+               status = "info",
+               
+               # Color coding and distribution
+               selectInput(
+                 "color_by",
+                 label = tags$strong("Color Points By:"),
+                 choices = list(
+                   "Room Type" = "room_type",
+                   "Neighbourhood" = "neighbourhood"
+                 ),
+                 selected = "room_type",
+                 width = "100%"
+               ),
+               
+               tags$h5("Distribution (Click to Filter)", style = "color: #4A4A4A; font-weight: 600; margin-top: 10px;"),
+               uiOutput("category_bars"),
+               
+               hr(),
+               
+               # Summary stats (auto-updates after filters and bar selection)
+               tags$h5("Summary Statistics", style = "color: #4A4A4A; font-weight: 600;"),
+               uiOutput("overview_stats"),
+               
+               hr(),
+               
+               # Filters
+               selectInput(
+                 "filter_room_type",
+                 label = "Room Type:",
+                 choices = c("All" = "all"),
+                 selected = "all",
+                 width = "100%"
+               ),
+               
                sliderInput(
                  "filter_price",
                  label = "Price Range (£):",
@@ -936,15 +932,15 @@ ui <- dashboardPage(
                  step = 10,
                  width = "100%"
                ),
-              
-              actionButton(
-                "apply_filter",
-                "Apply Filters",
-                class = "btn-primary",
-                style = "width: 100%; margin-top: 10px;"
-              )
-            )
-          )
+               
+               actionButton(
+                 "apply_filter",
+                 "Apply Filters",
+                 class = "btn-primary",
+                 style = "width: 100%; margin-top: 10px;"
+               )
+             )
+           )
         )
       ),
       
