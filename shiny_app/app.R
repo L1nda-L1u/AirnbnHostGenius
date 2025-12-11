@@ -1295,8 +1295,9 @@ ui <- dashboardPage(
       
       tabItem(tabName = "calculator",
         fluidRow(
+          style = "display: flex; align-items: stretch;",
         column(4,
-          div(class = "card",
+          div(class = "card", style = "height: 100%;",
             div(class = "section-title", "Settings"),
             numericInput("base_price", "Base Nightly Rate (GBP)", value = 120, min = 20, max = 1000),
             br(),
@@ -1311,7 +1312,7 @@ ui <- dashboardPage(
         ),
         column(8,
           # Price Summary Card (moved to right)
-          div(class = "card",
+          div(class = "card", style = "height: 100%;",
             div(class = "section-title", "Price Summary"),
             uiOutput("price_summary_panel")
           )
