@@ -2739,7 +2739,7 @@ server <- function(input, output, session) {
             "font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 10px; ",
             if (!is.na(d$TCI)) {
               if (d$TCI >= 70) "background: #dcfce7; color: #166534;"
-              else if (d$TCI >= 60) "background: #8DD3C7; color: #0f766e;"
+              else if (d$TCI >= 60) "background: #D7F0FF; color: #1f4b99;"
               else if (d$TCI >= 50) "background: #fef3c7; color: #92400e;"
               else "background: #fee2e2; color: #991b1b;"
             } else "background: #f1f5f9; color: #7F8C8D;"
@@ -2754,7 +2754,7 @@ server <- function(input, output, session) {
                 "background: ", 
                 if (!is.na(d$TCI)) {
                   if (d$TCI >= 70) "#22c55e"
-                  else if (d$TCI >= 60) "#5ABEA3"
+                  else if (d$TCI >= 60) "#8CCDF3"
                   else if (d$TCI >= 50) "#F5B085"
                   else "#ef4444"
                 } else "#D0D0D0", ";"
