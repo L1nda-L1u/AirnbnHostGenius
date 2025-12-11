@@ -371,8 +371,8 @@ ui <- dashboardPage(
       }
       
       .calendar-nav-btn {
-        background: #E0E0E0;
-        border: none;
+        background: #F5F5F5;
+        border: 1px solid #E0E0E0;
         color: #4A4A4A;
         padding: 8px 16px;
         border-radius: 6px;
@@ -381,7 +381,7 @@ ui <- dashboardPage(
         transition: background 0.2s, opacity 0.2s;
       }
       .calendar-nav-btn:hover:not(.disabled) {
-        background: #D0D0D0;
+        background: #E0E0E0;
       }
       .calendar-nav-btn.today-btn {
         background: #C7E9F8;
@@ -1187,8 +1187,10 @@ ui <- dashboardPage(
       
       tabItem(tabName = "calendar",
         fluidRow(
+          style = "display: flex; align-items: stretch;",
         column(8,
           div(class = "card",
+            style = "height: 100%;",
             div(class = "calendar-header",
               div(style = "display: flex; gap: 8px;",
                 uiOutput("prev_btn"),
@@ -1214,20 +1216,26 @@ ui <- dashboardPage(
           )
         ),
         column(4,
-          div(class = "card",
-            div(class = "section-title", "Selected Date Details"),
-            uiOutput("date_details_panel")
-          ),
-          div(class = "card",
-            div(class = "section-title", "High Demand Days This Month"),
-            DTOutput("high_demand_table")
+          div(
+            style = "height: 100%; display: flex; flex-direction: column;",
+            div(class = "card",
+              style = "flex: 1; overflow-y: auto;",
+              div(class = "section-title", "Selected Date Details"),
+              uiOutput("date_details_panel")
+            ),
+            div(class = "card",
+              div(class = "section-title", "High Demand Days This Month"),
+              div(style = "height: 120px; overflow-y: auto;",
+                DTOutput("high_demand_table")
+              )
+            )
           )
         )
-      )
-    ),
-      
+          )
+        ),
+        
       tabItem(tabName = "trends",
-      fluidRow(
+        fluidRow(
         column(12,
           div(class = "card",
             div(class = "section-title", "Price Adjustment Forecast"),
@@ -2583,26 +2591,24 @@ server <- function(input, output, session) {
       "Major Holiday" = "#F5B085",  # Bright Orange
       "Bank Holiday" = "#2A8C82",   # Green
       "Weekend" = "#2A8C82",        # Green
-      "#9E9E9E"                     # Neutral Grey
+      "#F5F5F5"                     # Light Grey (Standard)
     )
+    
+    # Text color for price adjustment (Green for base/small boost, Orange for Premium)
+    text_color <- if (d$price_multiplier >= 1.25) "#F5B085" else "#2A8C82"
     
     past_label <- if (d$is_past) " (Past)" else if (d$is_today) " (Today)" else ""
     
     div(class = "detail-panel",
-      div(class = "detail-date", paste0(format(d$date, "%A, %B %d, %Y"), past_label)),
-      
-      # Day Type Badge
-      div(style = paste0(
-        "display: inline-block; padding: 6px 12px; border-radius: 20px; ",
-        "font-size: 12px; font-weight: 600; margin-bottom: 16px; ",
-        "background: ", day_type_color, "; color: white;"
-      ), d$day_type),
+      div(
+        div(class = "detail-date", paste0(format(d$date, "%A, %B %d, %Y"), past_label))
+      ),
       
       # Price Adjustment (main info)
       div(class = "detail-grid",
         div(class = "detail-item",
           div(class = "detail-label", "Price Adjustment"),
-          div(class = "detail-value", style = paste0("color: ", if (d$price_multiplier == 1) "#2A8C82" else day_type_color), 
+          div(class = "detail-value", style = paste0("color: ", text_color), 
               if (d$price_multiplier == 1) "Base" else scales::percent(d$price_multiplier - 1, accuracy = 1))
         ),
         div(class = "detail-item",
@@ -2727,7 +2733,7 @@ server <- function(input, output, session) {
         ),
         
         # Caption
-        div(style = "font-size: 10px; color: #D0D0D0; margin-top: 4px; text-align: center;",
+        div(style = "font-size: 10px; color: #2C3E50; margin-top: 4px; text-align: center; font-weight: 500;",
           if (!is.na(d$tfl_relative)) {
             paste0(format(d$date, "%B"), ": ", 
                    ifelse(d$tfl_relative >= 0, "+", ""),
@@ -2776,7 +2782,7 @@ server <- function(input, output, session) {
       
       # Holiday name if applicable
       if (!is.na(d$holiday_name)) {
-        div(style = "margin-top: 12px; padding: 10px; background: rgba(244, 63, 94, 0.1); border-radius: 6px;",
+        div(style = "margin-top: 12px; padding: 10px; background: rgba(245, 176, 133, 0.2); border-radius: 6px;",
           div(style = "font-size: 11px; color: #7F8C8D; margin-bottom: 2px;", "HOLIDAY"),
           div(style = "font-size: 14px; font-weight: 600; color: #F5B085;", d$holiday_name)
         )
@@ -2784,7 +2790,7 @@ server <- function(input, output, session) {
       
       # Weather boost note (if applicable)
       if (d$weather_boost) {
-        div(style = "margin-top: 8px; padding: 8px; background: rgba(16, 185, 129, 0.1); border-radius: 6px; font-size: 11px; color: #2A8C82;",
+        div(style = "margin-top: 8px; padding: 8px; background: #E8F8F5; border-radius: 6px; font-size: 11px; color: #2A8C82;",
           "☀️ Good weather bonus: +5% applied"
         )
       }
@@ -2795,9 +2801,8 @@ server <- function(input, output, session) {
   
   output$high_demand_table <- renderDT({
     month_data() %>%
-      filter(!is_past, price_recommendation %in% c("Premium", "Above Average", "Standard+")) %>%
+      filter(!is_past, price_recommendation == "Premium") %>%
       arrange(desc(price_multiplier)) %>%
-      head(8) %>%
       mutate(
         Date = format(date, "%a %d"),
         Adj = scales::percent(price_multiplier - 1, accuracy = 1),
@@ -2811,7 +2816,7 @@ server <- function(input, output, session) {
       ) %>%
       select(Date, Adj, Reason) %>%
       datatable(
-        options = list(dom = 't', pageLength = 8, ordering = FALSE),
+        options = list(dom = 't', paging = FALSE, ordering = FALSE),
         rownames = FALSE,
         class = 'compact'
       )
