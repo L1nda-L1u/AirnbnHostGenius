@@ -1295,19 +1295,19 @@ ui <- dashboardPage(
       
       tabItem(tabName = "calculator",
         fluidRow(
-          style = "display: flex; align-items: stretch;",
+          style = "display: flex; align-items: stretch; margin-bottom: 20px;",
         column(4,
           div(class = "card", style = "height: 100%;",
             div(class = "section-title", "Settings"),
             numericInput("base_price", "Base Nightly Rate (GBP)", value = 120, min = 20, max = 1000),
-            br(),
             dateRangeInput("date_range", "Date Range",
                           start = Sys.Date(),
                           end = Sys.Date() + 30,
                           min = DATA_START,
                           max = DATA_END),
-            br(),
-            actionButton("calculate", "Calculate Prices", class = "btn-primary", style = "width: 100%;")
+            div(style = "margin-top: 15px;",
+              actionButton("calculate", "Calculate Prices", class = "btn-primary", style = "width: 100%;")
+            )
           )
         ),
         column(8,
