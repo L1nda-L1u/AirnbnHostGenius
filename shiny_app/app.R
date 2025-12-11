@@ -1308,12 +1308,6 @@ ui <- dashboardPage(
         column(4,
           div(class = "card", style = "height: 80%;",
             div(class = "section-title", "Settings"),
-            div(style = "width: 100%; margin-bottom: 10px;",
-              tags$label("Base Price (from Prediction)", style = "font-weight: 500; color: #2C3E50;"),
-              div(style = "background: #E8F8F5; border: 1px solid #D0D0D0; border-radius: 6px; padding: 10px; margin-top: 5px;",
-                uiOutput("base_price_display")
-              )
-            ),
             div(style = "width: 100%;",
               dateRangeInput("date_range", "Date Range",
                             start = Sys.Date(),
@@ -3011,12 +3005,15 @@ server <- function(input, output, session) {
     max_price <- max(pd$recommended_price, na.rm = TRUE)
     high_demand_days <- sum(pd$price_multiplier >= 1.15, na.rm = TRUE)
     
-    # 6 colors shuffled: Light Green, Sky Blue, Light Grey, Peach, Deep Teal, Charcoal
+    # Get base price
+    bp <- base_price_value()
+    
+    # 5 grid items: Baseline, Avg, Revenue, Range, High Demand
     div(style = "display: grid; grid-template-columns: 1fr 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 8px; height: 100%;",
-      # 1. Days - Light Green (Mint)
+      # 1. Baseline Price - Light Green (Mint) - lighter text
       div(style = "background: #D4F0EA; border-radius: 8px; padding: 15px 8px; text-align: center; display: flex; flex-direction: column; justify-content: center;",
-        div(style = "font-size: 22px; font-weight: 700; color: #2A8C82;", total_days),
-        div(style = "font-size: 10px; color: #7F8C8D; text-transform: uppercase;", "Days")
+        div(style = "font-size: 22px; font-weight: 700; color: #5DADE2;", paste0("£", bp)),
+        div(style = "font-size: 10px; color: #A0A0A0; text-transform: uppercase;", "Baseline")
       ),
       # 2. Avg Price - Peach (Orange)
       div(style = "background: #FEF0E5; border-radius: 8px; padding: 15px 8px; text-align: center; display: flex; flex-direction: column; justify-content: center;",
@@ -3033,15 +3030,10 @@ server <- function(input, output, session) {
         div(style = "font-size: 18px; font-weight: 700; color: #5DADE2;", paste0("£", min_price, "-", max_price)),
         div(style = "font-size: 10px; color: #7F8C8D; text-transform: uppercase;", "Price Range")
       ),
-      # 5. High Demand - Light Grey
-      div(style = "background: #F5F5F5; border-radius: 8px; padding: 15px 8px; text-align: center; display: flex; flex-direction: column; justify-content: center;",
-        div(style = "font-size: 22px; font-weight: 700; color: #2C3E50;", high_demand_days),
-        div(style = "font-size: 10px; color: #7F8C8D; text-transform: uppercase;", "High Demand")
-      ),
-      # 6. Peak Day - Charcoal Grey
-      div(style = "background: #E8EBF0; border-radius: 8px; padding: 15px 8px; text-align: center; display: flex; flex-direction: column; justify-content: center;",
-        div(style = "font-size: 18px; font-weight: 700; color: #2C3E50;", paste0("£", peak_price)),
-        div(style = "font-size: 10px; color: #7F8C8D; text-transform: uppercase;", paste0("Peak: ", peak_date))
+      # 5. High Demand - Light Grey - lighter text
+      div(style = "background: #F5F5F5; border-radius: 8px; padding: 15px 8px; text-align: center; display: flex; flex-direction: column; justify-content: center; grid-column: span 2;",
+        div(style = "font-size: 22px; font-weight: 700; color: #7F8C8D;", paste0(high_demand_days, " days")),
+        div(style = "font-size: 10px; color: #A0A0A0; text-transform: uppercase;", "High Demand (>15%)")
       )
     )
   })
