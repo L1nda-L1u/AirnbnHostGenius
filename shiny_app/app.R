@@ -1236,8 +1236,8 @@ ui <- dashboardPage(
                 DTOutput("high_demand_table")
               )
             )
-          )
-        )
+              )
+            )
           )
         ),
         
@@ -1245,8 +1245,8 @@ ui <- dashboardPage(
         fluidRow(
         column(12,
           div(class = "card",
-            div(class = "section-title", "Weather Forecast"),
-            plotlyOutput("weather_chart", height = "300px")
+            div(class = "section-title", "Price Adjustment Forecast"),
+            plotlyOutput("demand_timeline", height = "300px")
           )
         )
       ),
@@ -1301,10 +1301,16 @@ ui <- dashboardPage(
       
       tabItem(tabName = "market",
         fluidRow(
-        column(12,
+        column(6,
           div(class = "card",
             div(class = "section-title", "TfL Transport Activity"),
             plotlyOutput("tfl_chart", height = "280px")
+          )
+        ),
+        column(6,
+          div(class = "card",
+            div(class = "section-title", "Weather Forecast"),
+            plotlyOutput("weather_chart", height = "280px")
           )
         )
       ),
