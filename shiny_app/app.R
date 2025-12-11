@@ -1250,20 +1250,6 @@ ui <- dashboardPage(
           )
         )
       ),
-        fluidRow(
-        column(6,
-          div(class = "card",
-            div(class = "section-title", "Price Adjustment by Day of Week"),
-            plotlyOutput("demand_by_dow", height = "280px")
-          )
-        ),
-        column(6,
-          div(class = "card",
-            div(class = "section-title", "Day Type Distribution"),
-            plotlyOutput("demand_breakdown", height = "280px")
-          )
-        )
-      )
     ),
       
       tabItem(tabName = "calculator",
