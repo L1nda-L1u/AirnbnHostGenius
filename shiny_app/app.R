@@ -1295,7 +1295,7 @@ ui <- dashboardPage(
       
       tabItem(tabName = "calculator",
         fluidRow(
-          style = "display: flex; align-items: stretch; margin-bottom: 20px;",
+          style = "display: flex; align-items: stretch; margin-bottom: 15px;",
         column(4,
           div(class = "card", style = "height: 100%;",
             div(class = "section-title", "Settings"),
@@ -2963,27 +2963,48 @@ server <- function(input, output, session) {
     peak_date <- format(peak_day$date, "%b %d")
     peak_price <- peak_day$recommended_price
     
-    # Beautiful summary grid
-    div(style = "display: grid; grid-template-columns: 1fr 1fr; gap: 12px;",
+    # Additional stats
+    min_price <- min(pd$recommended_price, na.rm = TRUE)
+    max_price <- max(pd$recommended_price, na.rm = TRUE)
+    high_demand_days <- sum(pd$price_multiplier >= 1.15, na.rm = TRUE)
+    
+    # Weekend premium calculation
+    pd$is_weekend <- weekdays(pd$date) %in% c("Saturday", "Sunday")
+    weekend_avg <- mean(pd$recommended_price[pd$is_weekend], na.rm = TRUE)
+    weekday_avg <- mean(pd$recommended_price[!pd$is_weekend], na.rm = TRUE)
+    weekend_premium <- round((weekend_avg / weekday_avg - 1) * 100, 0)
+    
+    # Beautiful summary grid - 3 columns x 2 rows
+    div(style = "display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;",
       # Days
-      div(style = "background: #EAF6F5; border-radius: 8px; padding: 12px; text-align: center;",
-        div(style = "font-size: 24px; font-weight: 700; color: #2A8C82;", total_days),
-        div(style = "font-size: 11px; color: #7F8C8D; text-transform: uppercase;", "Days")
+      div(style = "background: #EAF6F5; border-radius: 8px; padding: 10px; text-align: center;",
+        div(style = "font-size: 22px; font-weight: 700; color: #2A8C82;", total_days),
+        div(style = "font-size: 10px; color: #7F8C8D; text-transform: uppercase;", "Days")
       ),
       # Avg Price
-      div(style = "background: #FEF5E7; border-radius: 8px; padding: 12px; text-align: center;",
-        div(style = "font-size: 24px; font-weight: 700; color: #F5B085;", paste0("£", avg_price)),
-        div(style = "font-size: 11px; color: #7F8C8D; text-transform: uppercase;", "Avg Price")
+      div(style = "background: #FEF5E7; border-radius: 8px; padding: 10px; text-align: center;",
+        div(style = "font-size: 22px; font-weight: 700; color: #F5B085;", paste0("£", avg_price)),
+        div(style = "font-size: 10px; color: #7F8C8D; text-transform: uppercase;", "Avg Price")
       ),
       # Total Revenue
-      div(style = "background: #E8F8F5; border-radius: 8px; padding: 12px; text-align: center;",
-        div(style = "font-size: 24px; font-weight: 700; color: #2A8C82;", paste0("£", format(total_revenue, big.mark = ","))),
-        div(style = "font-size: 11px; color: #7F8C8D; text-transform: uppercase;", "Est. Revenue")
+      div(style = "background: #E8F8F5; border-radius: 8px; padding: 10px; text-align: center;",
+        div(style = "font-size: 22px; font-weight: 700; color: #2A8C82;", paste0("£", format(total_revenue, big.mark = ","))),
+        div(style = "font-size: 10px; color: #7F8C8D; text-transform: uppercase;", "Est. Revenue")
       ),
-      # Peak Day
-      div(style = "background: #F0F9FD; border-radius: 8px; padding: 12px; text-align: center;",
-        div(style = "font-size: 18px; font-weight: 700; color: #A0D8EF;", paste0("£", peak_price)),
-        div(style = "font-size: 11px; color: #7F8C8D; text-transform: uppercase;", paste0("Peak: ", peak_date))
+      # Price Range
+      div(style = "background: #F5F5F5; border-radius: 8px; padding: 10px; text-align: center;",
+        div(style = "font-size: 18px; font-weight: 700; color: #2C3E50;", paste0("£", min_price, "-", max_price)),
+        div(style = "font-size: 10px; color: #7F8C8D; text-transform: uppercase;", "Price Range")
+      ),
+      # High Demand Days
+      div(style = "background: #F0F9FD; border-radius: 8px; padding: 10px; text-align: center;",
+        div(style = "font-size: 22px; font-weight: 700; color: #A0D8EF;", high_demand_days),
+        div(style = "font-size: 10px; color: #7F8C8D; text-transform: uppercase;", "High Demand")
+      ),
+      # Weekend Premium
+      div(style = "background: #FEF5E7; border-radius: 8px; padding: 10px; text-align: center;",
+        div(style = "font-size: 22px; font-weight: 700; color: #F5B085;", paste0("+", weekend_premium, "%")),
+        div(style = "font-size: 10px; color: #7F8C8D; text-transform: uppercase;", "Wknd Premium")
       )
     )
   })
