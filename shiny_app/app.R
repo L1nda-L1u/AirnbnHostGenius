@@ -360,7 +360,7 @@ ui <- dashboardPage(
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 16px;
+        margin-bottom: 8px;
         padding: 0 8px;
       }
       
@@ -515,9 +515,8 @@ ui <- dashboardPage(
         justify-content: center;
         align-items: center;
         gap: 24px;
-        margin-top: 20px;
-        padding-top: 16px;
-        border-top: 1px solid #D0D0D0;
+        margin-top: 8px;
+        padding-top: 0;
       }
       .legend-item {
         display: flex;
@@ -1190,7 +1189,7 @@ ui <- dashboardPage(
           style = "display: flex; align-items: stretch;",
         column(8,
           div(class = "card",
-            style = "height: 100%;",
+            style = "height: 640px;",
             div(class = "calendar-header",
               div(style = "display: flex; gap: 8px;",
                 uiOutput("prev_btn"),
@@ -1217,7 +1216,7 @@ ui <- dashboardPage(
         ),
         column(4,
           div(
-            style = "height: 100%; display: flex; flex-direction: column;",
+            style = "height: 640px; display: flex; flex-direction: column;",
             div(class = "card",
               style = "flex: 1; overflow-y: auto;",
               div(class = "section-title", "Selected Date Details"),
@@ -1225,7 +1224,7 @@ ui <- dashboardPage(
             ),
             div(class = "card",
               div(class = "section-title", "High Demand Days This Month"),
-              div(style = "height: 120px; overflow-y: auto;",
+              div(style = "height: 100px; overflow-y: auto;",
                 DTOutput("high_demand_table")
               )
             )
