@@ -69,10 +69,38 @@ DATA_END <- Sys.Date() + 365
 # DATA LOADING
 # ==================================================================================
 
-tfl_data <- fread("tfl.csv") %>% mutate(date = as.Date(date))
-weather_data <- fread("weather.csv") %>% mutate(date = as.Date(date))
-holidays_file <- fread("holidays.csv") %>% mutate(date = as.Date(date))
-tourism_data <- fread("tourism.csv") %>% mutate(date = as.Date(date))
+# Helper function to load data with multiple path attempts
+load_csv_safe <- function(filename, default_cols = c("date", "value")) {
+  paths <- c(
+    filename,
+    file.path("shiny_app", filename),
+    file.path(getwd(), filename),
+    file.path(dirname(getwd()), "shiny_app", filename)
+  )
+  
+  for (path in paths) {
+    if (file.exists(path)) {
+      tryCatch({
+        data <- fread(path) %>% mutate(date = as.Date(date))
+        message("Loaded ", filename, " from: ", path)
+        return(data)
+      }, error = function(e) {
+        message("Error loading ", path, ": ", e$message)
+      })
+    }
+  }
+  
+  # Return empty data frame if file not found
+  message("Warning: ", filename, " not found. Creating empty data frame.")
+  empty_df <- setNames(data.frame(matrix(ncol = length(default_cols), nrow = 0)), default_cols)
+  empty_df$date <- as.Date(character())
+  return(empty_df)
+}
+
+tfl_data <- load_csv_safe("tfl.csv", c("date", "value"))
+weather_data <- load_csv_safe("weather.csv", c("date", "temp_c"))
+holidays_file <- load_csv_safe("holidays.csv", c("date", "title"))
+tourism_data <- load_csv_safe("tourism.csv", c("date", "value"))
 
 # ==================================================================================
 # FETCH HOLIDAYS FROM GOV.UK API
