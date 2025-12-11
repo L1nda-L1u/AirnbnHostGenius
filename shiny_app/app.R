@@ -3019,30 +3019,26 @@ server <- function(input, output, session) {
   })
   
   output$weather_chart <- renderPlotly({
-    # Read weather.csv directly with absolute path
-    app_dir <- dirname(rstudioapi::getSourceEditorContext()$path)
-    if (is.null(app_dir) || app_dir == "") {
-      app_dir <- getwd()
+    # Simply read weather.csv - Shiny runs from shiny_app folder
+    df <- tryCatch({
+      read.csv("weather.csv")
+    }, error = function(e) {
+      tryCatch({
+        read.csv(file.path("shiny_app", "weather.csv"))
+      }, error = function(e2) {
+        NULL
+      })
+    })
+    
+    if (is.null(df)) {
+      return(plotly_empty() %>% layout(title = "Weather data not found"))
     }
     
-    weather_file <- file.path(app_dir, "weather.csv")
-    if (!file.exists(weather_file)) {
-      weather_file <- "weather.csv"
-    }
-    if (!file.exists(weather_file)) {
-      weather_file <- file.path("shiny_app", "weather.csv")
-    }
-    
-    if (!file.exists(weather_file)) {
-      return(plotly_empty() %>% layout(title = list(text = "Weather data file not found", font = list(color = "#2C3E50"))))
-    }
-    
-    df <- read.csv(weather_file)
     df$date <- as.Date(df$date)
     df <- df[df$date >= as.Date("2024-01-01") & df$date <= as.Date("2027-12-31"), ]
     
     if (nrow(df) == 0) {
-      df <- read.csv(weather_file)
+      df <- read.csv("weather.csv")
       df$date <- as.Date(df$date)
     }
     
