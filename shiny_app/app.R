@@ -1307,17 +1307,13 @@ ui <- dashboardPage(
                           max = DATA_END),
             br(),
             actionButton("calculate", "Calculate Prices", class = "btn-primary", style = "width: 100%;")
-          ),
-          # Price Summary Card
-          div(class = "card", style = "margin-top: 15px;",
-            div(class = "section-title", "Price Summary"),
-            uiOutput("price_summary_panel")
           )
         ),
         column(8,
+          # Price Summary Card (moved to right)
           div(class = "card",
-            div(class = "section-title", "Recommended Pricing"),
-            DTOutput("price_recommendations")
+            div(class = "section-title", "Price Summary"),
+            uiOutput("price_summary_panel")
           )
         )
       ),
