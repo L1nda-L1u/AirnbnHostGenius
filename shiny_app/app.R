@@ -1307,6 +1307,11 @@ ui <- dashboardPage(
                           max = DATA_END),
             br(),
             actionButton("calculate", "Calculate Prices", class = "btn-primary", style = "width: 100%;")
+          ),
+          # Price Summary Card
+          div(class = "card", style = "margin-top: 15px;",
+            div(class = "section-title", "Price Summary"),
+            uiOutput("price_summary_panel")
           )
         ),
         column(8,
@@ -2935,6 +2940,55 @@ server <- function(input, output, session) {
           c("rgba(245, 176, 133, 0.2)", "rgba(42, 140, 130, 0.2)", 
             "rgba(149, 165, 166, 0.2)", "rgba(149, 165, 166, 0.2)")
         ))
+  })
+  
+  # Price Summary Panel
+  output$price_summary_panel <- renderUI({
+    if (is.null(input$calculate) || input$calculate == 0) {
+      return(div(style = "text-align: center; padding: 20px; color: #7F8C8D;",
+        "Click 'Calculate Prices' to see summary"
+      ))
+    }
+    
+    pd <- price_data()
+    
+    if (is.null(pd) || nrow(pd) == 0) {
+      return(div(style = "text-align: center; padding: 20px; color: #7F8C8D;",
+        "No data available"
+      ))
+    }
+    
+    # Calculate statistics
+    total_days <- nrow(pd)
+    avg_price <- round(mean(pd$recommended_price, na.rm = TRUE), 0)
+    total_revenue <- sum(pd$recommended_price, na.rm = TRUE)
+    peak_day <- pd[which.max(pd$recommended_price), ]
+    peak_date <- format(peak_day$date, "%b %d")
+    peak_price <- peak_day$recommended_price
+    
+    # Beautiful summary grid
+    div(style = "display: grid; grid-template-columns: 1fr 1fr; gap: 12px;",
+      # Days
+      div(style = "background: #EAF6F5; border-radius: 8px; padding: 12px; text-align: center;",
+        div(style = "font-size: 24px; font-weight: 700; color: #2A8C82;", total_days),
+        div(style = "font-size: 11px; color: #7F8C8D; text-transform: uppercase;", "Days")
+      ),
+      # Avg Price
+      div(style = "background: #FEF5E7; border-radius: 8px; padding: 12px; text-align: center;",
+        div(style = "font-size: 24px; font-weight: 700; color: #F5B085;", paste0("£", avg_price)),
+        div(style = "font-size: 11px; color: #7F8C8D; text-transform: uppercase;", "Avg Price")
+      ),
+      # Total Revenue
+      div(style = "background: #E8F8F5; border-radius: 8px; padding: 12px; text-align: center;",
+        div(style = "font-size: 24px; font-weight: 700; color: #2A8C82;", paste0("£", format(total_revenue, big.mark = ","))),
+        div(style = "font-size: 11px; color: #7F8C8D; text-transform: uppercase;", "Est. Revenue")
+      ),
+      # Peak Day
+      div(style = "background: #F0F9FD; border-radius: 8px; padding: 12px; text-align: center;",
+        div(style = "font-size: 18px; font-weight: 700; color: #A0D8EF;", paste0("£", peak_price)),
+        div(style = "font-size: 11px; color: #7F8C8D; text-transform: uppercase;", paste0("Peak: ", peak_date))
+      )
+    )
   })
   
   output$price_timeline <- renderPlotly({
