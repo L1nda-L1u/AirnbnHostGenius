@@ -1572,7 +1572,17 @@ server <- function(input, output, session) {
     filtered <- filtered %>%
       filter(price >= input$filter_price[1], price <= input$filter_price[2])
     
-    # Sample based on user selection for performance
+    # Apply category selection from Distribution bars
+    sel <- selected_category()
+    color_by <- input$color_by
+    if (!is.null(sel) && sel != "") {
+      if (color_by == "room_type") {
+        filtered <- filtered %>% filter(room_type == sel)
+      } else if (color_by == "neighbourhood") {
+        filtered <- filtered %>% filter(neighbourhood == sel)
+      }
+    }
+    
     return(filtered)
   }) %>% bindEvent(input$apply_filter, ignoreNULL = FALSE, ignoreInit = FALSE)
   
