@@ -1306,8 +1306,11 @@ ui <- dashboardPage(
         column(4,
           div(class = "card", style = "height: 80%;",
             div(class = "section-title", "Settings"),
-            div(style = "width: 100%;",
-              numericInput("base_price", "Base Nightly Rate (GBP)", value = 120, min = 20, max = 1000, width = "100%")
+            div(style = "width: 100%; margin-bottom: 10px;",
+              tags$label("Base Price (from Prediction)", style = "font-weight: 500; color: #2C3E50;"),
+              div(style = "background: #E8F8F5; border: 1px solid #D0D0D0; border-radius: 6px; padding: 10px; margin-top: 5px;",
+                uiOutput("base_price_display")
+              )
             ),
             div(style = "width: 100%;",
               dateRangeInput("date_range", "Date Range",
@@ -2917,12 +2920,37 @@ server <- function(input, output, session) {
   
   # ==================== PRICE CALCULATOR ====================
   
+  # Get base price from Price Prediction page
+  base_price_value <- reactive({
+    result <- prediction_result()
+    if (!is.null(result) && !is.null(result$price)) {
+      round(result$price, 0)
+    } else {
+      120  # Default fallback
+    }
+  })
+  
+  output$base_price_display <- renderUI({
+    price <- base_price_value()
+    result <- prediction_result()
+    if (!is.null(result)) {
+      div(style = "font-size: 18px; font-weight: 600; color: #2A8C82;",
+        paste0("£", price, "/night")
+      )
+    } else {
+      div(style = "font-size: 14px; color: #7F8C8D;",
+        "Go to Price Prediction first"
+      )
+    }
+  })
+  
   price_data <- eventReactive(input$calculate, {
+    bp <- base_price_value()
     daily_data %>%
       filter(date >= input$date_range[1], date <= input$date_range[2]) %>%
       mutate(
-        recommended_price = round(input$base_price * price_multiplier, 0),
-        price_diff = recommended_price - input$base_price
+        recommended_price = round(bp * price_multiplier, 0),
+        price_diff = recommended_price - bp
       )
   })
   
@@ -2932,7 +2960,7 @@ server <- function(input, output, session) {
     price_data() %>%
       mutate(
         Date = format(date, "%a, %b %d"),
-        Base = paste0("£", input$base_price),
+        Base = paste0("£", base_price_value()),
         Recommended = paste0("£", recommended_price),
         Adj = ifelse(price_diff >= 0, paste0("+£", price_diff), paste0("-£", abs(price_diff))),
         Level = price_recommendation
@@ -3021,8 +3049,9 @@ server <- function(input, output, session) {
     
     pd <- price_data()
     
+    bp <- base_price_value()
     plot_ly(pd, x = ~date) %>%
-      add_trace(y = ~input$base_price, type = "scatter", mode = "lines",
+      add_trace(y = ~bp, type = "scatter", mode = "lines",
                 line = list(color = "#7F8C8D", dash = "dash", width = 2),
                 name = "Base Price") %>%
       add_trace(y = ~recommended_price, type = "scatter", mode = "lines+markers",
