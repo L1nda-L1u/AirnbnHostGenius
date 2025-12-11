@@ -1250,6 +1250,20 @@ ui <- dashboardPage(
           )
         )
       ),
+        fluidRow(
+        column(6,
+          div(class = "card",
+            div(class = "section-title", "TfL Transport Activity"),
+            plotlyOutput("tfl_chart", height = "280px")
+          )
+        ),
+        column(6,
+          div(class = "card",
+            div(class = "section-title", "Weather Forecast"),
+            plotlyOutput("weather_chart", height = "280px")
+          )
+        )
+      )
     ),
       
       tabItem(tabName = "calculator",
@@ -2950,13 +2964,13 @@ server <- function(input, output, session) {
     tfl_plot <- tfl_data %>% filter(date >= Sys.Date() - 365)
     
     plot_ly(tfl_plot, x = ~date, y = ~value, type = "scatter", mode = "lines",
-            line = list(color = "#3b82f6", width = 2)) %>%
+            line = list(color = "#2A8C82", width = 2)) %>%
       layout(
-        xaxis = list(title = "", gridcolor = "#D0D0D0", color = "#D0D0D0"),
-        yaxis = list(title = "Daily Journeys (M)", gridcolor = "#D0D0D0", color = "#D0D0D0"),
+        xaxis = list(title = "", gridcolor = "#D0D0D0", color = "#7F8C8D"),
+        yaxis = list(title = "Daily Journeys (M)", gridcolor = "#D0D0D0", color = "#7F8C8D"),
         paper_bgcolor = "transparent",
         plot_bgcolor = "transparent",
-        font = list(color = "#D0D0D0")
+        font = list(color = "#2C3E50")
       )
   })
   
@@ -2965,13 +2979,13 @@ server <- function(input, output, session) {
       filter(date >= Sys.Date() - 30, date <= Sys.Date() + 30)
     
     plot_ly(weather_plot, x = ~date, y = ~temp_c, type = "scatter", mode = "lines",
-            line = list(color = "#f97316", width = 2)) %>%
+            line = list(color = "#F5B085", width = 2)) %>%
       layout(
-        xaxis = list(title = "", gridcolor = "#D0D0D0", color = "#D0D0D0"),
-        yaxis = list(title = "Temperature (┬░C)", gridcolor = "#D0D0D0", color = "#D0D0D0"),
+        xaxis = list(title = "", gridcolor = "#D0D0D0", color = "#7F8C8D"),
+        yaxis = list(title = "Temperature (°C)", gridcolor = "#D0D0D0", color = "#7F8C8D"),
         paper_bgcolor = "transparent",
         plot_bgcolor = "transparent",
-        font = list(color = "#D0D0D0")
+        font = list(color = "#2C3E50")
       )
   })
   
