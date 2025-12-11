@@ -927,30 +927,15 @@ ui <- dashboardPage(
                 width = "100%"
               ),
               
-              sliderInput(
-                "filter_price",
-                label = "Price Range (£):",
-                min = 0,
-                max = 1000,
-                value = c(0, 500),
-                step = 10,
-                width = "100%"
-              ),
-              
-              sliderInput(
-                "sample_size",
-                label = "Number of Points to Display:",
-                min = 1000,
-                max = 50000,
-                value = 10000,
-                step = 1000,
-                width = "100%"
-              ),
-              
-              tags$p(
-                style = "font-size: 11px; color: #888; margin-top: 5px;",
-                "Reduce for better performance"
-              ),
+               sliderInput(
+                 "filter_price",
+                 label = "Price Range (£):",
+                 min = 0,
+                 max = 500,
+                 value = c(0, 500),
+                 step = 10,
+                 width = "100%"
+               ),
               
               actionButton(
                 "apply_filter",
@@ -1350,7 +1335,7 @@ ui <- dashboardPage(
           
           tags$div(
             style = "padding: 20px;",
-            tags$h4("Airbnb Baseline Price Predictor", style = "color: #1ABC9C;"),
+           
             tags$p("AirbnbHostGenius is an intelligent, data-driven platform designed to help Airbnb hosts maximize their annual revenue through machine learning-powered pricing recommendations and occupancy predictions."),
             tags$p("Creators: Linda Liu & Shirley Xiong"),
             tags$hr(),
@@ -1363,16 +1348,7 @@ ui <- dashboardPage(
               tags$li("Demand Trends: TfL transport and weather forecasts for demand signals.")
             ),
             tags$hr(),
-            tags$h5("Key Features:", style = "color: #2C3E50;"),
-            tags$ul(
-              tags$li("Automatic address/postcode to coordinates conversion"),
-              tags$li("Support for various property attributes"),
-              tags$li("Rich amenities selection"),
-              tags$li("Smart price prediction"),
-              tags$li("Location visualization"),
-              tags$li("Market insights with TfL, Tourism, and Weather data")
-            ),
-            tags$hr()
+           
           )
         )
       )
@@ -1576,8 +1552,8 @@ server <- function(input, output, session) {
       room_types <- c("All" = "all", setNames(unique(as.character(data$room_type)), unique(as.character(data$room_type))))
       updateSelectInput(session, "filter_room_type", choices = room_types)
       
-      max_price <- min(quantile(data$price, 0.95, na.rm = TRUE), 1000)
-      updateSliderInput(session, "filter_price", max = max_price, value = c(0, max_price))
+       max_price <- 500
+       updateSliderInput(session, "filter_price", max = max_price, value = c(0, max_price))
     }
   })
   
@@ -1597,11 +1573,6 @@ server <- function(input, output, session) {
       filter(price >= input$filter_price[1], price <= input$filter_price[2])
     
     # Sample based on user selection for performance
-    sample_size <- min(input$sample_size, nrow(filtered))
-    if (nrow(filtered) > sample_size) {
-      filtered <- filtered %>% sample_n(sample_size)
-    }
-    
     return(filtered)
   }) %>% bindEvent(input$apply_filter, ignoreNULL = FALSE, ignoreInit = FALSE)
   
@@ -1870,24 +1841,14 @@ server <- function(input, output, session) {
       tags$div(
         style = "display: grid; grid-template-columns: 1fr 1fr; gap: 10px;",
         tags$div(
-          style = "background: #EAF6F5; padding: 10px; border-radius: 5px; text-align: center;",
-          tags$div(style = "font-size: 20px; font-weight: bold; color: #2A8C82;", format(total, big.mark = ",")),
-          tags$div(style = "font-size: 11px; color: #666;", "Listings")
-        ),
-        tags$div(
           style = "background: #FEF5E7; padding: 10px; border-radius: 5px; text-align: center;",
           tags$div(style = "font-size: 20px; font-weight: bold; color: #F5B085;", paste0("£", round(avg_price))),
           tags$div(style = "font-size: 11px; color: #666;", "Avg Price")
         ),
         tags$div(
-          style = "background: #F0F9FD; padding: 10px; border-radius: 5px; text-align: center;",
-          tags$div(style = "font-size: 20px; font-weight: bold; color: #A0D8EF;", paste0("£", round(median_price))),
-          tags$div(style = "font-size: 11px; color: #666;", "Median Price")
-        ),
-        tags$div(
-          style = "background: #E8F8F5; padding: 10px; border-radius: 5px; text-align: center;",
-          tags$div(style = "font-size: 20px; font-weight: bold; color: #8DD3C7;", n_neighbourhoods),
-          tags$div(style = "font-size: 11px; color: #666;", "Areas")
+          style = "background: #EAF6F5; padding: 10px; border-radius: 5px; text-align: center;",
+          tags$div(style = "font-size: 20px; font-weight: bold; color: #2A8C82;", format(total, big.mark = ",")),
+          tags$div(style = "font-size: 11px; color: #666;", "Rooms (Filtered)")
         )
       )
     )
