@@ -1,0 +1,2 @@
+linters: "with_defaults(line_length_linter = NULL, cyclocomp_linter = NULL, object_usage_linter = NULL, undesirable_function_linter = NULL, undesirable_operator_linter = NULL)"
+exclusions: "list('.*\\\\.Rproj$' = 'any', '.*\\\\.md$' = 'any', '.*\\\\.csv$' = 'any', '.*\\\\.rds$' = 'any', '.*\\\\.rda$' = 'any', '.*\\\\.pt$' = 'any', '.*\\\\.xgb$' = 'any', '.*\\\\.png$' = 'any', '.*\\\\.jpg$' = 'any', '.*\\\\.pdf$' = 'any', '.*archive.*' = 'any', '.*legacy_files.*' = 'any')"

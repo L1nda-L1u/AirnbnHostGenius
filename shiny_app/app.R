@@ -788,8 +788,8 @@ ui <- dashboardPage(
           position: relative;
         }
         #overview_map {
-          height: 800px !important;
-          min-height: 800px !important;
+          height: 518px !important;
+          min-height: 518px !important;
         }
         .map-container {
           flex: 1;
@@ -878,7 +878,7 @@ ui <- dashboardPage(
                 width = NULL,
                 solidHeader = TRUE,
                 status = "primary",
-                leafletOutput("overview_map", height = "800px")
+                leafletOutput("overview_map", height = "518px")
               )
           ),
           
@@ -908,19 +908,13 @@ ui <- dashboardPage(
               
               hr(),
               
-               # Summary stats (auto-updates after filters and bar selection)
-              tags$h5("Summary Statistics", style = "color: #4A4A4A; font-weight: 600;"),
-               uiOutput("overview_stats"),
-               
-               hr(),
-               
                # Filters
               sliderInput(
                 "filter_price",
                 label = "Price Range (£):",
                 min = 0,
                  max = 500,
-                value = c(0, 500),
+                value = c(0, 200),
                 step = 10,
                 width = "100%"
               ),
@@ -930,7 +924,13 @@ ui <- dashboardPage(
                 "Apply Filters",
                 class = "btn-primary",
                 style = "width: 100%; margin-top: 10px;"
-              )
+              ),
+              
+              hr(),
+              
+               # Summary stats (auto-updates after filters and bar selection)
+              tags$h5("Summary Statistics", style = "color: #4A4A4A; font-weight: 600;"),
+               uiOutput("overview_stats")
             )
           )
         )
@@ -1541,7 +1541,7 @@ server <- function(input, output, session) {
       updateSelectInput(session, "filter_room_type", choices = room_types)
       
        max_price <- 500
-      updateSliderInput(session, "filter_price", max = max_price, value = c(0, max_price))
+      updateSliderInput(session, "filter_price", max = max_price, value = c(0, 200))
     }
   })
   
