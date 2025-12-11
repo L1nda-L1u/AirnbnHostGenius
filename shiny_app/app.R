@@ -3010,18 +3010,18 @@ server <- function(input, output, session) {
     
     # 6 grid items: Baseline, Avg, Revenue, Days, Range, High Demand
     div(style = "display: grid; grid-template-columns: 1fr 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 6px; height: 100%;",
-      # 1. Baseline Price - Light Green (Mint)
-      div(style = "background: #D4F0EA; border-radius: 8px; padding: 10px 6px; text-align: center; display: flex; flex-direction: column; justify-content: center;",
-        div(style = "font-size: 20px; font-weight: 700; color: #5DADE2;", paste0("£", bp)),
-        div(style = "font-size: 9px; color: #A0A0A0; text-transform: uppercase;", "Baseline")
+      # 1. Baseline Price - Deep Green
+      div(style = "background: #2A8C82; border-radius: 8px; padding: 10px 6px; text-align: center; display: flex; flex-direction: column; justify-content: center;",
+        div(style = "font-size: 20px; font-weight: 700; color: #FFFFFF;", paste0("£", bp)),
+        div(style = "font-size: 9px; color: #E8F8F5; text-transform: uppercase;", "Baseline")
       ),
       # 2. Avg Price - Peach (Orange)
       div(style = "background: #FEF0E5; border-radius: 8px; padding: 10px 6px; text-align: center; display: flex; flex-direction: column; justify-content: center;",
         div(style = "font-size: 20px; font-weight: 700; color: #E67E5F;", paste0("£", avg_price)),
         div(style = "font-size: 9px; color: #7F8C8D; text-transform: uppercase;", "Avg Price")
       ),
-      # 3. Total Revenue - Deep Teal
-      div(style = "background: #E8F8F5; border-radius: 8px; padding: 10px 6px; text-align: center; display: flex; flex-direction: column; justify-content: center;",
+      # 3. Total Revenue - Light Green
+      div(style = "background: #EAF6F5; border-radius: 8px; padding: 10px 6px; text-align: center; display: flex; flex-direction: column; justify-content: center;",
         div(style = "font-size: 20px; font-weight: 700; color: #2A8C82;", paste0("£", format(total_revenue, big.mark = ","))),
         div(style = "font-size: 9px; color: #7F8C8D; text-transform: uppercase;", "Est. Revenue")
       ),
