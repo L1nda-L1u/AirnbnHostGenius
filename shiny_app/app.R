@@ -1189,7 +1189,7 @@ ui <- dashboardPage(
           style = "display: flex; align-items: stretch;",
         column(8,
           div(class = "card",
-            style = "height: 95%;",
+            style = "height: 97%;",
             div(class = "calendar-header",
               div(style = "display: flex; gap: 8px;",
                 uiOutput("prev_btn"),
@@ -1216,9 +1216,8 @@ ui <- dashboardPage(
         ),
         column(4,
           div(
-            style = "height: 640px; display: flex; flex-direction: column;",
+            style = "display: flex; flex-direction: column; height: 100%;",
             div(class = "card",
-              style = "flex: 1; overflow-y: auto;",
               div(class = "section-title", "Selected Date Details"),
               uiOutput("date_details_panel")
             ),
@@ -2800,7 +2799,7 @@ server <- function(input, output, session) {
   
   output$high_demand_table <- renderDT({
     month_data() %>%
-      filter(!is_past, price_recommendation == "Premium") %>%
+      filter(!is_past, price_multiplier >= 1.15) %>%
       arrange(desc(price_multiplier)) %>%
       mutate(
         Date = format(date, "%a %d"),
