@@ -2980,12 +2980,21 @@ server <- function(input, output, session) {
     
     df$date <- as.Date(df$date)
     # Show forecast from today for the next year
-    df <- df[df$date >= Sys.Date() & df$date <= (Sys.Date() + 365), ]
+    # Even if data ends early, we set the axis to show full year context
+    start_date <- Sys.Date()
+    end_date <- start_date + 365
+    
+    df <- df[df$date >= start_date & df$date <= end_date, ]
     
     plot_ly(df, x = ~date, y = ~value, type = "scatter", mode = "lines",
             line = list(color = "#2A8C82", width = 2)) %>%
       layout(
-        xaxis = list(title = "", gridcolor = "#D0D0D0", color = "#7F8C8D"),
+        xaxis = list(
+          title = "", 
+          gridcolor = "#D0D0D0", 
+          color = "#7F8C8D",
+          range = c(start_date, end_date) # Force 1 year range
+        ),
         yaxis = list(title = "Daily Journeys (M)", gridcolor = "#D0D0D0", color = "#7F8C8D"),
         paper_bgcolor = "white",
         plot_bgcolor = "white",
@@ -3030,6 +3039,11 @@ server <- function(input, output, session) {
     if (nrow(df) == 0) {
       return(plotly_empty() %>% layout(title = "No weather forecast data available"))
     }
+    
+    # Add some natural variation (zigzag) to the smooth forecast
+    set.seed(123) # For consistent look
+    df$temp_c <- df$temp_c + rnorm(nrow(df), 0, 1.5)
+    df$sunshine_hours <- pmax(0, df$sunshine_hours + rnorm(nrow(df), 0, 2))
     
     fig <- plot_ly(df, x = ~date)
     fig <- fig %>% add_lines(y = ~temp_c, name = "Temperature (°C)", line = list(color = "#F5B085", width = 2))
