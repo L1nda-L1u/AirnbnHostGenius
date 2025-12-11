@@ -1,0 +1,179 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: #f1f5f9;
+  color: #2C3E50;
+}
+
+.navbar {
+  background: #ffffff !important;
+  border-bottom: 1px solid #D0D0D0;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.navbar-brand {
+  color: #2A8C82 !important;
+  font-weight: 700;
+  font-size: 20px;
+}
+
+.card,
+.box,
+.list-card,
+.calendar-container {
+  background: #FFFFFF;
+  border: 1px solid #D0D0D0;
+  border-radius: 10px;
+  box-shadow: 0 6px 14px rgba(0,0,0,0.06);
+}
+
+.btn-primary {
+  background-color: #2A8C82 !important;
+  border-color: #2A8C82 !important;
+  color: white !important;
+  font-weight: 600;
+  border-radius: 6px;
+}
+
+.btn-primary:hover {
+  background-color: #26746C !important;
+  border-color: #26746C !important;
+}
+
+.btn-accent {
+  background-color: #F5B085 !important;
+  border-color: #F5B085 !important;
+  color: #2C3E50 !important;
+  font-weight: 600;
+  border-radius: 6px;
+}
+
+.btn-outline {
+  background-color: transparent !important;
+  border-color: #D0D0D0 !important;
+  color: #2C3E50 !important;
+  font-weight: 600;
+  border-radius: 6px;
+}
+
+.form-control,
+.selectize-input {
+  border-radius: 6px !important;
+  border: 1px solid #D0D0D0 !important;
+  box-shadow: none !important;
+}
+
+.form-control:focus,
+.selectize-input.focus {
+  border-color: #2A8C82 !important;
+  box-shadow: 0 0 0 2px rgba(42, 140, 130, 0.1) !important;
+}
+
+.control-label {
+  font-weight: 600;
+  color: #2C3E50;
+}
+
+.sidebar-menu > li > a {
+  color: #4A4A4A;
+  font-weight: 600;
+}
+
+.sidebar-menu > li.active > a,
+.sidebar-menu > li > a:hover {
+  color: #2A8C82;
+  background: #F5F5F5;
+  border-left: 3px solid #2A8C82;
+}
+
+.metric-card,
+.demand-card {
+  background: #FFFFFF;
+  border: 1px solid #D0D0D0;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+}
+
+.metric-value,
+.price-display,
+.detail-value {
+  color: #2C3E50;
+}
+
+.price-display {
+  font-size: 64px;
+  font-weight: 700;
+}
+
+.calendar-day {
+  background: #FFFFFF;
+  border: 1px solid #D0D0D0;
+  border-radius: 10px;
+  padding: 12px;
+  min-height: 120px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+}
+
+.value-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 12px;
+  background: #F5F5F5;
+  border: 1px solid #E5E7EB;
+}
+
+.badge {
+  display: inline-block;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  border: 1px solid #E5E7EB;
+  background: #F8F8F8;
+}
+
+.badge.holiday { color: #E67E22; border-color: #E67E22; background: #FFF6ED; }
+.badge.weekend { color: #2A8C82; border-color: #2A8C82; background: #F0FFFC; }
+.badge.good-weather { color: #F5B085; border-color: #F5B085; background: #FFF7F0; }
+
+.dataTables_wrapper { color: #2C3E50 !important; }
+table.dataTable { color: #2C3E50 !important; }
+table.dataTable thead th {
+  background-color: #F5F5F5;
+  color: #2C3E50;
+  border-bottom: 1px solid #D0D0D0;
+}
+
+.legend {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  padding-top: 8px;
+  border-top: 1px solid #D0D0D0;
+}
+
+.legend-dot,
+.legend-color {
+  width: 12px;
+  height: 12px;
+  border-radius: 4px;
+}
+
+.detail-panel {
+  background: #F5F5F5;
+  border: 1px solid #D0D0D0;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.amenities-scrollable .shiny-input-checkboxgroup {
+  max-height: 280px;
+  overflow-y: auto;
+}
+

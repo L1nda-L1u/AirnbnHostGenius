@@ -69,9 +69,10 @@ DATA_END <- Sys.Date() + 365
 # DATA LOADING
 # ==================================================================================
 
-# Helper function to load data with multiple path attempts
 load_csv_safe <- function(filename, default_cols = c("date", "value")) {
   paths <- c(
+    file.path(app_dir, "data", "preprocessed", filename),
+    file.path(app_dir, "data", filename),
     filename,
     file.path("shiny_app", filename),
     file.path(getwd(), filename),
@@ -90,7 +91,6 @@ load_csv_safe <- function(filename, default_cols = c("date", "value")) {
     }
   }
   
-  # Return empty data frame if file not found
   message("Warning: ", filename, " not found. Creating empty data frame.")
   empty_df <- setNames(data.frame(matrix(ncol = length(default_cols), nrow = 0)), default_cols)
   empty_df$date <- as.Date(character())
@@ -101,6 +101,31 @@ tfl_data <- load_csv_safe("tfl.csv", c("date", "value"))
 weather_data <- load_csv_safe("weather.csv", c("date", "temp_c"))
 holidays_file <- load_csv_safe("holidays.csv", c("date", "title"))
 tourism_data <- load_csv_safe("tourism.csv", c("date", "value"))
+
+# Helper to load preprocessed CSVs (used for simple plots)
+read_pre_csv <- function(filename) {
+  primary <- file.path(app_dir, "data", "preprocessed", filename)
+  if (file.exists(primary)) {
+    message("✓ Loaded ", filename, " from: ", primary)
+    return(fread(primary))
+  }
+  
+  paths <- c(
+    file.path(app_dir, "data", filename),
+    filename,
+    file.path(app_dir, filename),
+    file.path("shiny_app", filename)
+  )
+  
+  for (p in paths) {
+    if (file.exists(p)) {
+      message("✓ Loaded ", filename, " from: ", p)
+      return(fread(p))
+    }
+  }
+  message("⚠ Cannot find ", filename, " in: ", paste(c(primary, paths), collapse = " | "))
+  NULL
+}
 
 # ==================================================================================
 # FETCH HOLIDAYS FROM GOV.UK API
@@ -183,7 +208,6 @@ daily_data <- daily_data %>%
 # CALCULATE TfL SEASONAL PATTERN (Using pre-COVID historical data)
 # ==================================================================================
 
-# Calculate monthly seasonal averages (excluding COVID years 2020-2021)
 tfl_seasonal <- tfl_data %>%
   filter(!is.na(value)) %>%
   mutate(
@@ -197,11 +221,10 @@ tfl_seasonal <- tfl_data %>%
     .groups = "drop"
   )
 
-# Calculate overall average and relative position
 overall_avg <- mean(tfl_seasonal$monthly_avg)
 tfl_seasonal <- tfl_seasonal %>%
   mutate(
-    relative = (monthly_avg - overall_avg) / overall_avg * 100,  # % above/below avg
+    relative = (monthly_avg - overall_avg) / overall_avg * 100,
     season_label = case_when(
       relative >= 5 ~ "Busy",
       relative <= -5 ~ "Quiet",
@@ -294,6 +317,13 @@ tfl_monthly_pattern <- tfl_seasonal
 
 cat("Daily data loaded:", nrow(daily_data), "days from", 
     as.character(min(daily_data$date)), "to", as.character(max(daily_data$date)), "\n")
+
+# Persist processed daily data for market tab
+post_dir <- file.path(app_dir, "data", "postprocessed")
+if (!dir.exists(post_dir)) {
+  dir.create(post_dir, recursive = TRUE, showWarnings = FALSE)
+}
+saveRDS(daily_data, file.path(post_dir, "daily_data.rds"))
 
 
 
@@ -2256,11 +2286,7 @@ server <- function(input, output, session) {
   
   # TfL Visualizations
   output$tfl_timeseries <- renderPlotly({
-    data <- market_data()
-    if (is.null(data) || !data$loaded) {
-      return(create_empty_plot() %>% layout(title = "Loading TfL data..."))
-    }
-    create_tfl_timeseries(data)
+    create_tfl_timeseries(NULL)
   })
   
   output$tfl_yearly <- renderPlotly({
@@ -2291,11 +2317,7 @@ server <- function(input, output, session) {
   
   # Weather Visualizations
   output$weather_timeseries <- renderPlotly({
-    data <- market_data()
-    if (is.null(data) || !data$loaded) {
-      return(create_empty_plot() %>% layout(title = "Loading weather data..."))
-    }
-    create_weather_timeseries(data)
+    create_weather_timeseries(NULL)
   })
   
   output$seasonal_temp <- renderPlotly({
@@ -3026,28 +3048,18 @@ server <- function(input, output, session) {
   # ==================== MARKET DATA ====================
   
   output$tourism_chart <- renderPlotly({
-    # Read tfl.csv directly
-    df <- tryCatch({
-      read.csv("tfl.csv")
-    }, error = function(e) {
-      tryCatch({
-        read.csv(file.path("shiny_app", "tfl.csv"))
-      }, error = function(e2) {
-        NULL
-      })
-    })
-    
+    df <- read_pre_csv("tfl.csv")
     if (is.null(df)) {
       return(plotly_empty() %>% layout(title = "TfL data not found"))
     }
     
-    df$date <- as.Date(df$date)
-    # Show forecast from today for the next year
-    # Even if data ends early, we set the axis to show full year context
-    start_date <- Sys.Date()
-    end_date <- start_date + 365
+    df <- df %>%
+      mutate(date = as.Date(date), value = as.numeric(value)) %>%
+      filter(date >= Sys.Date(), date <= Sys.Date() + 365)
     
-    df <- df[df$date >= start_date & df$date <= end_date, ]
+    if (nrow(df) == 0) {
+      return(plotly_empty() %>% layout(title = "No TfL data in next year"))
+    }
     
     plot_ly(df, x = ~date, y = ~value, type = "scatter", mode = "lines",
             line = list(color = "#2A8C82", width = 2)) %>%
@@ -3056,7 +3068,7 @@ server <- function(input, output, session) {
           title = "", 
           gridcolor = "#D0D0D0", 
           color = "#7F8C8D",
-          range = c(start_date, end_date) # Force 1 year range
+          range = c(min(df$date), max(df$date))
         ),
         yaxis = list(title = "Daily Journeys (M)", gridcolor = "#D0D0D0", color = "#7F8C8D"),
         paper_bgcolor = "white",
@@ -3066,7 +3078,17 @@ server <- function(input, output, session) {
   })
   
   output$tfl_chart <- renderPlotly({
-    tfl_plot <- tfl_data %>% filter(date >= Sys.Date() - 365)
+    tfl_plot <- read_pre_csv("tfl.csv")
+    if (is.null(tfl_plot)) {
+      return(plotly_empty() %>% layout(title = "TfL data not found"))
+    }
+    tfl_plot <- tfl_plot %>%
+      mutate(date = as.Date(date), value = as.numeric(value)) %>%
+      filter(date >= Sys.Date(), date <= Sys.Date() + 365)
+    
+    if (nrow(tfl_plot) == 0) {
+      return(plotly_empty() %>% layout(title = "No TfL data in next year"))
+    }
     
     plot_ly(tfl_plot, x = ~date, y = ~value, type = "scatter", mode = "lines",
             line = list(color = "#2A8C82", width = 2)) %>%
@@ -3080,16 +3102,7 @@ server <- function(input, output, session) {
   })
   
   output$weather_chart <- renderPlotly({
-    # Simply read weather.csv - Shiny runs from shiny_app folder
-    df <- tryCatch({
-      read.csv("weather.csv")
-    }, error = function(e) {
-      tryCatch({
-        read.csv(file.path("shiny_app", "weather.csv"))
-      }, error = function(e2) {
-        NULL
-      })
-    })
+    df <- read_pre_csv("weather.csv")
     
     if (is.null(df)) {
       return(plotly_empty() %>% layout(title = "Weather data not found"))

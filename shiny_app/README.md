@@ -30,14 +30,14 @@ A beautiful Shiny application for predicting Airbnb baseline prices with amenity
    shiny::runApp("app.R")
    ```
 
-3. **The app will open in your browser automatically!**
+
 
 ## Features
 
 - 🏠 **Property Information Input**: Bedrooms, bathrooms, accommodates, etc.
 - 📍 **Auto Geocoding**: Automatically converts address/postcode to coordinates
 - ✨ **Amenity Selection**: Rich amenity options (WiFi, Kitchen, Washer, etc.)
-- 💰 **Smart Price Prediction**: Based on Stacking model (XGBoost + Neural Network)
+- 💰 **Smart Price Prediction**: XGBoost baseline price model
 - 📈 **Occupancy & Revenue Prediction**: Placeholders for future model integration
 - 💡 **Amenity Recommendations**: Shows top 3 amenities that can increase price
 - 🗺️ **Location Map**: Displays property location
@@ -52,32 +52,18 @@ The `run_app.R` script will automatically install missing packages, or install m
 ```r
 install.packages(c(
   "shiny", "shinydashboard", "DT", "leaflet", "plotly",
-  "dplyr", "geosphere", "xgboost", "reticulate", "glmnet",
-  "httr", "jsonlite", "caret"
+  "dplyr", "geosphere", "xgboost", "httr", "jsonlite",
+  "caret", "zoo", "data.table", "sf", "lubridate",
+  "scales", "ggplot2"
 ))
 ```
 
-### Python (Optional, for Neural Network model)
-
-If you want to use the Neural Network model:
-
-```r
-library(reticulate)
-py_install("torch", pip = TRUE)
-```
-
-The app will work with XGBoost-only mode if Python/PyTorch is not available.
-
 ### Model Files
 
-Ensure these model files exist in `baseline_price_predict/baseprice_model/` directory:
+Ensure these model files exist in `shiny_app/baseprice_model/` directory:
 
 - `best_xgb_log_model.xgb` - XGBoost model
-- `best_price_A2_log_pytorch.pt` - Neural Network model (optional)
 - `scaler_xgb.rds` - XGBoost feature scaler
-- `scaler_price_pytorch.rds` - Neural Network feature scaler (optional)
-- `meta_ridge_model.rds` - Stacking meta model
-- `meta_ridge_cv.rds` - Stacking cross-validation results
 - `nn_price_training_v4.csv` - Training data (for feature reference)
 
 ## How to Use
@@ -102,21 +88,26 @@ Ensure these model files exist in `baseline_price_predict/baseprice_model/` dire
 shiny_app/
 ├── app.R                  # Main application file
 ├── run_app.R              # Launch script (recommended)
+├── data_preparation.R     # Data sourcing/cleaning into post-processed outputs
+├── baseprice_model/       # XGBoost model + scaler + training data/scripts
 ├── model_loader.R         # Model loading functions
 ├── geocoding.R            # Address to coordinates conversion
 ├── feature_builder.R      # Feature construction
 ├── sensitivity_helper.R   # Amenity recommendation functions
-├── init_python.R          # Python initialization (optional)
+├── data/                  # Pre/post processed data
+│   ├── preprocessed/      # Source CSVs (holidays, tfl, tourism, weather)
+│   └── postprocessed/     # Derived artefacts (e.g., daily_data.rds)
 └── README.md              # This file
+
+www/
+└── styles.css             # Centralised theme stylesheet
 ```
 
 ## Technical Details
 
 ### Model Architecture
 
-- **XGBoost**: Gradient boosting tree model
-- **Neural Network**: Multi-layer perceptron (MLP) with PyTorch
-- **Stacking**: Ridge regression to combine both models
+- **XGBoost**: Gradient boosting tree model (pricing)
 
 ### Features
 
@@ -145,9 +136,8 @@ The app automatically:
 
 ### Model loading fails
 
-1. Check model files exist in `baseline_price_predict/baseprice_model/` directory
-2. App will work with XGBoost-only mode if Python/PyTorch is unavailable
-3. Check console for detailed error messages
+1. Check model files exist in `shiny_app/baseprice_model/` directory
+2. Check console for detailed error messages
 
 ### Address lookup fails
 

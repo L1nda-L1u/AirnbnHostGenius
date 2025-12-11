@@ -28,77 +28,81 @@ create_empty_plot <- function(message = "No data available") {
 }
 
 # Path to component data folder - try multiple possible locations
-find_component_data_path <- function() {
-  possible_paths <- c(
-    # From project root (shiny_app is now at root)
-    normalizePath(file.path(getwd(), "tfl,weather,tourism,holiday_prediction"), mustWork = FALSE),
-    # From parent directory
-    normalizePath(file.path(dirname(getwd()), "tfl,weather,tourism,holiday_prediction"), mustWork = FALSE),
-    # Fallback: from baseline_price_predict directory
-    normalizePath(file.path(getwd(), "..", "tfl,weather,tourism,holiday_prediction"), mustWork = FALSE)
+find_daily_data_path <- function() {
+  paths <- c(
+    file.path(getwd(), "data", "postprocessed", "daily_data.rds"),
+    file.path(getwd(), "shiny_app", "data", "postprocessed", "daily_data.rds"),
+    file.path(dirname(getwd()), "shiny_app", "data", "postprocessed", "daily_data.rds")
   )
-  
-  for (path in possible_paths) {
-    if (dir.exists(path)) {
-      message("Found component data path: ", path)
-      return(path)
-    }
+  for (p in paths) {
+    if (file.exists(p)) return(p)
   }
-  
-  message("Component data path not found. Please ensure the tfl,weather,tourism,holiday_prediction folder is in the project.")
-  return(possible_paths[1])
+  paths[1]
 }
-
-COMPONENT_DATA_PATH <- find_component_data_path()
 
 # ==================================================================================
 # DATA LOADING FUNCTIONS
 # ==================================================================================
 
-#' Load Component Predictions Data
-#' @return A list with tfl, tourism, weather data frames
-load_market_data <- function() {
-  result <- list(
-    tfl = NULL,
-    tourism = NULL,
-    weather = NULL,
-    daily = NULL,
-    loaded = FALSE
+normalize_market_data <- function(df) {
+  df <- df %>% mutate(date = as.Date(date))
+  
+  if (!"tfl_daily_avg_m" %in% names(df) && "tfl_value" %in% names(df)) {
+    df <- df %>% rename(tfl_daily_avg_m = tfl_value)
+  }
+  if (!"tourism_quarterly_visits_k" %in% names(df) && "tourism_value" %in% names(df)) {
+    df <- df %>% rename(tourism_quarterly_visits_k = tourism_value)
+  }
+  
+  df$day_of_week <- if ("day_of_week" %in% names(df)) {
+    factor(df$day_of_week, levels = c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"))
+  } else {
+    lubridate::wday(df$date, label = TRUE)
+  }
+  
+  df
+}
+
+# Load a preprocessed CSV directly (used for simple charts)
+load_preprocessed <- function(filename) {
+  paths <- c(
+    file.path(getwd(), "data", "preprocessed", filename),
+    file.path(getwd(), "shiny_app", "data", "preprocessed", filename),
+    file.path(dirname(getwd()), "shiny_app", "data", "preprocessed", filename)
   )
   
-  # Try to load component predictions lookup
-  lookup_path <- file.path(COMPONENT_DATA_PATH, "shiny_export", "component_predictions_lookup.rds")
-  if (file.exists(lookup_path)) {
-    result$daily <- readRDS(lookup_path)
-    result$loaded <- TRUE
-    message("✓ Loaded component predictions from: ", lookup_path)
+  for (p in paths) {
+    if (file.exists(p)) {
+      message("✓ Loaded ", filename, " from: ", p)
+      return(fread(p))
+    }
+  }
+  
+  message("⚠ Cannot find ", filename, " in any of: ", paste(paths, collapse = " | "))
+  NULL
+}
+
+#' Load Component Predictions Data
+#' @return A list with tfl, tourism, weather data frames
+load_market_data <- function(daily_override = NULL) {
+  result <- list(daily = NULL, loaded = FALSE)
+  
+  if (!is.null(daily_override)) {
+    result$daily <- normalize_market_data(daily_override)
+    result$loaded <- nrow(result$daily) > 0
     return(result)
   }
   
-  # Alternative: Load from cleaned daily data
-  daily_path <- file.path(COMPONENT_DATA_PATH, "foot_traffic_data", "cleaned", "foot_traffic_daily.csv")
+  daily_path <- find_daily_data_path()
   if (file.exists(daily_path)) {
-    result$daily <- fread(daily_path) %>%
-      mutate(
-        date = as.Date(date),
-        day_of_week = factor(day_of_week, levels = c("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun")),
-        month_name = lubridate::month(date, label = TRUE, abbr = TRUE),
-        season = case_when(
-          month %in% c(12, 1, 2) ~ "Winter",
-          month %in% c(3, 4, 5) ~ "Spring",
-          month %in% c(6, 7, 8) ~ "Summer",
-          month %in% c(9, 10, 11) ~ "Autumn"
-        ),
-        season = factor(season, levels = c("Spring", "Summer", "Autumn", "Winter"))
-      ) %>%
-      filter(!is.na(date))
-    result$loaded <- TRUE
-    message("✓ Loaded daily data from: ", daily_path)
-    return(result)
+    result$daily <- readRDS(daily_path) %>% normalize_market_data()
+    result$loaded <- nrow(result$daily) > 0
+    message("✓ Loaded market data from: ", daily_path)
+  } else {
+    message("⚠ No market data found at: ", daily_path)
   }
   
-  message("⚠ No component data found. Please run the prediction pipeline first.")
-  return(result)
+  result
 }
 
 #' Get component values for a specific date
@@ -152,25 +156,29 @@ get_components_for_date <- function(date, data) {
 #' @param data The loaded market data
 #' @return A plotly object
 create_tfl_timeseries <- function(data) {
-  if (is.null(data$daily) || !data$loaded) {
-    return(create_empty_plot() %>% layout(title = "TfL Data Not Available"))
+  tfl_df <- load_preprocessed("tfl.csv")
+  if (is.null(tfl_df)) {
+    return(create_empty_plot() %>% layout(title = "TfL data not found"))
   }
   
-  tfl_data <- data$daily %>%
-    filter(!is.na(tfl_daily_avg_m), is.finite(tfl_daily_avg_m)) %>%
+  tfl_df <- tfl_df %>%
+    mutate(
+      date = as.Date(date),
+      value = as.numeric(value)
+    ) %>%
+    filter(date >= Sys.Date(), date <= Sys.Date() + 365) %>%
     arrange(date)
   
-  if (nrow(tfl_data) == 0) {
-    return(create_empty_plot() %>% layout(title = "No TfL Data"))
+  if (nrow(tfl_df) == 0) {
+    return(create_empty_plot() %>% layout(title = "No TfL data in next year"))
   }
   
-  # Calculate 30-day rolling average
-  tfl_data <- tfl_data %>%
-    mutate(tfl_rolling = zoo::rollmean(tfl_daily_avg_m, k = 30, fill = NA, align = "right"))
+  tfl_df <- tfl_df %>%
+    mutate(tfl_rolling = zoo::rollmean(value, k = 30, fill = NA, align = "right"))
   
-  plot_ly(tfl_data) %>%
+  plot_ly(tfl_df) %>%
     add_lines(
-      x = ~date, y = ~tfl_daily_avg_m,
+      x = ~date, y = ~value,
       name = "Daily",
       line = list(color = "#2A8C82", width = 1),
       opacity = 0.4
@@ -181,9 +189,9 @@ create_tfl_timeseries <- function(data) {
       line = list(color = "#F5B085", width = 2)
     ) %>%
     layout(
-      title = list(text = "TfL Daily Journeys (Millions)", font = list(size = 14)),
+      title = list(text = "TfL Daily Journeys (Index)", font = list(size = 14)),
       xaxis = list(title = "", tickformat = "%Y-%m"),
-      yaxis = list(title = "Journeys (M)"),
+      yaxis = list(title = "Journeys"),
       legend = list(orientation = "h", y = -0.15),
       hovermode = "x unified",
       margin = list(t = 40, b = 50)
@@ -273,40 +281,45 @@ create_tourism_timeseries <- function(data) {
 #' @param data The loaded market data
 #' @return A plotly object
 create_weather_timeseries <- function(data) {
-  if (is.null(data$daily) || !data$loaded) {
-    return(create_empty_plot() %>% layout(title = "Weather Data Not Available"))
+  weather_df <- load_preprocessed("weather.csv")
+  if (is.null(weather_df)) {
+    return(create_empty_plot() %>% layout(title = "Weather data not found"))
   }
   
-  weather_data <- data$daily %>%
-    filter(!is.na(temp_c), is.finite(temp_c)) %>%
+  weather_df <- weather_df %>%
+    mutate(
+      date = as.Date(date),
+      temp_c = as.numeric(temp_c),
+      sunshine_hours = as.numeric(sunshine_hours)
+    ) %>%
+    filter(date >= Sys.Date(), date <= Sys.Date() + 365) %>%
     arrange(date)
   
-  if (nrow(weather_data) == 0) {
-    return(create_empty_plot() %>% layout(title = "No Weather Data"))
+  if (nrow(weather_df) == 0) {
+    return(create_empty_plot() %>% layout(title = "No Weather Data in next year"))
   }
   
-  # Calculate 30-day rolling average
-  weather_data <- weather_data %>%
+  weather_df <- weather_df %>%
     mutate(temp_rolling = zoo::rollmean(temp_c, k = 30, fill = NA, align = "right"))
   
-  plot_ly(weather_data) %>%
+  plot_ly(weather_df) %>%
     add_lines(
       x = ~date, y = ~temp_c,
-      name = "Daily",
-      line = list(color = "#8DD3C7", width = 1),
-      opacity = 0.4
-    ) %>%
-    add_lines(
-      x = ~date, y = ~temp_rolling,
-      name = "30-Day Avg",
+      name = "Temperature (°C)",
       line = list(color = "#F5B085", width = 2)
     ) %>%
+    add_lines(
+      x = ~date, y = ~sunshine_hours,
+      name = "Sunshine (h)",
+      yaxis = "y2",
+      line = list(color = "#8DD3C7", width = 2)
+    ) %>%
     layout(
-      title = list(text = "Daily Temperature (°C)", font = list(size = 14)),
+      title = list(text = "Weather Forecast", font = list(size = 14)),
       xaxis = list(title = "", tickformat = "%Y-%m"),
-      yaxis = list(title = "Temperature (°C)"),
-      legend = list(orientation = "h", y = -0.15),
-      hovermode = "x unified",
+      yaxis = list(title = "Temp °C"),
+      yaxis2 = list(title = "Sunshine h", overlaying = "y", side = "right"),
+      legend = list(orientation = "h", y = 1.1),
       margin = list(t = 40, b = 50)
     )
 }

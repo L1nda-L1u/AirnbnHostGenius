@@ -20,10 +20,9 @@ load_training_sample <- function() {
   
   # Try multiple possible paths (from root directory)
   possible_paths <- c(
-    file.path(getwd(), "baseline_price_predict", "baseprice_model", "nn_price_training_v4.csv"),
-    file.path(dirname(getwd()), "baseline_price_predict", "baseprice_model", "nn_price_training_v4.csv"),
-    file.path(getwd(), "..", "baseline_price_predict", "baseprice_model", "nn_price_training_v4.csv"),
-    file.path(getwd(), "baseprice_model", "nn_price_training_v4.csv")  # Fallback
+    file.path(getwd(), "baseprice_model", "nn_price_training_v4.csv"),
+    file.path(getwd(), "shiny_app", "baseprice_model", "nn_price_training_v4.csv"),
+    file.path(dirname(getwd()), "shiny_app", "baseprice_model", "nn_price_training_v4.csv")
   )
   
   for (training_file in possible_paths) {

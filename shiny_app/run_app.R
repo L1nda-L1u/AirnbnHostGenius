@@ -11,7 +11,7 @@
 # Check and install required R packages
 required_packages <- c(
   "shiny", "shinydashboard", "DT", "leaflet", "plotly",
-  "dplyr", "geosphere", "xgboost", "reticulate", "glmnet",
+  "dplyr", "geosphere", "xgboost",
   "httr", "jsonlite", "caret", "zoo", "data.table", "sf",
   "lubridate", "scales", "ggplot2"
 )
@@ -22,23 +22,6 @@ if (length(missing_packages) > 0) {
   cat("Installing missing R packages...\n")
   install.packages(missing_packages)
   cat("Installation complete!\n\n")
-}
-
-# Check Python and PyTorch (optional, for Neural Network model)
-# Note: App uses XGBoost-only mode, Python is not required
-if (requireNamespace("reticulate", quietly = TRUE)) {
-  library(reticulate)
-  
-  if (!py_available()) {
-    cat("Info: Python not configured. App will use XGBoost-only mode (this is normal).\n")
-    cat("To enable Neural Network model, run: source('baseline_price_predict/sensitivity_analysis/configure_python.R')\n\n")
-  } else {
-    if (!py_module_available("torch")) {
-      cat("PyTorch not installed. Installing...\n")
-      py_install("torch", pip = TRUE)
-      cat("PyTorch installation complete!\n\n")
-    }
-  }
 }
 
 # Launch app
